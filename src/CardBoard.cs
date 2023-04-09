@@ -13,10 +13,18 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
     public void Init(CardGameStateDto cardGameState)
     {
         CardGameState = cardGameState;
-        _atkPanel.Value = CardGameState.Record.Atk;
-        _defPanel.Value = cardGameState.Record.Def;
+        _atkPanel.Value = CardGameState.Atk;
+        _defPanel.Value = cardGameState.Def;
 
         Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
+    }
+
+    public void Update(CardGameStateDto cardGameState)
+    {
+        _atkPanel.Value = cardGameState.Atk;
+        _defPanel.Value = cardGameState.Def;
+
+        CardGameState = cardGameState;
     }
 
     public override void _Ready()

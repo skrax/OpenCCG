@@ -25,18 +25,19 @@ public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
         var record = card.Record;
         Id = card.Id;
         _infoPanel.Description = record.Description;
-        _costPanel.Value = record.Cost;
-        _atkPanel.Value = record.Atk;
-        _defPanel.Value = record.Def;
+        _costPanel.Value = card.Cost;
+        _atkPanel.Value = card.Atk;
+        _defPanel.Value = card.Def;
+        Logger.Info<Card>($"Init Card: {card.Atk}/{card.Def}/{card.Cost}");
         Texture = GD.Load<Texture2D>(record.ImgPath);
     }
 
     public override void _Ready()
     {
         _infoPanel = GetChild<CardInfoPanel>(0);
-        _costPanel = GetChild<CardStatPanel>(1);
-        _atkPanel = GetChild<CardStatPanel>(2);
-        _defPanel = GetChild<CardStatPanel>(3);
+        _atkPanel = GetChild<CardStatPanel>(1);
+        _defPanel = GetChild<CardStatPanel>(2);
+        _costPanel = GetChild<CardStatPanel>(3);
         _area2D = GetChild<Area2D>(4);
 
         _area2D.AreaEntered += OnAreaEntered;

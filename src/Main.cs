@@ -9,4 +9,9 @@ public partial class Main : Node, IMainRpc
     public void PlayCard(string id)
     {
     }
+
+    [Rpc]
+    public void CombatPlayerCard(string attackerId, string targetId)
+    {
+    }
 }

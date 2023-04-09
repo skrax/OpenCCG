@@ -1,10 +1,8 @@
 namespace OpenCCG.Data;
 
 public record CardRecord
-(
-    string Description,
-    int Cost,
+(string Description,
     int Atk,
     int Def,
-    string ImgPath
-);
+    int Cost,
+    string ImgPath);

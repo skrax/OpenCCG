@@ -44,7 +44,7 @@ public partial class Server : Node, IMainRpc
             var p1 = new PlayerGameState
             {
                 PeerId = peers[0],
-                EnemyPeerIds = new[] { peers[1] },
+                EnemyPeerId = peers[1],
                 PlayerName = "player-1",
                 Nodes = new RpcNodes
                 {
@@ -57,7 +57,7 @@ public partial class Server : Node, IMainRpc
             var p2 = new PlayerGameState
             {
                 PeerId = peers[1],
-                EnemyPeerIds = new[] { peers[0] },
+                EnemyPeerId = peers[0],
                 PlayerName = "player-2",
                 Nodes = new RpcNodes
                 {
@@ -82,6 +82,9 @@ public partial class Server : Node, IMainRpc
             p1.Init(p1DeckList);
             p2.Init(p2DeckList);
 
+            p1.Enemy = p2;
+            p2.Enemy = p1;
+
             _gameState.PlayerGameStates.Add(p1.PeerId, p1);
             _gameState.PlayerGameStates.Add(p2.PeerId, p2);
 
@@ -101,5 +104,13 @@ public partial class Server : Node, IMainRpc
         var peerId = Multiplayer.GetRemoteSenderId();
 
         _gameState.PlayerGameStates[peerId].PlayCard(Guid.Parse(id));
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void CombatPlayerCard(string attackerId, string targetId)
+    {
+        var peerId = Multiplayer.GetRemoteSenderId();
+
+        _gameState.PlayerGameStates[peerId].Combat(Guid.Parse(attackerId), Guid.Parse(targetId));
     }
 }

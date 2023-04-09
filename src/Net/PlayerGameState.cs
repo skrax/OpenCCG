@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.Json;
 using OpenCCG.Core;
 using OpenCCG.Data;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -13,7 +12,9 @@ public class PlayerGameState
 {
     public int PeerId { get; init; }
 
-    public int[] EnemyPeerIds { get; init; }
+    public int EnemyPeerId { get; set; }
+
+    public PlayerGameState Enemy { get; set; }
 
     public string PlayerName { get; init; }
 
@@ -44,10 +45,17 @@ public class PlayerGameState
         DeckList = deckList;
 
         var shuffledDeckList = DeckList
-                               .Select(x => new CardGameState
+                               .Select(x =>
                                {
-                                   Record = x,
-                                   Zone = CardZone.Deck
+                                   var card = new CardGameState
+                                   {
+                                       Record = x,
+                                       Zone = CardZone.Deck
+                                   };
+
+                                   card.ResetStats();
+
+                                   return card;
                                })
                                .Shuffle();
 
@@ -76,11 +84,10 @@ public class PlayerGameState
             Deck.RemoveFirst();
             Hand.AddLast(card);
 
-            var dto = new CardGameStateDto(card.Id, card.Record, CardZone.Hand, CardZone.Deck);
-            var json = JsonSerializer.Serialize(dto);
+            var json = JsonSerializer.Serialize(card.AsDto());
 
             Nodes.Hand.RpcId(PeerId, "DrawCard", json);
-            foreach (var enemyPeerId in EnemyPeerIds) Nodes.EnemyHand.RpcId(enemyPeerId, "DrawCard");
+            Nodes.EnemyHand.RpcId(EnemyPeerId, "DrawCard");
         }
     }
 
@@ -93,16 +100,53 @@ public class PlayerGameState
         Hand.Remove(card);
         card.Zone = CardZone.Board;
         Board.AddLast(card);
-
-        var dtoJson = JsonSerializer.Serialize(new CardGameStateDto(id, card.Record, CardZone.Board, CardZone.Hand));
+        var dtoJson = JsonSerializer.Serialize(card.AsDto());
 
         Nodes.Board.RpcId(PeerId, "PlaceCard", dtoJson);
         Nodes.Hand.RpcId(PeerId, "RemoveCard", id.ToString());
 
-        foreach (var enemyPeerId in EnemyPeerIds)
+        Nodes.EnemyBoard.RpcId(EnemyPeerId, "PlaceCard", dtoJson);
+        Nodes.EnemyHand.RpcId(EnemyPeerId, "RemoveCard");
+    }
+
+    public void Combat(Guid attackerId, Guid targetId)
+    {
+        var attacker = Board.First(x => x.Id == attackerId);
+        var target = Enemy.Board.First(x => x.Id == targetId);
+
+        attacker.Def -= target.Atk;
+        target.Def -= attacker.Atk;
+
+        if (attacker.Def <= 0)
         {
-            Nodes.EnemyBoard.RpcId(enemyPeerId, "PlaceCard", dtoJson);
-            Nodes.EnemyHand.RpcId(enemyPeerId, "RemoveCard");
+            Board.Remove(attacker);
+            Pit.AddLast(attacker);
+
+            Nodes.Board.RpcId(PeerId, "RemoveCard", attacker.Id.ToString());
+            Nodes.EnemyBoard.RpcId(EnemyPeerId, "RemoveCard", attacker.Id.ToString());
+        }
+        else
+        {
+            var json = JsonSerializer.Serialize(attacker.AsDto());
+            Nodes.Board.RpcId(PeerId, "UpdateCard", json);
+
+            Nodes.EnemyBoard.RpcId(EnemyPeerId, "UpdateCard", json);
+        }
+
+        if (target.Def <= 0)
+        {
+            Enemy.Board.Remove(target);
+            Enemy.Pit.AddLast(target);
+
+            Nodes.EnemyBoard.RpcId(PeerId, "RemoveCard", target.Id.ToString());
+
+            Nodes.Board.RpcId(EnemyPeerId, "RemoveCard", target.Id.ToString());
+        }
+        else
+        {
+            var json = JsonSerializer.Serialize(target.AsDto());
+            Nodes.EnemyBoard.RpcId(PeerId, "UpdateCard", json);
+            Nodes.Board.RpcId(EnemyPeerId, "UpdateCard", json);
         }
     }
 }

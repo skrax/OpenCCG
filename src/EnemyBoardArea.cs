@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -20,12 +21,31 @@ public partial class EnemyBoardArea : Area2D, IBoardRpc
     }
 
     [Rpc]
-    public void PlaceCard(string cardGameStateJson)
+    public void PlaceCard(string cardGameStateDtoJson)
     {
-        var obj = JsonSerializer.Deserialize<CardGameStateDto>(cardGameStateJson);
+        var obj = JsonSerializer.Deserialize<CardGameStateDto>(cardGameStateDtoJson);
         var card = CardBoardScene.Make<CardBoard, CardGameStateDto>(obj, this);
 
         _cards.Add(card);
+
+        SetCardPositions();
+    }
+
+    [Rpc]
+    public void UpdateCard(string cardGameStateDtoJson)
+    {
+        var obj = JsonSerializer.Deserialize<CardGameStateDto>(cardGameStateDtoJson);
+
+        _cards.Find(x => x.CardGameState.Id == obj.Id)
+              .Update(obj);
+    }
+
+    [Rpc]
+    public void RemoveCard(string id)
+    {
+        var card = _cards.Find(x => x.CardGameState.Id == Guid.Parse(id));
+        _cards.Remove(card);
+        card.QueueFree();
 
         SetCardPositions();
     }

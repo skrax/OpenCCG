@@ -18,6 +18,7 @@ public partial class InputEventSystem : Node2D
     private Line2D _line;
     private Vector2 _dragOffset;
     private Card? _cardToDrag;
+    private ulong? _dragLineStartInstanceId;
 
 
     public override void _Ready()
@@ -78,7 +79,8 @@ public partial class InputEventSystem : Node2D
         var cardBoard = EventSink.PointerDownCardBoard.MinBy(x => x.ZIndex);
         if (cardBoard != null)
         {
-            OnDragLineStart(cardBoard, mousePosition);
+            if (cardBoard.GetParentOrNull<BoardArea>() != null)
+                OnDragLineStart(cardBoard, mousePosition);
             return;
         }
 
@@ -126,24 +128,33 @@ public partial class InputEventSystem : Node2D
         _line.Points = new[] { first, _line.ToLocal(mousePosition) };
     }
 
-
     private void OnDragLineStart(CardBoard cardBoard, Vector2 mousePosition)
     {
         _state = InputState.DraggingLine;
         Logger.Info<InputEventSystem>($"DragLine Start {cardBoard.GetInstanceId()}");
         _line.Points = new[] { _line.ToLocal(mousePosition), _line.ToLocal(mousePosition) };
+        _dragLineStartInstanceId = cardBoard.GetInstanceId();
     }
 
     private void OnDragLineEnd()
     {
         var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
-        if (cardBoard != null)
-        {
-            Logger.Info<InputEventSystem>($"DragLine End {cardBoard.GetInstanceId()}");
-        }
+        Logger.Info<InputEventSystem>($"DragLine End {cardBoard?.GetInstanceId()}");
 
         _line.Points = Array.Empty<Vector2>();
         _state = InputState.Idle;
+
+        if (cardBoard != null && _dragLineStartInstanceId.HasValue)
+        {
+            if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
+            {
+                GetNode("/root/Main").RpcId(1, "CombatPlayerCard",
+                    attacker.CardGameState.Id.ToString(),
+                    cardBoard.CardGameState.Id.ToString());
+            }
+
+            _dragLineStartInstanceId = null;
+        }
     }
 
     private void OnDragCardStart(Card card, Vector2 mousePosition)
@@ -153,7 +164,6 @@ public partial class InputEventSystem : Node2D
         _cardToDrag = card;
         card.ZIndex = 1;
     }
-
 
     private void OnDragCardEnd()
     {
