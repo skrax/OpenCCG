@@ -34,6 +34,8 @@ public class PlayerGameState
 
     public List<CardRecord> DeckList { get; private set; }
 
+    public bool isTurn { get; set; }
+
 
     public void Init(List<CardRecord> deckList)
     {
@@ -60,6 +62,7 @@ public class PlayerGameState
                                .Shuffle();
 
         Deck = new(shuffledDeckList);
+        Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", false);
     }
 
     public LinkedList<CardGameState> GetListByZone(CardZone zone)
@@ -176,7 +179,24 @@ public class PlayerGameState
     public void Start()
     {
         Draw(Rules.InitialCardsDrawn);
-        Energy = MaxEnergy += 6;
         UpdateEnergyRpc();
+    }
+
+    public void EndTurn()
+    {
+        if (!isTurn) return;
+
+        isTurn = false;
+        Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", false);
+        Enemy.StartTurn();
+    }
+
+    public void StartTurn()
+    {
+        isTurn = true;
+        Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", true);
+        Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
+        UpdateEnergyRpc();
+        Draw(Rules.CardsDrawnPerTurn);
     }
 }

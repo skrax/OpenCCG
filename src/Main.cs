@@ -14,4 +14,10 @@ public partial class Main : Node, IMainRpc
     public void CombatPlayerCard(string attackerId, string targetId)
     {
     }
+
+    [Rpc]
+    public void EndTurn()
+    {
+        throw new System.NotImplementedException();
+    }
 }

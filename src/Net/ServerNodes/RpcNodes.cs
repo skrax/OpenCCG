@@ -13,4 +13,6 @@ public class RpcNodes
     public StatusPanel StatusPanel { get; init; }
 
     public StatusPanel EnemyStatusPanel { get; init; }
+    
+    public MidPanel MidPanel { get; init; }
 }

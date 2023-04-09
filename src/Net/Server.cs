@@ -41,35 +41,30 @@ public partial class Server : Node, IMainRpc
         var peers = Multiplayer.GetPeers();
         if (peers.Length == 2)
         {
+            var rpcNodes = new RpcNodes
+            {
+                Hand = GetNode<Hand>("Hand"),
+                EnemyHand = GetNode<EnemyHand>("EnemyHand"),
+                Board = GetNode<Board>("Board"),
+                EnemyBoard = GetNode<EnemyBoard>("EnemyBoard"),
+                StatusPanel = GetNode<ServerNodes.StatusPanel>("Hand/StatusPanel"),
+                EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel"),
+                MidPanel = GetNode<ServerNodes.MidPanel>("MidPanel"),
+            };
+            
             var p1 = new PlayerGameState
             {
                 PeerId = peers[0],
                 EnemyPeerId = peers[1],
                 PlayerName = "player-1",
-                Nodes = new RpcNodes
-                {
-                    Hand = GetNode<Hand>("Hand"),
-                    EnemyHand = GetNode<EnemyHand>("EnemyHand"),
-                    Board = GetNode<Board>("Board"),
-                    EnemyBoard = GetNode<EnemyBoard>("EnemyBoard"),
-                    StatusPanel = GetNode<ServerNodes.StatusPanel>("Hand/StatusPanel"),
-                    EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel")
-                }
+                Nodes = rpcNodes
             };
             var p2 = new PlayerGameState
             {
                 PeerId = peers[1],
                 EnemyPeerId = peers[0],
                 PlayerName = "player-2",
-                Nodes = new RpcNodes
-                {
-                    Hand = GetNode<Hand>("Hand"),
-                    EnemyHand = GetNode<EnemyHand>("EnemyHand"),
-                    Board = GetNode<Board>("Board"),
-                    EnemyBoard = GetNode<EnemyBoard>("EnemyBoard"),
-                    StatusPanel = GetNode<ServerNodes.StatusPanel>("Hand/StatusPanel"),
-                    EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel")
-                }
+                Nodes = rpcNodes
             };
 
             var p1DeckList = new List<CardRecord>();
@@ -94,7 +89,7 @@ public partial class Server : Node, IMainRpc
 
             p1.Start();
             p2.Start();
-
+            p1.StartTurn();
         }
     }
 
@@ -117,5 +112,13 @@ public partial class Server : Node, IMainRpc
         var peerId = Multiplayer.GetRemoteSenderId();
 
         _gameState.PlayerGameStates[peerId].Combat(Guid.Parse(attackerId), Guid.Parse(targetId));
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void EndTurn()
+    {
+        var peerId = Multiplayer.GetRemoteSenderId();
+
+        _gameState.PlayerGameStates[peerId].EndTurn();
     }
 }

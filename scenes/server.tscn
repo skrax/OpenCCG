@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dobmo3im8em5o"]
+[gd_scene load_steps=9 format=3 uid="uid://dobmo3im8em5o"]
 
 [ext_resource type="Script" path="res://src/Net/Server.cs" id="1_337q5"]
 [ext_resource type="Script" path="res://src/Net/ServerNodes/Hand.cs" id="2_btlg5"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://src/Net/ServerNodes/EnemyHand.cs" id="4_dvbuv"]
 [ext_resource type="Script" path="res://src/Net/ServerNodes/Board.cs" id="5_3a7jm"]
 [ext_resource type="Script" path="res://src/Net/ServerNodes/EnemyBoard.cs" id="6_p7vfk"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/MidPanel.cs" id="8_ssima"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_337q5")
@@ -31,3 +32,6 @@ script = ExtResource("3_bmwaj")
 
 [node name="Client" type="Node" parent="."]
 script = ExtResource("2_fcoa2")
+
+[node name="MidPanel" type="Node" parent="."]
+script = ExtResource("8_ssima")
