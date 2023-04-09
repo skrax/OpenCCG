@@ -1,0 +1,168 @@
+[gd_scene load_steps=9 format=3 uid="uid://dsuxsivyevb7t"]
+
+[ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_8stps"]
+[ext_resource type="Script" path="res://src/Card.cs" id="2_davtw"]
+[ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_bkiwm"]
+[ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_wwja8"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1wc8l"]
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_7yoig"]
+font_size = 60
+
+[sub_resource type="LabelSettings" id="LabelSettings_o8t5t"]
+font_size = 34
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_od8kd"]
+size = Vector2(513.333, 766.667)
+
+[node name="Card" type="Sprite2D"]
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_8stps")
+script = ExtResource("2_davtw")
+
+[node name="InfoPanel" type="Panel" parent="."]
+self_modulate = Color(0, 0, 0, 1)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = -613.0
+offset_right = -256.0
+offset_bottom = -384.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("3_bkiwm")
+
+[node name="Description" type="Label" parent="InfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Sample Description Text"
+label_settings = SubResource("LabelSettings_1wc8l")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 3
+
+[node name="AttackPanel" type="Panel" parent="."]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -256.0
+offset_top = -429.0
+offset_right = -166.0
+offset_bottom = -309.0
+grow_vertical = 2
+script = ExtResource("4_wwja8")
+
+[node name="AtkValue" type="Label" parent="AttackPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 57.0
+grow_horizontal = 2
+text = "12"
+label_settings = SubResource("LabelSettings_7yoig")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AtkDescription" type="Label" parent="AttackPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -35.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "ATK"
+label_settings = SubResource("LabelSettings_o8t5t")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CostPanel" type="Panel" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -346.0
+offset_top = -384.0
+offset_right = -256.0
+offset_bottom = -264.0
+grow_horizontal = 0
+script = ExtResource("4_wwja8")
+
+[node name="CostValue" type="Label" parent="CostPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 57.0
+grow_horizontal = 2
+text = "12"
+label_settings = SubResource("LabelSettings_7yoig")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CostDescription" type="Label" parent="CostPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -35.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "COST"
+label_settings = SubResource("LabelSettings_o8t5t")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefPanel" type="Panel" parent="."]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -346.0
+offset_top = -429.0
+offset_right = -256.0
+offset_bottom = -309.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("4_wwja8")
+
+[node name="DefValue" type="Label" parent="DefPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 57.0
+grow_horizontal = 2
+text = "12"
+label_settings = SubResource("LabelSettings_7yoig")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefDescription" type="Label" parent="DefPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -35.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "DEF"
+label_settings = SubResource("LabelSettings_o8t5t")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(2.48353e-06, 1.27157e-05)
+shape = SubResource("RectangleShape2D_od8kd")

@@ -1,0 +1,26 @@
+[gd_scene load_steps=7 format=3 uid="uid://dobmo3im8em5o"]
+
+[ext_resource type="Script" path="res://src/Net/Server.cs" id="1_337q5"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/Hand.cs" id="2_btlg5"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/Client.cs" id="2_fcoa2"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/EnemyHand.cs" id="4_dvbuv"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/Board.cs" id="5_3a7jm"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/EnemyBoard.cs" id="6_p7vfk"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_337q5")
+
+[node name="Hand" type="Node" parent="."]
+script = ExtResource("2_btlg5")
+
+[node name="Board" type="Node" parent="."]
+script = ExtResource("5_3a7jm")
+
+[node name="EnemyBoard" type="Node" parent="."]
+script = ExtResource("6_p7vfk")
+
+[node name="EnemyHand" type="Node" parent="."]
+script = ExtResource("4_dvbuv")
+
+[node name="Client" type="Node" parent="."]
+script = ExtResource("2_fcoa2")

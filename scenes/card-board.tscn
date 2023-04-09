@@ -1,0 +1,72 @@
+[gd_scene load_steps=8 format=3 uid="uid://d0fb3ln1oyfld"]
+
+[ext_resource type="Shader" path="res://shaders/card-board.gdshader" id="1_0ggqa"]
+[ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="2_wipga"]
+[ext_resource type="Script" path="res://src/CardBoard.cs" id="3_7q1kr"]
+[ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_0j6jh"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4a4ib"]
+shader = ExtResource("1_0ggqa")
+shader_parameter/amt = 1.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_5ex16"]
+font_size = 60
+
+[sub_resource type="LabelSettings" id="LabelSettings_6jk6c"]
+font_size = 60
+
+[node name="CardBoard" type="Sprite2D"]
+material = SubResource("ShaderMaterial_4a4ib")
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_wipga")
+script = ExtResource("3_7q1kr")
+
+[node name="AttackPanel" type="Panel" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = -504.0
+offset_right = -166.0
+offset_bottom = -384.0
+grow_vertical = 0
+pivot_offset = Vector2(2.08165e-12, 2.08165e-12)
+script = ExtResource("4_0j6jh")
+
+[node name="Label" type="Label" parent="AttackPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "12"
+label_settings = SubResource("LabelSettings_5ex16")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefPanel" type="Panel" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -346.0
+offset_top = -504.0
+offset_right = -256.0
+offset_bottom = -384.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("4_0j6jh")
+
+[node name="Label" type="Label" parent="DefPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "12"
+label_settings = SubResource("LabelSettings_6jk6c")
+horizontal_alignment = 1
+vertical_alignment = 1

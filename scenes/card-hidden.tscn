@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://ds57mbanap7pj"]
+
+[ext_resource type="Texture2D" uid="uid://digjedd0khmgw" path="res://img/card-backs/cardback-2.png" id="1_pcjix"]
+
+[node name="card-hidden" type="Sprite2D"]
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_pcjix")
