@@ -88,7 +88,20 @@ public class PlayerGameState
 
             Nodes.Hand.RpcId(PeerId, "DrawCard", json);
             Nodes.EnemyHand.RpcId(EnemyPeerId, "DrawCard");
+            UpdateCardCountRpc();
         }
+    }
+
+    private void UpdateCardCountRpc()
+    {
+        Nodes.StatusPanel.RpcId(PeerId, "SetCardCount", Hand.Count);
+        Nodes.EnemyStatusPanel.RpcId(EnemyPeerId, "SetCardCount", Hand.Count);
+    }
+
+    private void UpdateEnergyRpc()
+    {
+        Nodes.StatusPanel.RpcId(PeerId, "SetEnergy", Energy);
+        Nodes.EnemyStatusPanel.RpcId(EnemyPeerId, "SetEnergy", Energy);
     }
 
     public void PlayCard(Guid id)
@@ -107,6 +120,8 @@ public class PlayerGameState
 
         Nodes.EnemyBoard.RpcId(EnemyPeerId, "PlaceCard", dtoJson);
         Nodes.EnemyHand.RpcId(EnemyPeerId, "RemoveCard");
+        
+        UpdateCardCountRpc();
     }
 
     public void Combat(Guid attackerId, Guid targetId)
@@ -148,5 +163,12 @@ public class PlayerGameState
             Nodes.EnemyBoard.RpcId(PeerId, "UpdateCard", json);
             Nodes.Board.RpcId(EnemyPeerId, "UpdateCard", json);
         }
+    }
+
+    public void Start()
+    {
+        Draw(Rules.InitialCardsDrawn);
+        Energy = MaxEnergy += 6;
+        UpdateEnergyRpc();
     }
 }

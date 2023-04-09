@@ -51,7 +51,9 @@ public partial class Server : Node, IMainRpc
                     Hand = GetNode<Hand>("Hand"),
                     EnemyHand = GetNode<EnemyHand>("EnemyHand"),
                     Board = GetNode<Board>("Board"),
-                    EnemyBoard = GetNode<EnemyBoard>("EnemyBoard")
+                    EnemyBoard = GetNode<EnemyBoard>("EnemyBoard"),
+                    StatusPanel = GetNode<ServerNodes.StatusPanel>("Hand/StatusPanel"),
+                    EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel")
                 }
             };
             var p2 = new PlayerGameState
@@ -64,7 +66,9 @@ public partial class Server : Node, IMainRpc
                     Hand = GetNode<Hand>("Hand"),
                     EnemyHand = GetNode<EnemyHand>("EnemyHand"),
                     Board = GetNode<Board>("Board"),
-                    EnemyBoard = GetNode<EnemyBoard>("EnemyBoard")
+                    EnemyBoard = GetNode<EnemyBoard>("EnemyBoard"),
+                    StatusPanel = GetNode<ServerNodes.StatusPanel>("Hand/StatusPanel"),
+                    EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel")
                 }
             };
 
@@ -88,8 +92,9 @@ public partial class Server : Node, IMainRpc
             _gameState.PlayerGameStates.Add(p1.PeerId, p1);
             _gameState.PlayerGameStates.Add(p2.PeerId, p2);
 
-            p1.Draw(Rules.InitialCardsDrawn);
-            p2.Draw(Rules.InitialCardsDrawn);
+            p1.Start();
+            p2.Start();
+
         }
     }
 

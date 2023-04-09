@@ -1,9 +1,10 @@
-[gd_scene load_steps=24 format=3 uid="uid://1dmvryxgjv51"]
+[gd_scene load_steps=25 format=3 uid="uid://1dmvryxgjv51"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
 [ext_resource type="Script" path="res://src/BoardArea.cs" id="2_wweqi"]
 [ext_resource type="Script" path="res://src/EnemyHandArea.cs" id="3_8aogm"]
+[ext_resource type="Script" path="res://src/StatusPanel.cs" id="3_a0id7"]
 [ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
 [ext_resource type="Script" path="res://src/EnemyBoardArea.cs" id="4_4t5gh"]
 [ext_resource type="Script" path="res://src/InputEventSystem.cs" id="7_di0s5"]
@@ -83,14 +84,16 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_xrtuc")
 
-[node name="Panel" type="Panel" parent="Hand"]
+[node name="StatusPanel" type="Panel" parent="Hand"]
 self_modulate = Color(1, 1, 1, 0.294118)
 offset_left = 738.0
 offset_top = 2.0
 offset_right = 961.0
 offset_bottom = 128.0
+script = ExtResource("3_a0id7")
 
-[node name="CardCount" type="Label" parent="Hand/Panel"]
+[node name="CardCount" type="Label" parent="Hand/StatusPanel"]
+layout_mode = 0
 offset_top = 32.0
 offset_right = 79.0
 offset_bottom = 101.0
@@ -99,7 +102,7 @@ label_settings = SubResource("LabelSettings_fgagx")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CardSymbol" type="Label" parent="Hand/Panel"]
+[node name="CardSymbol" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
 offset_left = 74.0
 offset_top = 52.0
@@ -108,7 +111,7 @@ offset_bottom = 97.0
 text = "🀆"
 label_settings = SubResource("LabelSettings_o1b6m")
 
-[node name="EnergyCount" type="Label" parent="Hand/Panel"]
+[node name="EnergyCount" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
 offset_left = 124.0
 offset_top = 32.0
@@ -119,7 +122,7 @@ label_settings = SubResource("LabelSettings_fgagx")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EnergySymbol" type="Label" parent="Hand/Panel"]
+[node name="EnergySymbol" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
 offset_left = 191.0
 offset_top = 51.0
@@ -167,6 +170,53 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 [node name="Background" type="Sprite2D" parent="EnemyHand"]
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_d05ec")
+
+[node name="StatusPanel" type="Panel" parent="EnemyHand"]
+self_modulate = Color(1, 1, 1, 0.294118)
+offset_left = 738.0
+offset_top = 2.0
+offset_right = 961.0
+offset_bottom = 128.0
+script = ExtResource("3_a0id7")
+
+[node name="CardCount" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 79.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardSymbol" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
+offset_left = 74.0
+offset_top = 52.0
+offset_right = 114.0
+offset_bottom = 97.0
+text = "🀆"
+label_settings = SubResource("LabelSettings_o1b6m")
+
+[node name="EnergyCount" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
+offset_left = 124.0
+offset_top = 32.0
+offset_right = 203.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergySymbol" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
+offset_left = 191.0
+offset_top = 51.0
+offset_right = 231.0
+offset_bottom = 96.0
+text = "⚡"
+label_settings = SubResource("LabelSettings_iyv0j")
 
 [node name="Client" parent="." instance=ExtResource("3_uxwq6")]
 
