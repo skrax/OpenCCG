@@ -27,6 +27,12 @@ public partial class HandArea : Area2D, IHandRpc
     }
 
     [Rpc]
+    public void FailPlayCard()
+    {
+        SetCardPositions();
+    }
+
+    [Rpc]
     public void DrawCard(string cardGameStateJson)
     {
         var card = JsonSerializer.Deserialize<CardGameStateDto>(cardGameStateJson);

@@ -14,4 +14,9 @@ public partial class Hand : Node, IHandRpc
     public void RemoveCard(string id)
     {
     }
+
+    [Rpc]
+    public void FailPlayCard()
+    {
+    }
 }

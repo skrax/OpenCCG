@@ -109,6 +109,14 @@ public class PlayerGameState
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
         if (card == null) throw new ApplicationException();
+        if (Energy - card.Cost < 0)
+        {
+            Nodes.Hand.RpcId(PeerId, "FailPlayCard");
+            return;
+        }
+
+        Energy -= card.Cost;
+        UpdateEnergyRpc();
 
         Hand.Remove(card);
         card.Zone = CardZone.Board;
@@ -120,7 +128,7 @@ public class PlayerGameState
 
         Nodes.EnemyBoard.RpcId(EnemyPeerId, "PlaceCard", dtoJson);
         Nodes.EnemyHand.RpcId(EnemyPeerId, "RemoveCard");
-        
+
         UpdateCardCountRpc();
     }
 
