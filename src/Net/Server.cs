@@ -113,6 +113,15 @@ public partial class Server : Node, IMainRpc
 
         _gameState.PlayerGameStates[peerId].Combat(Guid.Parse(attackerId), Guid.Parse(targetId));
     }
+    
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void CombatPlayer(string attackerId)
+    {
+        var peerId = Multiplayer.GetRemoteSenderId();
+
+        _gameState.PlayerGameStates[peerId].CombatPlayer(Guid.Parse(attackerId));
+    }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void EndTurn()

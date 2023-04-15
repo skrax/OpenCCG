@@ -139,22 +139,35 @@ public partial class InputEventSystem : Node2D
     private void OnDragLineEnd()
     {
         var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
-        Logger.Info<InputEventSystem>($"DragLine End {cardBoard?.GetInstanceId()}");
+        var avatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
 
         _line.Points = Array.Empty<Vector2>();
         _state = InputState.Idle;
 
         if (cardBoard != null && _dragLineStartInstanceId.HasValue)
         {
+            Logger.Info<InputEventSystem>($"DragLine End {cardBoard.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
             {
                 GetNode("/root/Main").RpcId(1, "CombatPlayerCard",
                     attacker.CardGameState.Id.ToString(),
                     cardBoard.CardGameState.Id.ToString());
             }
-
-            _dragLineStartInstanceId = null;
         }
+        else if (avatar != null && _dragLineStartInstanceId.HasValue)
+        {
+            Logger.Info<InputEventSystem>($"DragLine End {avatar.GetInstanceId()}");
+            if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
+            {
+                GetNode("/root/Main").RpcId(1, "CombatPlayer", attacker.CardGameState.Id.ToString());
+            }
+        }
+        else
+        {
+            Logger.Info<InputEventSystem>($"DragLine End");
+        }
+
+        _dragLineStartInstanceId = null;
     }
 
     private void OnDragCardStart(Card card, Vector2 mousePosition)

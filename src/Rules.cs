@@ -9,4 +9,6 @@ public static class Rules
     public const int EnergyGainedPerTurn = 1;
 
     public const int CardsDrawnPerTurn = 1;
+
+    public const int InitialHealth = 30;
 }

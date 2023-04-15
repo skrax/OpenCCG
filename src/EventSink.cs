@@ -9,6 +9,10 @@ public static class EventSink
     public static readonly List<CardBoard> PointerUpCardBoard = new();
     public static readonly List<Card> PointerDownCards = new();
     public static readonly List<Card> PointerUpCards = new();
+    public static readonly List<Avatar> PointerDownAvatars = new();
+    public static readonly List<Avatar> PointerUpAvatars = new();
+    public static readonly List<EnemyAvatar> PointerDownEnemyAvatars = new();
+    public static readonly List<EnemyAvatar> PointerUpEnemyAvatars = new();
 
     public static void Drain()
     {
@@ -16,6 +20,10 @@ public static class EventSink
         PointerUpCards.Clear();
         PointerDownCardBoard.Clear();
         PointerUpCardBoard.Clear();
+        PointerDownAvatars.Clear();
+        PointerUpAvatars.Clear();
+        PointerDownEnemyAvatars.Clear();
+        PointerUpEnemyAvatars.Clear();
     }
 
     public static void ReportPointerUp<T>(T entity)
@@ -27,6 +35,12 @@ public static class EventSink
                 break;
             case Card x:
                 PointerUpCards.Add(x);
+                break;
+            case Avatar x:
+                PointerUpAvatars.Add(x);
+                break;
+            case EnemyAvatar x:
+                PointerUpEnemyAvatars.Add(x);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(entity));
@@ -42,6 +56,12 @@ public static class EventSink
                 break;
             case Card x:
                 PointerDownCards.Add(x);
+                break;
+            case Avatar x:
+                PointerDownAvatars.Add(x);
+                break;
+            case EnemyAvatar x:
+                PointerDownEnemyAvatars.Add(x);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(entity));

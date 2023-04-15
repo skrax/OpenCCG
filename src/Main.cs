@@ -20,4 +20,10 @@ public partial class Main : Node, IMainRpc
     {
         throw new System.NotImplementedException();
     }
+
+    [Rpc]
+    public void CombatPlayer(string attackerId)
+    {
+        throw new System.NotImplementedException();
+    }
 }
