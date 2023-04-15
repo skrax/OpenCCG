@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://1dmvryxgjv51"]
+[gd_scene load_steps=32 format=3 uid="uid://1dmvryxgjv51"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -8,8 +8,10 @@
 [ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
 [ext_resource type="Script" path="res://src/EnemyBoardArea.cs" id="4_4t5gh"]
 [ext_resource type="Texture2D" uid="uid://wart73b367qr" path="res://img/avatar/00018-679053703.png" id="4_f02f3"]
+[ext_resource type="Script" path="res://src/Avatar.cs" id="5_ce2ri"]
 [ext_resource type="Script" path="res://src/InputEventSystem.cs" id="7_di0s5"]
 [ext_resource type="Texture2D" uid="uid://b8hwvu6ghiybr" path="res://img/avatar/00056-1946604175.png" id="7_lymuw"]
+[ext_resource type="Script" path="res://src/EnemyAvatar.cs" id="9_7fk18"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8c0a6"]
@@ -162,6 +164,7 @@ label_settings = SubResource("LabelSettings_iyv0j")
 position = Vector2(960, 889)
 scale = Vector2(0.242188, 0.242188)
 texture = ExtResource("4_f02f3")
+script = ExtResource("5_ce2ri")
 
 [node name="Board" type="Area2D" parent="."]
 position = Vector2(960, 699)
@@ -193,6 +196,7 @@ texture = SubResource("GradientTexture2D_n57q8")
 position = Vector2(960, 190)
 scale = Vector2(0.242, 0.242)
 texture = ExtResource("7_lymuw")
+script = ExtResource("9_7fk18")
 
 [node name="EnemyHand" type="Area2D" parent="."]
 position = Vector2(960, 2.08165e-12)

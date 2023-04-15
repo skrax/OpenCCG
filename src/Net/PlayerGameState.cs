@@ -154,7 +154,7 @@ public class PlayerGameState
         if (attacker.AttacksAvailable <= 0) return;
 
         --attacker.AttacksAvailable;
-        Enemy.Health -= Math.Min(0, attacker.Atk);
+        Enemy.Health -= Math.Max(0, attacker.Atk);
 
         Nodes.EnemyStatusPanel.RpcId(PeerId, "SetHealth", Enemy.Health);
         Nodes.StatusPanel.RpcId(EnemyPeerId, "SetHealth", Enemy.Health);
