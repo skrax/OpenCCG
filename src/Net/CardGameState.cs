@@ -14,6 +14,10 @@ public class CardGameState
     public int Atk { get; set; }
     public int Def { get; set; }
     public int Cost { get; set; }
+    
+    public bool IsSummoningSicknessOn { get; set; }
+    
+    public bool IsSummoningProtectionOn { get; set; }
 
     public void ResetStats()
     {
@@ -34,7 +38,9 @@ public class CardGameState
             Id,
             Record,
             recordMod,
-            Zone
+            Zone,
+            IsSummoningSicknessOn,
+            IsSummoningProtectionOn
         );
     }
 }

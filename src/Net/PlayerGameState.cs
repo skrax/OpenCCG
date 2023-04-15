@@ -124,6 +124,10 @@ public class PlayerGameState
         Hand.Remove(card);
         card.Zone = CardZone.Board;
         Board.AddLast(card);
+
+        card.IsSummoningProtectionOn = true;
+        card.IsSummoningSicknessOn = true;
+
         var dtoJson = JsonSerializer.Serialize(card.AsDto());
 
         Nodes.Board.RpcId(PeerId, "PlaceCard", dtoJson);
@@ -139,6 +143,10 @@ public class PlayerGameState
     {
         var attacker = Board.First(x => x.Id == attackerId);
         var target = Enemy.Board.First(x => x.Id == targetId);
+
+        // TODO feedback
+        if (attacker.IsSummoningSicknessOn) return;
+        if (target.IsSummoningProtectionOn) return;
 
         attacker.Def -= target.Atk;
         target.Def -= attacker.Atk;
@@ -195,6 +203,16 @@ public class PlayerGameState
     {
         isTurn = true;
         Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", true);
+        foreach (var cardGameState in Board)
+        {
+            cardGameState.IsSummoningProtectionOn = false;
+            cardGameState.IsSummoningSicknessOn = false;
+
+            var json = JsonSerializer.Serialize(cardGameState.AsDto());
+            Nodes.Board.RpcId(PeerId, "UpdateCard", json);
+            Nodes.EnemyBoard.RpcId(EnemyPeerId, "UpdateCard", json);
+        }
+
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
         UpdateEnergyRpc();
         Draw(Rules.CardsDrawnPerTurn);
