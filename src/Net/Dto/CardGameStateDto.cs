@@ -8,7 +8,9 @@ public record CardGameStateDto
     Guid Id,
     CardRecord Record,
     CardRecordMod RecordMod,
-    CardZone Zone
+    CardZone Zone,
+    bool IsSummoningSicknessOn,
+    bool ISummoningProtectionOn
 )
 {
     public int Atk => Record.Atk + RecordMod.Atk;

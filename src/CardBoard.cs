@@ -17,6 +17,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         _defPanel.Value = cardGameState.Def;
 
         Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
+
+        var shader = Material as ShaderMaterial;
+        shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
     }
 
     public void Update(CardGameStateDto cardGameState)
@@ -25,6 +28,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         _defPanel.Value = cardGameState.Def;
 
         CardGameState = cardGameState;
+        
+        var shader = Material as ShaderMaterial;
+        shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
     }
 
     public override void _Ready()
