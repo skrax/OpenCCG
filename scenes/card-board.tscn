@@ -6,8 +6,10 @@
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_0j6jh"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4a4ib"]
+resource_local_to_scene = true
 shader = ExtResource("1_0ggqa")
-shader_parameter/amt = 1.0
+shader_parameter/doMix = false
+shader_parameter/mixColor = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_5ex16"]
 font_size = 60

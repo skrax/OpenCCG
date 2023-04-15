@@ -141,6 +141,9 @@ public class PlayerGameState
 
     public void Combat(Guid attackerId, Guid targetId)
     {
+        // TODO feedback
+        if (!isTurn) return;
+        
         var attacker = Board.First(x => x.Id == attackerId);
         var target = Enemy.Board.First(x => x.Id == targetId);
 
