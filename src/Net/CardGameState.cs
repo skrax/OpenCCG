@@ -15,6 +15,10 @@ public class CardGameState
     public int Def { get; set; }
     public int Cost { get; set; }
     
+    public int AttacksAvailable { get; set; }
+
+    public int MaxAttacksPerTurn { get; set; }
+    
     public bool IsSummoningSicknessOn { get; set; }
     
     public bool IsSummoningProtectionOn { get; set; }

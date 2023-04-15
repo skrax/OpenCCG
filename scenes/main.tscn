@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://1dmvryxgjv51"]
+[gd_scene load_steps=30 format=3 uid="uid://1dmvryxgjv51"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -7,7 +7,9 @@
 [ext_resource type="Script" path="res://src/StatusPanel.cs" id="3_a0id7"]
 [ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
 [ext_resource type="Script" path="res://src/EnemyBoardArea.cs" id="4_4t5gh"]
+[ext_resource type="Texture2D" uid="uid://wart73b367qr" path="res://img/avatar/00018-679053703.png" id="4_f02f3"]
 [ext_resource type="Script" path="res://src/InputEventSystem.cs" id="7_di0s5"]
+[ext_resource type="Texture2D" uid="uid://b8hwvu6ghiybr" path="res://img/avatar/00056-1946604175.png" id="7_lymuw"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8c0a6"]
@@ -80,7 +82,7 @@ bg_color = Color(0.6, 0, 0.6, 1)
 script = ExtResource("1_pq47c")
 
 [node name="Hand" type="Area2D" parent="."]
-position = Vector2(960, 953)
+position = Vector2(960, 1081)
 script = ExtResource("1_kp75l")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hand"]
@@ -93,14 +95,13 @@ texture = SubResource("GradientTexture2D_xrtuc")
 
 [node name="StatusPanel" type="Panel" parent="Hand"]
 self_modulate = Color(1, 1, 1, 0.294118)
-offset_left = 738.0
-offset_top = 2.0
+offset_left = 65.0
+offset_top = -253.0
 offset_right = 961.0
-offset_bottom = 128.0
+offset_bottom = -127.0
 script = ExtResource("3_a0id7")
 
-[node name="CardCount" type="Label" parent="Hand/StatusPanel"]
-layout_mode = 0
+[node name="HealthCount" type="Label" parent="Hand/StatusPanel"]
 offset_top = 32.0
 offset_right = 79.0
 offset_bottom = 101.0
@@ -109,20 +110,39 @@ label_settings = SubResource("LabelSettings_fgagx")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="HealthSymbol" type="Label" parent="Hand/StatusPanel"]
+offset_left = 68.0
+offset_top = 52.0
+offset_right = 108.0
+offset_bottom = 97.0
+text = "🖤"
+label_settings = SubResource("LabelSettings_o1b6m")
+
+[node name="CardCount" type="Label" parent="Hand/StatusPanel"]
+layout_mode = 0
+offset_left = 677.0
+offset_top = 32.0
+offset_right = 756.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CardSymbol" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
-offset_left = 74.0
+offset_left = 744.0
 offset_top = 52.0
-offset_right = 114.0
+offset_right = 784.0
 offset_bottom = 97.0
 text = "🀆"
 label_settings = SubResource("LabelSettings_o1b6m")
 
 [node name="EnergyCount" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
-offset_left = 124.0
+offset_left = 790.0
 offset_top = 32.0
-offset_right = 203.0
+offset_right = 869.0
 offset_bottom = 101.0
 text = "10"
 label_settings = SubResource("LabelSettings_fgagx")
@@ -131,12 +151,17 @@ vertical_alignment = 1
 
 [node name="EnergySymbol" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
-offset_left = 191.0
+offset_left = 854.0
 offset_top = 51.0
-offset_right = 231.0
+offset_right = 894.0
 offset_bottom = 96.0
 text = "⚡"
 label_settings = SubResource("LabelSettings_iyv0j")
+
+[node name="Avatar" type="Sprite2D" parent="."]
+position = Vector2(960, 889)
+scale = Vector2(0.242188, 0.242188)
+texture = ExtResource("4_f02f3")
 
 [node name="Board" type="Area2D" parent="."]
 position = Vector2(960, 699)
@@ -164,8 +189,13 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_n57q8")
 
+[node name="EnemyAvatar" type="Sprite2D" parent="."]
+position = Vector2(960, 190)
+scale = Vector2(0.242, 0.242)
+texture = ExtResource("7_lymuw")
+
 [node name="EnemyHand" type="Area2D" parent="."]
-position = Vector2(960, 127)
+position = Vector2(960, 2.08165e-12)
 monitoring = false
 monitorable = false
 script = ExtResource("3_8aogm")
@@ -180,14 +210,13 @@ texture = SubResource("GradientTexture2D_d05ec")
 
 [node name="StatusPanel" type="Panel" parent="EnemyHand"]
 self_modulate = Color(1, 1, 1, 0.294118)
-offset_left = 738.0
-offset_top = 2.0
-offset_right = 961.0
-offset_bottom = 128.0
+offset_left = 62.0
+offset_top = 127.0
+offset_right = 960.0
+offset_bottom = 253.0
 script = ExtResource("3_a0id7")
 
-[node name="CardCount" type="Label" parent="EnemyHand/StatusPanel"]
-layout_mode = 0
+[node name="HealthCount" type="Label" parent="EnemyHand/StatusPanel"]
 offset_top = 32.0
 offset_right = 79.0
 offset_bottom = 101.0
@@ -196,20 +225,39 @@ label_settings = SubResource("LabelSettings_fgagx")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="HealthSymbol" type="Label" parent="EnemyHand/StatusPanel"]
+offset_left = 68.0
+offset_top = 52.0
+offset_right = 108.0
+offset_bottom = 97.0
+text = "🖤"
+label_settings = SubResource("LabelSettings_o1b6m")
+
+[node name="CardCount" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
+offset_left = 677.0
+offset_top = 32.0
+offset_right = 756.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CardSymbol" type="Label" parent="EnemyHand/StatusPanel"]
 layout_mode = 0
-offset_left = 74.0
+offset_left = 751.0
 offset_top = 52.0
-offset_right = 114.0
+offset_right = 791.0
 offset_bottom = 97.0
 text = "🀆"
 label_settings = SubResource("LabelSettings_o1b6m")
 
 [node name="EnergyCount" type="Label" parent="EnemyHand/StatusPanel"]
 layout_mode = 0
-offset_left = 124.0
+offset_left = 801.0
 offset_top = 32.0
-offset_right = 203.0
+offset_right = 880.0
 offset_bottom = 101.0
 text = "10"
 label_settings = SubResource("LabelSettings_fgagx")
@@ -218,9 +266,9 @@ vertical_alignment = 1
 
 [node name="EnergySymbol" type="Label" parent="EnemyHand/StatusPanel"]
 layout_mode = 0
-offset_left = 191.0
+offset_left = 862.0
 offset_top = 51.0
-offset_right = 231.0
+offset_right = 902.0
 offset_bottom = 96.0
 text = "⚡"
 label_settings = SubResource("LabelSettings_iyv0j")

@@ -20,6 +20,8 @@ public class PlayerGameState
 
     public RpcNodes Nodes { get; init; }
 
+    public int Health { get; set; }
+
     public int Energy { get; set; }
 
     public int MaxEnergy { get; set; }
@@ -45,6 +47,7 @@ public class PlayerGameState
         Board.Clear();
         Pit.Clear();
         DeckList = deckList;
+        Health = Rules.InitialHealth;
 
         var shuffledDeckList = DeckList
                                .Select(x =>
@@ -52,7 +55,9 @@ public class PlayerGameState
                                    var card = new CardGameState
                                    {
                                        Record = x,
-                                       Zone = CardZone.Deck
+                                       Zone = CardZone.Deck,
+                                       AttacksAvailable = 1,
+                                       MaxAttacksPerTurn = 1
                                    };
 
                                    card.ResetStats();
@@ -139,18 +144,36 @@ public class PlayerGameState
         UpdateCardCountRpc();
     }
 
+    public void CombatPlayer(Guid attackerId)
+    {
+        if (!isTurn) return;
+
+        var attacker = Board.First(x => x.Id == attackerId);
+
+        if (attacker.IsSummoningSicknessOn) return;
+        if (attacker.AttacksAvailable <= 0) return;
+
+        --attacker.AttacksAvailable;
+        Enemy.Health -= Math.Min(0, attacker.Atk);
+
+        Nodes.EnemyStatusPanel.RpcId(PeerId, "SetHealth", Enemy.Health);
+        Nodes.StatusPanel.RpcId(EnemyPeerId, "SetHealth", Enemy.Health);
+    }
+
     public void Combat(Guid attackerId, Guid targetId)
     {
         // TODO feedback
         if (!isTurn) return;
-        
+
         var attacker = Board.First(x => x.Id == attackerId);
         var target = Enemy.Board.First(x => x.Id == targetId);
 
         // TODO feedback
         if (attacker.IsSummoningSicknessOn) return;
         if (target.IsSummoningProtectionOn) return;
+        if (attacker.AttacksAvailable <= 0) return;
 
+        --attacker.AttacksAvailable;
         attacker.Def -= target.Atk;
         target.Def -= attacker.Atk;
 
@@ -191,6 +214,9 @@ public class PlayerGameState
     {
         Draw(Rules.InitialCardsDrawn);
         UpdateEnergyRpc();
+
+        Nodes.StatusPanel.RpcId(PeerId, "SetHealth", Health);
+        Nodes.EnemyStatusPanel.RpcId(EnemyPeerId, "SetHealth", Health);
     }
 
     public void EndTurn()
@@ -210,6 +236,7 @@ public class PlayerGameState
         {
             cardGameState.IsSummoningProtectionOn = false;
             cardGameState.IsSummoningSicknessOn = false;
+            cardGameState.AttacksAvailable = cardGameState.MaxAttacksPerTurn;
 
             var json = JsonSerializer.Serialize(cardGameState.AsDto());
             Nodes.Board.RpcId(PeerId, "UpdateCard", json);

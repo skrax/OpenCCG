@@ -14,4 +14,10 @@ public partial class StatusPanel : Node, IStatusPanelRpc
     public void SetCardCount(int value)
     {
     }
+
+    [Rpc]
+    public void SetHealth(int value)
+    {
+        throw new System.NotImplementedException();
+    }
 }
