@@ -1,0 +1,179 @@
+[gd_scene load_steps=8 format=3 uid="uid://80hml386v23m"]
+
+[ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_3xnqq"]
+[ext_resource type="Script" path="res://src/CardUI.cs" id="2_u6qw2"]
+[ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_moyad"]
+[ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_ti623"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_i7brf"]
+font_size = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_jwlpm"]
+font_size = 18
+
+[sub_resource type="LabelSettings" id="LabelSettings_880an"]
+font_size = 10
+
+[node name="Card" type="TextureRect"]
+custom_minimum_size = Vector2(153.6, 230.4)
+offset_right = 153.6
+offset_bottom = 230.4
+texture = ExtResource("1_3xnqq")
+expand_mode = 1
+script = ExtResource("2_u6qw2")
+
+[node name="InfoPanel" type="Panel" parent="."]
+self_modulate = Color(0, 0, 0, 1)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -68.4
+offset_right = 0.399994
+offset_bottom = 0.300018
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("3_moyad")
+
+[node name="Description" type="Label" parent="InfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Sample Description Text"
+label_settings = SubResource("LabelSettings_i7brf")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 3
+
+[node name="AttackPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -18.0
+offset_right = 27.0
+offset_bottom = 18.0
+grow_vertical = 2
+script = ExtResource("4_ti623")
+
+[node name="AtkValue" type="Label" parent="AttackPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 2.0
+offset_top = -0.199997
+offset_right = -4.0
+offset_bottom = 28.8
+grow_horizontal = 2
+text = "12"
+label_settings = SubResource("LabelSettings_jwlpm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AtkDescription" type="Label" parent="AttackPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -14.2
+offset_right = -4.0
+offset_bottom = 2.8
+grow_horizontal = 2
+grow_vertical = 0
+text = "ATK"
+label_settings = SubResource("LabelSettings_880an")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -27.0
+offset_top = -18.0
+offset_bottom = 18.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("4_ti623")
+
+[node name="DefValue" type="Label" parent="DefPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 2.0
+offset_top = -0.199997
+offset_right = -4.0
+offset_bottom = 28.8
+grow_horizontal = 2
+text = "12"
+label_settings = SubResource("LabelSettings_jwlpm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefDescription" type="Label" parent="DefPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -14.2
+offset_right = -4.0
+offset_bottom = 2.8
+grow_horizontal = 2
+grow_vertical = 0
+text = "DEF"
+label_settings = SubResource("LabelSettings_880an")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CostPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -27.0
+offset_bottom = 36.0
+grow_horizontal = 0
+script = ExtResource("4_ti623")
+
+[node name="CostValue" type="Label" parent="CostPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 2.0
+offset_top = -0.199997
+offset_right = -4.0
+offset_bottom = 28.8
+grow_horizontal = 2
+text = "12"
+label_settings = SubResource("LabelSettings_jwlpm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CostDescription" type="Label" parent="CostPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -14.2
+offset_right = -4.0
+offset_bottom = 2.8
+grow_horizontal = 2
+grow_vertical = 0
+text = "COST"
+label_settings = SubResource("LabelSettings_880an")
+horizontal_alignment = 1
+vertical_alignment = 1
