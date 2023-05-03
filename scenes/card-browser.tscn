@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=3 uid="uid://datdpp7ssksne"]
+
+[ext_resource type="Script" path="res://src/CardBrowser.cs" id="1_7casj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mulv"]
+bg_color = Color(0.705882, 0.584314, 0.262745, 1)
+
+[node name="card-browser" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_7casj")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 1820.0
+offset_bottom = 980.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5mulv")
+horizontal_scroll_mode = 0
+
+[node name="VFlowContainer" type="FlowContainer" parent="ScrollContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 40
+alignment = 1
+
+[node name="PanelContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 988.0
+offset_right = 1820.0
+offset_bottom = 1068.0
+
+[node name="Button" type="Button" parent="PanelContainer"]
+custom_minimum_size = Vector2(80, 2.08165e-12)
+layout_mode = 2
+text = "Clear"
+
+[node name="TextEdit" type="TextEdit" parent="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search description .."

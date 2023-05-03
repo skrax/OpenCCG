@@ -104,6 +104,7 @@ offset_bottom = -127.0
 script = ExtResource("3_a0id7")
 
 [node name="HealthCount" type="Label" parent="Hand/StatusPanel"]
+layout_mode = 0
 offset_top = 32.0
 offset_right = 79.0
 offset_bottom = 101.0
@@ -113,6 +114,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HealthSymbol" type="Label" parent="Hand/StatusPanel"]
+layout_mode = 0
 offset_left = 68.0
 offset_top = 52.0
 offset_right = 108.0
@@ -221,6 +223,7 @@ offset_bottom = 253.0
 script = ExtResource("3_a0id7")
 
 [node name="HealthCount" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
 offset_top = 32.0
 offset_right = 79.0
 offset_bottom = 101.0
@@ -230,6 +233,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HealthSymbol" type="Label" parent="EnemyHand/StatusPanel"]
+layout_mode = 0
 offset_left = 68.0
 offset_top = 52.0
 offset_right = 108.0
