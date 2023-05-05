@@ -8,11 +8,14 @@ namespace OpenCCG;
 public partial class CardBrowser : Control
 {
     private static readonly PackedScene CardUIScene = GD.Load<PackedScene>("res://scenes/card-ui.tscn");
+    private static readonly PackedScene MenuScene = GD.Load<PackedScene>("res://scenes/menu.tscn");
+    
     private ScrollContainer _scrollContainer;
     private FlowContainer _flowContainer;
     private HBoxContainer _bottomPanelContainer;
     private Button _clearTextButton;
     private TextEdit _textEdit;
+    private Button _menuButton;
 
     public override void _Ready()
     {
@@ -21,6 +24,12 @@ public partial class CardBrowser : Control
         _bottomPanelContainer = GetChild<HBoxContainer>(1);
         _clearTextButton = _bottomPanelContainer.GetChild<Button>(0);
         _textEdit = _bottomPanelContainer.GetChild<TextEdit>(1);
+        _menuButton = GetChild<Button>(2);
+
+        _menuButton.Pressed += () =>
+        {
+            GetTree().ChangeSceneToPacked(MenuScene);
+        };
 
         _clearTextButton.Pressed += () =>
         {
