@@ -34,6 +34,7 @@ offset_right = 0.399994
 offset_bottom = 0.300018
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 1
 script = ExtResource("3_moyad")
 
 [node name="Description" type="Label" parent="InfoPanel"]
@@ -59,6 +60,7 @@ offset_top = -18.0
 offset_right = 27.0
 offset_bottom = 18.0
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("4_ti623")
 
 [node name="AtkValue" type="Label" parent="AttackPanel"]
@@ -104,6 +106,7 @@ offset_top = -18.0
 offset_bottom = 18.0
 grow_horizontal = 0
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("4_ti623")
 
 [node name="DefValue" type="Label" parent="DefPanel"]
@@ -145,6 +148,7 @@ anchor_right = 1.0
 offset_left = -27.0
 offset_bottom = 36.0
 grow_horizontal = 0
+mouse_filter = 1
 script = ExtResource("4_ti623")
 
 [node name="CostValue" type="Label" parent="CostPanel"]
