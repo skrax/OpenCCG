@@ -11,6 +11,8 @@ public partial class CardUI : TextureRect, INodeInit<CardRecord>
     private CardStatPanel _costPanel, _atkPanel, _defPanel;
     
     private CardInfoPanel _infoPanel;
+    
+    public CardRecord Record { get; private set; }
 
     public void Init(CardRecord record)
     {
@@ -19,6 +21,7 @@ public partial class CardUI : TextureRect, INodeInit<CardRecord>
         _atkPanel.Value = record.Atk;
         _defPanel.Value = record.Def;
         Texture = GD.Load<Texture2D>(record.ImgPath);
+        Record = record;
     }
 
     public override void _Ready()

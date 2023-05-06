@@ -10,16 +10,16 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
     private bool _isDragging, _canStopDrag;
     public CardGameStateDto CardGameState;
 
-    public void Init(CardGameStateDto cardGameState)
+    public void Init(CardGameStateDto record)
     {
-        CardGameState = cardGameState;
+        CardGameState = record;
         _atkPanel.Value = CardGameState.Atk;
-        _defPanel.Value = cardGameState.Def;
+        _defPanel.Value = record.Def;
 
         Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
 
         var shader = Material as ShaderMaterial;
-        shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
+        shader?.SetShaderParameter("doMix", record.ISummoningProtectionOn);
     }
 
     public void Update(CardGameStateDto cardGameState)
