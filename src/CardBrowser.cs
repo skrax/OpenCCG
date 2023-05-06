@@ -103,7 +103,7 @@ public partial class CardBrowser : Control
         };
     }
 
-    private void AddCardToDeck(CardRecord cardRecord)
+    private CardUIDeck AddCardToDeck(CardRecord cardRecord)
     {
         var cardDeck = CardUIDeckScene.Make<CardUIDeck, CardRecord>(cardRecord, _deckContainer);
         var nodes = _deckContainer.GetChildren();
@@ -128,6 +128,8 @@ public partial class CardBrowser : Control
             cardDeck.QueueFree();
         };
         _deck.Add(cardRecord.Id, cardDeck);
+
+        return cardDeck;
     }
 
     private void SaveDeck()
@@ -156,9 +158,7 @@ public partial class CardBrowser : Control
         foreach (var jsonRecord in deserialized)
         {
             var cardRecord = CardDatabase.Cards.First(x => x.Id == jsonRecord.Id);
-            var cardDeck = CardUIDeckScene.Make<CardUIDeck, CardRecord>(cardRecord, _deckContainer);
-            cardDeck.SetCount(jsonRecord.Count);
-            _deck.Add(cardRecord.Id, cardDeck);
+            AddCardToDeck(cardRecord).SetCount(jsonRecord.Count);
         }
     }
 }
