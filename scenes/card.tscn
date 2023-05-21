@@ -17,12 +17,44 @@ font_size = 34
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_od8kd"]
 size = Vector2(513.333, 766.667)
 
-[node name="Card" type="Sprite2D"]
+[node name="Card" type="Sprite2D" node_paths=PackedStringArray("_area2D", "_costPanel", "_atkPanel", "_defPanel", "_infoPanel", "_namePanel")]
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("1_8stps")
 script = ExtResource("2_davtw")
+_area2D = NodePath("Area2D")
+_costPanel = NodePath("CostPanel")
+_atkPanel = NodePath("AttackPanel")
+_defPanel = NodePath("DefPanel")
+_infoPanel = NodePath("InfoPanel")
+_namePanel = NodePath("NamePanel")
 
-[node name="InfoPanel" type="Panel" parent="."]
+[node name="NamePanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
+self_modulate = Color(0, 0, 0, 1)
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = -256.0
+offset_top = -384.0
+offset_right = -345.0
+offset_bottom = -263.0
+grow_horizontal = 2
+script = ExtResource("3_bkiwm")
+_descriptionLabel = NodePath("Description")
+
+[node name="Description" type="Label" parent="NamePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Golthrang, Destroyer of Worlds"
+label_settings = SubResource("LabelSettings_1wc8l")
+vertical_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 3
+max_lines_visible = 2
+
+[node name="InfoPanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
 self_modulate = Color(0, 0, 0, 1)
 anchors_preset = 12
 anchor_top = 1.0
@@ -35,6 +67,7 @@ offset_bottom = -384.0
 grow_horizontal = 2
 grow_vertical = 0
 script = ExtResource("3_bkiwm")
+_descriptionLabel = NodePath("Description")
 
 [node name="Description" type="Label" parent="InfoPanel"]
 layout_mode = 1
@@ -50,7 +83,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 text_overrun_behavior = 3
 
-[node name="AttackPanel" type="Panel" parent="."]
+[node name="AttackPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
@@ -60,6 +93,7 @@ offset_right = -166.0
 offset_bottom = -309.0
 grow_vertical = 2
 script = ExtResource("4_wwja8")
+_statLabel = NodePath("AtkValue")
 
 [node name="AtkValue" type="Label" parent="AttackPanel"]
 layout_mode = 1
@@ -86,7 +120,7 @@ label_settings = SubResource("LabelSettings_o8t5t")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DefPanel" type="Panel" parent="."]
+[node name="DefPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
@@ -99,6 +133,7 @@ offset_bottom = -309.0
 grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("4_wwja8")
+_statLabel = NodePath("DefValue")
 
 [node name="DefValue" type="Label" parent="DefPanel"]
 layout_mode = 1
@@ -125,7 +160,7 @@ label_settings = SubResource("LabelSettings_o8t5t")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CostPanel" type="Panel" parent="."]
+[node name="CostPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -135,6 +170,7 @@ offset_right = -256.0
 offset_bottom = -264.0
 grow_horizontal = 0
 script = ExtResource("4_wwja8")
+_statLabel = NodePath("CostValue")
 
 [node name="CostValue" type="Label" parent="CostPanel"]
 layout_mode = 1

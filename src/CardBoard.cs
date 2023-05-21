@@ -6,7 +6,7 @@ namespace OpenCCG;
 
 public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 {
-    private CardStatPanel _atkPanel, _defPanel;
+    [Export] private CardStatPanel _atkPanel, _defPanel;
     private bool _isDragging, _canStopDrag;
     public CardGameStateDto CardGameState;
 
@@ -28,15 +28,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         _defPanel.Value = cardGameState.Def;
 
         CardGameState = cardGameState;
-        
+
         var shader = Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
-    }
-
-    public override void _Ready()
-    {
-        _atkPanel = GetChild<CardStatPanel>(0);
-        _defPanel = GetChild<CardStatPanel>(1);
     }
 
     public override void _Input(InputEvent inputEvent)

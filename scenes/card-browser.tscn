@@ -119,7 +119,7 @@ size_flags_horizontal = 3
 
 [node name="FileDialog" type="FileDialog" parent="."]
 initial_position = 1
-title = "Load Deck"
+title = "Open a File"
 size = Vector2i(500, 500)
 ok_button_text = "Open"
 dialog_hide_on_ok = true
