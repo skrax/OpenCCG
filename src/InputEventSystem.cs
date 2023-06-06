@@ -11,20 +11,18 @@ public partial class InputEventSystem : Node2D
     {
         Idle,
         DraggingCard,
-        DraggingLine
+        DraggingLine,
+        ChoosingTargets
     }
+
+    [Export] private Line2D _line;
+    [Export] private CardTempArea _cardTempArea;
 
     private InputState _state = InputState.Idle;
-    private Line2D _line;
     private Vector2 _dragOffset;
     private Card? _cardToDrag;
+
     private ulong? _dragLineStartInstanceId;
-
-
-    public override void _Ready()
-    {
-        _line = GetChild<Line2D>(0);
-    }
 
     public override void _UnhandledInput(InputEvent inputEvent)
     {
@@ -46,6 +44,23 @@ public partial class InputEventSystem : Node2D
         EventSink.Drain();
     }
 
+    public void OnRequireTarget()
+    {
+        if (_state is not InputState.Idle)
+        {
+            Logger.Error<InputEventSystem>($"Cannot require targets when input state is {_state}");
+            return;
+        }
+
+        _state = InputState.ChoosingTargets;
+
+        var pos = _cardTempArea.Position;
+        pos += _cardTempArea.GetRect().GetCenter();
+
+        Logger.Info<InputEventSystem>($"RequireTargets Start");
+        _line.Points = new[] { _line.ToLocal(pos), _line.ToLocal(GetGlobalMousePosition()) };
+    }
+
     private void OnSpriteClickReleased()
     {
         switch (_state)
@@ -58,6 +73,11 @@ public partial class InputEventSystem : Node2D
             case InputState.DraggingCard:
             {
                 OnDragCardEnd();
+                break;
+            }
+            case InputState.ChoosingTargets:
+            {
+                OnTargetDetect();
                 break;
             }
             case InputState.Idle:
@@ -105,6 +125,11 @@ public partial class InputEventSystem : Node2D
                 OnDragCardUpdate(mouseMotion);
                 break;
             }
+            case InputState.ChoosingTargets:
+            {
+                OnDragLineUpdate(mouseMotion);
+                break;
+            }
             case InputState.Idle:
             {
                 break;
@@ -149,9 +174,7 @@ public partial class InputEventSystem : Node2D
             Logger.Info<InputEventSystem>($"DragLine End {cardBoard.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
             {
-                GetNode("/root/Main").RpcId(1, "CombatPlayerCard",
-                    attacker.CardGameState.Id.ToString(),
-                    cardBoard.CardGameState.Id.ToString());
+                GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, cardBoard.CardGameState.Id);
             }
         }
         else if (avatar != null && _dragLineStartInstanceId.HasValue)
@@ -159,7 +182,7 @@ public partial class InputEventSystem : Node2D
             Logger.Info<InputEventSystem>($"DragLine End {avatar.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
             {
-                GetNode("/root/Main").RpcId(1, "CombatPlayer", attacker.CardGameState.Id.ToString());
+                GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
             }
         }
         else
@@ -168,6 +191,29 @@ public partial class InputEventSystem : Node2D
         }
 
         _dragLineStartInstanceId = null;
+    }
+
+    private void OnTargetDetect()
+    {
+        var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
+        var avatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
+
+        if (cardBoard != null)
+        {
+            if (_cardTempArea.TryUpstreamTarget(cardBoard))
+            {
+                _state = InputState.Idle;
+                _line.Points = Array.Empty<Vector2>();
+            }
+        }
+        else if (avatar != null)
+        {
+            if (_cardTempArea.TryUpstreamTarget(avatar))
+            {
+                _state = InputState.Idle;
+                _line.Points = Array.Empty<Vector2>();
+            }
+        }
     }
 
     private void OnDragCardStart(Card card, Vector2 mousePosition)

@@ -1,22 +1,37 @@
+using System;
+using System.Collections.Generic;
 using Godot;
-using OpenCCG.Net.Api;
+using OpenCCG.Net.Dto;
 
 namespace OpenCCG.Net.ServerNodes;
 
-public partial class Hand : Node, IHandRpc
+public partial class Hand : Node, IMessageReceiver<MessageType>
 {
-    [Rpc]
-    public void DrawCard(string cardGameStateJson)
+    public void DrawCard(long peerId, CardGameStateDto cardGameStateJson)
     {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.DrawCard, cardGameStateJson);
     }
 
-    [Rpc]
-    public void RemoveCard(string id)
+    public void RemoveCard(long peerId, Guid id)
     {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard, id);
     }
 
-    [Rpc]
-    public void FailPlayCard()
+    public void FailPlayCard(long peerId)
     {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.FailPlayCard);
+    }
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public void HandleMessage(string messageJson)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Func<int, string?, string?> GetExecutor(MessageType messageType)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -10,6 +10,12 @@ namespace OpenCCG.Net;
 
 public class PlayerGameState
 {
+    public enum ControllingEntity
+    {
+        Self,
+        Enemy
+    }
+
     public int PeerId { get; init; }
 
     public int EnemyPeerId { get; set; }
@@ -67,7 +73,7 @@ public class PlayerGameState
                                .Shuffle();
 
         Deck = new(shuffledDeckList);
-        Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", false);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
     }
 
     public LinkedList<CardGameState> GetListByZone(CardZone zone)
@@ -92,24 +98,24 @@ public class PlayerGameState
             Deck.RemoveFirst();
             Hand.AddLast(card);
 
-            var json = JsonSerializer.Serialize(card.AsDto());
+            var dto = card.AsDto();
 
-            Nodes.Hand.RpcId(PeerId, "DrawCard", json);
-            Nodes.EnemyHand.RpcId(EnemyPeerId, "DrawCard");
+            Nodes.Hand.DrawCard(PeerId, dto);
+            Nodes.EnemyHand.DrawCard(EnemyPeerId);
             UpdateCardCountRpc();
         }
     }
 
     private void UpdateCardCountRpc()
     {
-        Nodes.StatusPanel.RpcId(PeerId, "SetCardCount", Hand.Count);
-        Nodes.EnemyStatusPanel.RpcId(EnemyPeerId, "SetCardCount", Hand.Count);
+        Nodes.StatusPanel.SetCardCount(PeerId, Hand.Count);
+        Nodes.EnemyStatusPanel.SetCardCount(EnemyPeerId, Hand.Count);
     }
 
     private void UpdateEnergyRpc()
     {
-        Nodes.StatusPanel.RpcId(PeerId, "SetEnergy", Energy);
-        Nodes.EnemyStatusPanel.RpcId(EnemyPeerId, "SetEnergy", Energy);
+        Nodes.StatusPanel.SetEnergy(PeerId, Energy);
+        Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy);
     }
 
     public void PlayCard(Guid id)
@@ -119,7 +125,7 @@ public class PlayerGameState
         if (card == null) throw new ApplicationException();
         if (Energy - card.Cost < 0)
         {
-            Nodes.Hand.RpcId(PeerId, "FailPlayCard");
+            Nodes.Hand.FailPlayCard(PeerId);
             return;
         }
 
@@ -127,19 +133,37 @@ public class PlayerGameState
         UpdateEnergyRpc();
 
         Hand.Remove(card);
-        card.Zone = CardZone.Board;
-        Board.AddLast(card);
 
-        card.IsSummoningProtectionOn = true;
-        card.IsSummoningSicknessOn = true;
+        if (card.Record.Type is CardRecordType.Spell)
+        {
+            var effects = card.Record.Effects.Select(x => Database.CardEffects[x.Id](x.initJson));
 
-        var dtoJson = JsonSerializer.Serialize(card.AsDto());
+            Nodes.Hand.RemoveCard(PeerId, id);
+            Nodes.EnemyHand.RemoveCard(EnemyPeerId);
 
-        Nodes.Board.RpcId(PeerId, "PlaceCard", dtoJson);
-        Nodes.Hand.RpcId(PeerId, "RemoveCard", id.ToString());
+            foreach (var cardEffect in effects)
+            {
+                cardEffect.Execute(card, this);
+            }
 
-        Nodes.EnemyBoard.RpcId(EnemyPeerId, "PlaceCard", dtoJson);
-        Nodes.EnemyHand.RpcId(EnemyPeerId, "RemoveCard");
+            Pit.AddLast(card);
+        }
+        else if (card.Record.Type is CardRecordType.Creature)
+        {
+            card.Zone = CardZone.Board;
+            Board.AddLast(card);
+
+            card.IsSummoningProtectionOn = true;
+            card.IsSummoningSicknessOn = true;
+
+            var dto = card.AsDto();
+
+            Nodes.Board.PlaceCard(PeerId, dto);
+            Nodes.Hand.RemoveCard(PeerId, id);
+
+            Nodes.EnemyBoard.PlaceCard(EnemyPeerId, dto);
+            Nodes.EnemyHand.RemoveCard(EnemyPeerId);
+        }
 
         UpdateCardCountRpc();
     }
@@ -156,8 +180,48 @@ public class PlayerGameState
         --attacker.AttacksAvailable;
         Enemy.Health -= Math.Max(0, attacker.Atk);
 
-        Nodes.EnemyStatusPanel.RpcId(PeerId, "SetHealth", Enemy.Health);
-        Nodes.StatusPanel.RpcId(EnemyPeerId, "SetHealth", Enemy.Health);
+        Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
+        Nodes.StatusPanel.SetHealth(EnemyPeerId, Enemy.Health);
+    }
+
+    public void ResolveDamage(CardGameState card, int damage, ControllingEntity controllingEntity)
+    {
+        card.Def -= damage;
+
+        if (controllingEntity is ControllingEntity.Self)
+        {
+            if (card.Def <= 0)
+            {
+                Board.Remove(card);
+                Pit.AddLast(card);
+
+                Nodes.Board.RemoveCard(PeerId, card.Id);
+                Nodes.EnemyBoard.RemoveCard(EnemyPeerId, card.Id);
+            }
+            else
+            {
+                var dto = card.AsDto();
+                Nodes.Board.UpdateCard(PeerId, dto);
+                Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
+            }
+        }
+        else
+        {
+            if (card.Def <= 0)
+            {
+                Enemy.Board.Remove(card);
+                Enemy.Pit.AddLast(card);
+
+                Nodes.EnemyBoard.RemoveCard(PeerId, card.Id);
+                Nodes.Board.RemoveCard(EnemyPeerId, card.Id);
+            }
+            else
+            {
+                var dto = card.AsDto();
+                Nodes.EnemyBoard.UpdateCard(PeerId, dto);
+                Nodes.Board.UpdateCard(EnemyPeerId, dto);
+            }
+        }
     }
 
     public void Combat(Guid attackerId, Guid targetId)
@@ -174,40 +238,8 @@ public class PlayerGameState
         if (attacker.AttacksAvailable <= 0) return;
 
         --attacker.AttacksAvailable;
-        attacker.Def -= target.Atk;
-        target.Def -= attacker.Atk;
-
-        if (attacker.Def <= 0)
-        {
-            Board.Remove(attacker);
-            Pit.AddLast(attacker);
-
-            Nodes.Board.RpcId(PeerId, "RemoveCard", attacker.Id.ToString());
-            Nodes.EnemyBoard.RpcId(EnemyPeerId, "RemoveCard", attacker.Id.ToString());
-        }
-        else
-        {
-            var json = JsonSerializer.Serialize(attacker.AsDto());
-            Nodes.Board.RpcId(PeerId, "UpdateCard", json);
-
-            Nodes.EnemyBoard.RpcId(EnemyPeerId, "UpdateCard", json);
-        }
-
-        if (target.Def <= 0)
-        {
-            Enemy.Board.Remove(target);
-            Enemy.Pit.AddLast(target);
-
-            Nodes.EnemyBoard.RpcId(PeerId, "RemoveCard", target.Id.ToString());
-
-            Nodes.Board.RpcId(EnemyPeerId, "RemoveCard", target.Id.ToString());
-        }
-        else
-        {
-            var json = JsonSerializer.Serialize(target.AsDto());
-            Nodes.EnemyBoard.RpcId(PeerId, "UpdateCard", json);
-            Nodes.Board.RpcId(EnemyPeerId, "UpdateCard", json);
-        }
+        ResolveDamage(attacker, target.Atk, ControllingEntity.Self);
+        ResolveDamage(target, attacker.Atk, ControllingEntity.Enemy);
     }
 
     public void Start()
@@ -215,8 +247,8 @@ public class PlayerGameState
         Draw(Rules.InitialCardsDrawn);
         UpdateEnergyRpc();
 
-        Nodes.StatusPanel.RpcId(PeerId, "SetHealth", Health);
-        Nodes.EnemyStatusPanel.RpcId(EnemyPeerId, "SetHealth", Health);
+        Nodes.StatusPanel.SetHealth(PeerId, Health);
+        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
     }
 
     public void EndTurn()
@@ -224,23 +256,23 @@ public class PlayerGameState
         if (!isTurn) return;
 
         isTurn = false;
-        Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", false);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
         Enemy.StartTurn();
     }
 
     public void StartTurn()
     {
         isTurn = true;
-        Nodes.MidPanel.RpcId(PeerId, "EndTurnButtonSetActive", true);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, true);
         foreach (var cardGameState in Board)
         {
             cardGameState.IsSummoningProtectionOn = false;
             cardGameState.IsSummoningSicknessOn = false;
             cardGameState.AttacksAvailable = cardGameState.MaxAttacksPerTurn;
 
-            var json = JsonSerializer.Serialize(cardGameState.AsDto());
-            Nodes.Board.RpcId(PeerId, "UpdateCard", json);
-            Nodes.EnemyBoard.RpcId(EnemyPeerId, "UpdateCard", json);
+            var dto = cardGameState.AsDto();
+            Nodes.Board.UpdateCard(PeerId, dto);
+            Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
         }
 
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);

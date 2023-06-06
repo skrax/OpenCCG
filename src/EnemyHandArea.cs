@@ -1,18 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenCCG.Core;
-using OpenCCG.Net.Api;
+using OpenCCG.Net;
 
 namespace OpenCCG;
 
-public partial class EnemyHandArea : Area2D, IEnemyHandRpc
+public partial class EnemyHandArea : Area2D, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardHiddenScene = GD.Load<PackedScene>("res://scenes/card-hidden.tscn");
     private readonly List<Sprite2D> _cards = new();
 
-    [Rpc]
-    public void RemoveCard()
+    private void RemoveCard()
     {
         var cardEntity = _cards.LastOrDefault();
         if (cardEntity == null) return;
@@ -22,8 +22,7 @@ public partial class EnemyHandArea : Area2D, IEnemyHandRpc
         SetCardPositions();
     }
 
-    [Rpc]
-    public void DrawCard()
+    private void DrawCard()
     {
         var entity = CardHiddenScene.Make<Sprite2D>(this);
         _cards.Add(entity);
@@ -34,4 +33,18 @@ public partial class EnemyHandArea : Area2D, IEnemyHandRpc
     {
         SpriteHelpers.OrderHorizontally(_cards.ToArray());
     }
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public void HandleMessage(string messageJson)
+    {
+        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+    }
+
+    public Func<int, string?, string?> GetExecutor(MessageType messageType) => messageType switch
+    {
+        MessageType.RemoveCard => IMessageReceiver<MessageType>.MakeExecutor(RemoveCard),
+        MessageType.DrawCard => IMessageReceiver<MessageType>.MakeExecutor(DrawCard),
+    };
 }

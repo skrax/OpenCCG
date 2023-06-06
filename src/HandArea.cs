@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Godot;
 using OpenCCG.Core;
-using OpenCCG.Net.Api;
+using OpenCCG.Net;
 using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
-public partial class HandArea : Area2D, IHandRpc
+public partial class HandArea : Area2D, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardScene = GD.Load<PackedScene>("res://scenes/card.tscn");
     private readonly List<Card> _cards = new();
 
-    [Rpc]
-    public void RemoveCard(string id)
+    private void RemoveCard(Guid cardId)
     {
-        var cardId = Guid.Parse(id);
         var cardEntity = _cards.FirstOrDefault(x => x.Id == cardId);
         if (cardEntity == null) return;
 
@@ -26,16 +23,13 @@ public partial class HandArea : Area2D, IHandRpc
         SetCardPositions();
     }
 
-    [Rpc]
-    public void FailPlayCard()
+    private void FailPlayCard()
     {
         SetCardPositions();
     }
 
-    [Rpc]
-    public void DrawCard(string cardGameStateJson)
+    private void DrawCard(CardGameStateDto card)
     {
-        var card = JsonSerializer.Deserialize<CardGameStateDto>(cardGameStateJson);
         var entity = CardScene.Make<Card, CardGameStateDto>(card, this);
         entity.OnDragFailed += SetCardPositions;
 
@@ -47,4 +41,19 @@ public partial class HandArea : Area2D, IHandRpc
     {
         SpriteHelpers.OrderHorizontally(_cards.Cast<Sprite2D>().ToArray());
     }
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public void HandleMessage(string messageJson)
+    {
+        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+    }
+
+    public Func<int, string?, string?> GetExecutor(MessageType messageType) => messageType switch
+    {
+        MessageType.RemoveCard => IMessageReceiver<MessageType>.MakeExecutor<Guid>(RemoveCard),
+        MessageType.FailPlayCard => IMessageReceiver<MessageType>.MakeExecutor(FailPlayCard),
+        MessageType.DrawCard => IMessageReceiver<MessageType>.MakeExecutor<CardGameStateDto>(DrawCard)
+    };
 }

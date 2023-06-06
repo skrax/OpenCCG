@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
-using OpenCCG.Net.Api;
+using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
 
-public partial class Server : Node, IMainRpc
+public partial class Server : Node, IMessageReceiver<MessageType>
 {
     private readonly GameState _gameState = new();
 
@@ -43,15 +43,18 @@ public partial class Server : Node, IMainRpc
         {
             var rpcNodes = new RpcNodes
             {
+                Server = this,
                 Hand = GetNode<Hand>("Hand"),
                 EnemyHand = GetNode<EnemyHand>("EnemyHand"),
                 Board = GetNode<Board>("Board"),
-                EnemyBoard = GetNode<EnemyBoard>("EnemyBoard"),
+                EnemyBoard = GetNode<Board>("EnemyBoard"),
                 StatusPanel = GetNode<ServerNodes.StatusPanel>("Hand/StatusPanel"),
                 EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel"),
                 MidPanel = GetNode<ServerNodes.MidPanel>("MidPanel"),
+                CardTempArea = GetNode<ServerNodes.CardTempArea>("CardTempArea"),
+                EnemyCardTempArea = GetNode<ServerNodes.CardTempArea>("EnemyCardTempArea"),
             };
-            
+
             var p1 = new PlayerGameState
             {
                 PeerId = peers[0],
@@ -71,10 +74,10 @@ public partial class Server : Node, IMainRpc
             var p2DeckList = new List<CardRecord>();
             for (var i = 0; i < 9; ++i)
             {
-                var record = CardDatabase.Cards[GD.RandRange(0, CardDatabase.Cards.Length - 1)];
+                var record = Database.Cards[GD.RandRange(0, Database.Cards.Length - 1)];
                 p1DeckList.Add(record);
 
-                var record2 = CardDatabase.Cards[GD.RandRange(0, CardDatabase.Cards.Length - 1)];
+                var record2 = Database.Cards[GD.RandRange(0, Database.Cards.Length - 1)];
                 p2DeckList.Add(record2);
             }
 
@@ -98,36 +101,41 @@ public partial class Server : Node, IMainRpc
         Logger.Info<Server>($"Peer disconnected {id}");
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void PlayCard(string id)
-    {
-        var peerId = Multiplayer.GetRemoteSenderId();
+    public Dictionary<string, IObserver>? Observers { get; } = new();
 
-        _gameState.PlayerGameStates[peerId].PlayCard(Guid.Parse(id));
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void HandleMessage(string messageJson)
+    {
+        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void CombatPlayerCard(string attackerId, string targetId)
+    public Func<int, string?, string?> GetExecutor(MessageType messageType) => messageType switch
     {
-        var peerId = Multiplayer.GetRemoteSenderId();
+        MessageType.PlayCard => IMessageReceiver<MessageType>.MakeExecutor<Guid>(PlayCard),
+        MessageType.CombatPlayerCard => IMessageReceiver<MessageType>.MakeExecutor<CombatPlayerCardDto>(
+            CombatPlayerCard),
+        MessageType.CombatPlayer => IMessageReceiver<MessageType>.MakeExecutor<Guid>(CombatPlayer),
+        MessageType.EndTurn => IMessageReceiver<MessageType>.MakeExecutor(EndTurn),
+        _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+    };
 
-        _gameState.PlayerGameStates[peerId].Combat(Guid.Parse(attackerId), Guid.Parse(targetId));
-    }
-    
-    
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void CombatPlayer(string attackerId)
+    private void PlayCard(int senderPeerId, Guid cardId)
     {
-        var peerId = Multiplayer.GetRemoteSenderId();
-
-        _gameState.PlayerGameStates[peerId].CombatPlayer(Guid.Parse(attackerId));
+        _gameState.PlayerGameStates[senderPeerId].PlayCard(cardId);
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void EndTurn()
+    private void CombatPlayerCard(int senderPeerId, CombatPlayerCardDto t)
     {
-        var peerId = Multiplayer.GetRemoteSenderId();
+        _gameState.PlayerGameStates[senderPeerId].Combat(t.AttackerId, t.TargetId);
+    }
 
-        _gameState.PlayerGameStates[peerId].EndTurn();
+    private void CombatPlayer(int senderPeerId, Guid cardId)
+    {
+        _gameState.PlayerGameStates[senderPeerId].CombatPlayer(cardId);
+    }
+
+    private void EndTurn(int senderPeerId)
+    {
+        _gameState.PlayerGameStates[senderPeerId].EndTurn();
     }
 }

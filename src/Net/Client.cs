@@ -1,11 +1,10 @@
 using System;
 using Godot;
 using OpenCCG.Core;
-using OpenCCG.Net.Api;
 
 namespace OpenCCG.Net;
 
-public partial class Client : Node, IClientRpc
+public partial class Client : Node
 {
     public override void _Ready()
     {
@@ -46,7 +45,6 @@ public partial class Client : Node, IClientRpc
     private void OnPeerConnected(long id)
     {
         Logger.Info<Client>($"Peer connected {id}");
-        
         GetParent().SetMultiplayerAuthority(Multiplayer.GetUniqueId(), false);
     }
 

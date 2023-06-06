@@ -104,7 +104,7 @@ public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
     {
         if (!_hoverZones.Contains(CardZone.Hand))
         {
-            GetNode("/root/Main").RpcId(1, "PlayCard", Id.ToString());
+            GetNode<Main>("/root/Main").PlayCard(Id);
 
             return;
         }

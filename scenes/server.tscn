@@ -6,8 +6,8 @@
 [ext_resource type="Script" path="res://src/Net/ServerNodes/StatusPanel.cs" id="3_bmwaj"]
 [ext_resource type="Script" path="res://src/Net/ServerNodes/EnemyHand.cs" id="4_dvbuv"]
 [ext_resource type="Script" path="res://src/Net/ServerNodes/Board.cs" id="5_3a7jm"]
-[ext_resource type="Script" path="res://src/Net/ServerNodes/EnemyBoard.cs" id="6_p7vfk"]
 [ext_resource type="Script" path="res://src/Net/ServerNodes/MidPanel.cs" id="8_ssima"]
+[ext_resource type="Script" path="res://src/Net/ServerNodes/CardTempArea.cs" id="9_iwnhu"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_337q5")
@@ -22,7 +22,7 @@ script = ExtResource("3_bmwaj")
 script = ExtResource("5_3a7jm")
 
 [node name="EnemyBoard" type="Node" parent="."]
-script = ExtResource("6_p7vfk")
+script = ExtResource("5_3a7jm")
 
 [node name="EnemyHand" type="Node" parent="."]
 script = ExtResource("4_dvbuv")
@@ -35,3 +35,9 @@ script = ExtResource("2_fcoa2")
 
 [node name="MidPanel" type="Node" parent="."]
 script = ExtResource("8_ssima")
+
+[node name="CardTempArea" type="Node" parent="."]
+script = ExtResource("9_iwnhu")
+
+[node name="EnemyCardTempArea" type="Node" parent="."]
+script = ExtResource("9_iwnhu")
