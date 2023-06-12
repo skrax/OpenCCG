@@ -1,18 +1,18 @@
-[gd_scene load_steps=32 format=3 uid="uid://1dmvryxgjv51"]
+[gd_scene load_steps=32 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
-[ext_resource type="Script" path="res://src/BoardArea.cs" id="2_wweqi"]
 [ext_resource type="Script" path="res://src/EnemyHandArea.cs" id="3_8aogm"]
 [ext_resource type="Script" path="res://src/StatusPanel.cs" id="3_a0id7"]
 [ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
-[ext_resource type="Script" path="res://src/EnemyBoardArea.cs" id="4_4t5gh"]
+[ext_resource type="Script" path="res://src/BoardArea.cs" id="4_4t5gh"]
 [ext_resource type="Texture2D" uid="uid://wart73b367qr" path="res://img/avatar/00018-679053703.png" id="4_f02f3"]
 [ext_resource type="Script" path="res://src/Avatar.cs" id="5_ce2ri"]
 [ext_resource type="Script" path="res://src/InputEventSystem.cs" id="7_di0s5"]
 [ext_resource type="Texture2D" uid="uid://b8hwvu6ghiybr" path="res://img/avatar/00056-1946604175.png" id="7_lymuw"]
 [ext_resource type="Script" path="res://src/EnemyAvatar.cs" id="9_7fk18"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
+[ext_resource type="PackedScene" uid="uid://rp3que8k4xmy" path="res://scenes/card-tmp.tscn" id="13_hy35u"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8c0a6"]
 size = Vector2(1920, 255)
@@ -170,7 +170,7 @@ script = ExtResource("5_ce2ri")
 
 [node name="Board" type="Area2D" parent="."]
 position = Vector2(960, 699)
-script = ExtResource("2_wweqi")
+script = ExtResource("4_4t5gh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Board"]
 shape = SubResource("RectangleShape2D_ramgb")
@@ -283,8 +283,10 @@ label_settings = SubResource("LabelSettings_iyv0j")
 
 [node name="Client" parent="." instance=ExtResource("3_uxwq6")]
 
-[node name="InputEventSystem" type="Node2D" parent="."]
+[node name="InputEventSystem" type="Node2D" parent="." node_paths=PackedStringArray("_cardTempArea", "_line")]
 script = ExtResource("7_di0s5")
+_cardTempArea = NodePath("../CardTempArea")
+_line = NodePath("Line2D")
 
 [node name="Line2D" type="Line2D" parent="InputEventSystem"]
 top_level = true
@@ -308,3 +310,12 @@ theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_8ghqf")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_1jar7")
 text = "End Turn"
+
+[node name="CardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
+visible = false
+_inputEventSystem = NodePath("../InputEventSystem")
+
+[node name="EnemyCardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
+visible = false
+position = Vector2(1401, 186)
+_inputEventSystem = NodePath("../InputEventSystem")

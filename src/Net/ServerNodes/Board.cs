@@ -1,22 +1,41 @@
+using System;
+using System.Collections.Generic;
 using Godot;
-using OpenCCG.Net.Api;
+using OpenCCG.Net.Dto;
+using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
 
-public partial class Board : Node, IBoardRpc
+public record RemoveCardDto(string Id);
+
+public partial class Board : Node, IMessageReceiver<MessageType>
 {
     [Rpc]
-    public void PlaceCard(string cardGameStateDtoJson)
+    public void HandleMessageAsync(string messageJson)
     {
+        IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    [Rpc]
-    public void UpdateCard(string cardGameStateDtoJson)
+    public Dictionary<string, IObserver>? Observers => null;
+
+    public Executor GetExecutor(MessageType messageType)
     {
+        throw new NotImplementedException();
     }
 
-    [Rpc]
-    public void RemoveCard(string id)
+    public void PlaceCard(long peerId, CardGameStateDto cardGameStateDtoJson)
     {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.PlaceCard, cardGameStateDtoJson);
+    }
+
+    public void UpdateCard(long peerId, CardGameStateDto cardGameStateDtoJson)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.UpdateCard, cardGameStateDtoJson);
+    }
+
+    public void RemoveCard(long peerId, Guid cardId)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard,
+            new RemoveCardDto(cardId.ToString()));
     }
 }

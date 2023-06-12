@@ -6,5 +6,8 @@ namespace OpenCCG.Core;
 
 public static class EnumerableExtensions
 {
-    public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable) => enumerable.OrderBy(_ => GD.Randi());
+    public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
+    {
+        return enumerable.OrderBy(_ => GD.Randi());
+    }
 }

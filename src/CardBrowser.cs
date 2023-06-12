@@ -15,16 +15,16 @@ public partial class CardBrowser : Control
     private static readonly PackedScene CardUIDeckScene = GD.Load<PackedScene>("res://scenes/card-ui-deck.tscn");
     private static readonly PackedScene MenuScene = GD.Load<PackedScene>("res://scenes/menu.tscn");
 
-    [Export] private ScrollContainer _cardViewScrollContainer, _deckScrollContainer;
-    [Export] private FlowContainer _cardViewFlowContainer;
+    private readonly Dictionary<string, CardUIDeck> _deck = new();
     [Export] private HBoxContainer _bottomPanelContainer;
+    [Export] private FlowContainer _cardViewFlowContainer;
+
+    [Export] private ScrollContainer _cardViewScrollContainer, _deckScrollContainer;
     [Export] private Button _clearTextButton;
-    [Export] private TextEdit _searchEdit, _deckNameEdit;
-    [Export] private Button _menuButton, _createDeckButton, _saveDeckButton, _loadDeckButton;
     [Export] private VBoxContainer _deckContainer;
     [Export] private FileDialog _fileDialog;
-
-    private readonly Dictionary<string, CardUIDeck> _deck = new();
+    [Export] private Button _menuButton, _createDeckButton, _saveDeckButton, _loadDeckButton;
+    [Export] private TextEdit _searchEdit, _deckNameEdit;
 
     public override void _Ready()
     {
@@ -43,42 +43,29 @@ public partial class CardBrowser : Control
             _searchEdit.Text = "";
 
             foreach (var child in _cardViewFlowContainer.GetChildren())
-            {
-                if (!child.IsQueuedForDeletion()) child.QueueFree();
-            }
+                if (!child.IsQueuedForDeletion())
+                    child.QueueFree();
 
-            foreach (var cardRecord in CardDatabase.Cards)
-            {
-                AddCardToView(cardRecord);
-            }
+            foreach (var cardRecord in Database.Cards) AddCardToView(cardRecord);
         };
 
         _searchEdit.TextChanged += () =>
         {
             var text = _searchEdit.Text;
             foreach (var child in _cardViewFlowContainer.GetChildren())
-            {
-                if (!child.IsQueuedForDeletion()) child.QueueFree();
-            }
+                if (!child.IsQueuedForDeletion())
+                    child.QueueFree();
 
-            foreach (var cardRecord in CardDatabase.Cards.Where(x => x.Description.Contains(text)))
-            {
+            foreach (var cardRecord in Database.Cards.Where(x => x.Description.Contains(text)))
                 AddCardToView(cardRecord);
-            }
         };
 
-        foreach (var cardRecord in CardDatabase.Cards)
-        {
-            AddCardToView(cardRecord);
-        }
+        foreach (var cardRecord in Database.Cards) AddCardToView(cardRecord);
     }
 
     private void ClearDeck()
     {
-        foreach (var child in _deckContainer.GetChildren())
-        {
-            child?.QueueFree();
-        }
+        foreach (var child in _deckContainer.GetChildren()) child?.QueueFree();
 
         _deck.Clear();
         _deckNameEdit.Clear();
@@ -93,13 +80,9 @@ public partial class CardBrowser : Control
             if (!x.IsActionPressed(InputActions.SpriteClick)) return;
 
             if (_deck.TryGetValue(cardRecord.Id, out var cardDeck))
-            {
                 cardDeck.SetCount(cardDeck.Count + 1);
-            }
             else
-            {
                 AddCardToDeck(card.Record);
-            }
         };
     }
 
@@ -157,7 +140,7 @@ public partial class CardBrowser : Control
 
         foreach (var jsonRecord in deserialized)
         {
-            var cardRecord = CardDatabase.Cards.First(x => x.Id == jsonRecord.Id);
+            var cardRecord = Database.Cards.First(x => x.Id == jsonRecord.Id);
             AddCardToDeck(cardRecord).SetCount(jsonRecord.Count);
         }
     }

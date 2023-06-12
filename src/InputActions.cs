@@ -1,5 +1,3 @@
-using Godot;
-
 namespace OpenCCG;
 
 public static class InputActions

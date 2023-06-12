@@ -1,29 +1,48 @@
+using System;
+using System.Collections.Generic;
 using Godot;
-using OpenCCG.Net.Api;
+using OpenCCG.Net;
+using OpenCCG.Net.Dto;
+using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
-public partial class Main : Node, IMainRpc
+public partial class Main : Node, IMessageReceiver<MessageType>
 {
-    [Rpc]
-    public void PlayCard(string id)
-    {
-    }
+    public Dictionary<string, IObserver>? Observers => null;
 
     [Rpc]
-    public void CombatPlayerCard(string attackerId, string targetId)
+    public async void HandleMessageAsync(string messageJson)
     {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    [Rpc]
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    public void PlayCard(Guid id)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.PlayCard, id);
+    }
+
+    public void CombatPlayerCard(Guid attackerId, Guid targetId)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.CombatPlayerCard,
+            new CombatPlayerCardDto(attackerId, targetId));
+    }
+
     public void EndTurn()
     {
-        throw new System.NotImplementedException();
+        IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.EndTurn);
     }
 
-    [Rpc]
-    public void CombatPlayer(string attackerId)
+    public void CombatPlayer(Guid cardId)
     {
-        throw new System.NotImplementedException();
+        IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.CombatPlayer, cardId);
     }
 }

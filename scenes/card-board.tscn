@@ -17,13 +17,15 @@ font_size = 60
 [sub_resource type="LabelSettings" id="LabelSettings_6jk6c"]
 font_size = 60
 
-[node name="CardBoard" type="Sprite2D"]
+[node name="CardBoard" type="Sprite2D" node_paths=PackedStringArray("_atkPanel", "_defPanel")]
 material = SubResource("ShaderMaterial_4a4ib")
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_wipga")
 script = ExtResource("3_7q1kr")
+_atkPanel = NodePath("AttackPanel")
+_defPanel = NodePath("DefPanel")
 
-[node name="AttackPanel" type="Panel" parent="."]
+[node name="AttackPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -34,6 +36,7 @@ offset_bottom = -384.0
 grow_vertical = 0
 pivot_offset = Vector2(2.08165e-12, 2.08165e-12)
 script = ExtResource("4_0j6jh")
+_statLabel = NodePath("Label")
 
 [node name="Label" type="Label" parent="AttackPanel"]
 layout_mode = 1
@@ -47,7 +50,7 @@ label_settings = SubResource("LabelSettings_5ex16")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DefPanel" type="Panel" parent="."]
+[node name="DefPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -60,6 +63,7 @@ offset_bottom = -384.0
 grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("4_0j6jh")
+_statLabel = NodePath("Label")
 
 [node name="Label" type="Label" parent="DefPanel"]
 layout_mode = 1

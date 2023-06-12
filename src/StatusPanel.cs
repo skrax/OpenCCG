@@ -1,11 +1,33 @@
+using System.Collections.Generic;
 using Godot;
-using OpenCCG.Net.Api;
+using OpenCCG.Net;
+using OpenCCG.Net.Rpc;
 
-public partial class StatusPanel : Node, IStatusPanelRpc
+namespace OpenCCG;
+
+public partial class StatusPanel : Node, IMessageReceiver<MessageType>
 {
-    private Label _healthLabel;
     private Label _cardCountLabel;
     private Label _energyLabel;
+    private Label _healthLabel;
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.SetEnergy => Executor.Make<int>(SetEnergy),
+            MessageType.SetCardCount => Executor.Make<int>(SetCardCount),
+            MessageType.SetHealth => Executor.Make<int>(SetHealth)
+        };
+    }
 
     public override void _Ready()
     {
@@ -14,20 +36,17 @@ public partial class StatusPanel : Node, IStatusPanelRpc
         _energyLabel = GetChild<Label>(4);
     }
 
-    [Rpc]
-    public void SetEnergy(int value)
+    private void SetEnergy(int value)
     {
         _energyLabel.Text = value.ToString();
     }
 
-    [Rpc]
-    public void SetCardCount(int value)
+    private void SetCardCount(int value)
     {
         _cardCountLabel.Text = value.ToString();
     }
 
-    [Rpc]
-    public void SetHealth(int value)
+    private void SetHealth(int value)
     {
         _healthLabel.Text = value.ToString();
     }
