@@ -283,10 +283,10 @@ label_settings = SubResource("LabelSettings_iyv0j")
 
 [node name="Client" parent="." instance=ExtResource("3_uxwq6")]
 
-[node name="InputEventSystem" type="Node2D" parent="." node_paths=PackedStringArray("_line", "_cardTempArea")]
+[node name="InputEventSystem" type="Node2D" parent="." node_paths=PackedStringArray("_cardTempArea", "_line")]
 script = ExtResource("7_di0s5")
-_line = NodePath("Line2D")
 _cardTempArea = NodePath("../CardTempArea")
+_line = NodePath("Line2D")
 
 [node name="Line2D" type="Line2D" parent="InputEventSystem"]
 top_level = true

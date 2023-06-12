@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -14,6 +15,7 @@ public partial class CardUI : TextureRect, INodeInit<CardRecord>
 
     public void Init(CardRecord record)
     {
+        var effects = Database.CardEffects.Where(x => record.Effects.Any(y => y.Id == x.Key));
         _infoPanel.Value = record.Description;
         _costPanel.Value = record.Cost;
         _atkPanel.Value = record.Atk;

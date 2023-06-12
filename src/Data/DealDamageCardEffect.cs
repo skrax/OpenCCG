@@ -32,7 +32,7 @@ public class DealDamageCardEffect : ICardEffect
 
         if (output.cardId == null)
         {
-            playerGameState.Enemy.Health -= 1;
+            playerGameState.Enemy.Health -= Damage;
 
             playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Enemy.Health);
             playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Enemy.Health);
@@ -40,7 +40,7 @@ public class DealDamageCardEffect : ICardEffect
         else
         {
             var targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-            playerGameState.ResolveDamage(targetCard, 1, PlayerGameState.ControllingEntity.Enemy);
+            playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
         }
     }
 

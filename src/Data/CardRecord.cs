@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 namespace OpenCCG.Data;
 
 public enum CardRecordType
@@ -19,12 +23,33 @@ public record CardRecord(
     string ImgPath
 )
 {
-    //ICardEffect[] Effects,
-    //this.Effects = Effects;
-    //Effects.Any()
-    //? Effects.Select(x => x.Text).Aggregate((x, y) => $"{x}\n{y}")
-    //     :
-    //public ICardEffect[] Effects { get; }
+    public string Description => GetEffectText();
 
-    public string Description { get; } = "";
+    private List<ICardEffect>? _cachedEffects;
+
+    private string GetEffectText()
+    {
+        var sb = new StringBuilder();
+        if (_cachedEffects == null)
+        {
+            _cachedEffects = new List<ICardEffect>(Effects.Length);
+
+            foreach (var cardEffectRecord in Effects)
+            {
+                var effect = Database.CardEffects[cardEffectRecord.Id](cardEffectRecord.initJson);
+                _cachedEffects.Add(effect);
+
+                sb.AppendLine(effect.GetText());
+            }
+
+            return sb.ToString();
+        }
+
+        foreach (var cachedEffect in _cachedEffects)
+        {
+            sb.AppendLine(cachedEffect.GetText());
+        }
+
+        return sb.ToString();
+    }
 }

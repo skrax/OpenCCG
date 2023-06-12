@@ -8,23 +8,23 @@ bg_color = Color(0.705882, 0.584314, 0.262745, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fchwj"]
 bg_color = Color(0, 0.709804, 0.486275, 1)
 
-[node name="card-browser" type="Control" node_paths=PackedStringArray("_cardViewScrollContainer", "_deckScrollContainer", "_cardViewFlowContainer", "_bottomPanelContainer", "_clearTextButton", "_searchEdit", "_deckNameEdit", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton", "_deckContainer", "_fileDialog")]
+[node name="card-browser" type="Control" node_paths=PackedStringArray("_bottomPanelContainer", "_cardViewFlowContainer", "_cardViewScrollContainer", "_deckScrollContainer", "_clearTextButton", "_deckContainer", "_fileDialog", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton", "_searchEdit", "_deckNameEdit")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_7casj")
+_bottomPanelContainer = NodePath("FilterBar")
+_cardViewFlowContainer = NodePath("CardBrowser/VFlowContainer")
 _cardViewScrollContainer = NodePath("CardBrowser")
 _deckScrollContainer = NodePath("DeckBrowser")
-_cardViewFlowContainer = NodePath("CardBrowser/VFlowContainer")
-_bottomPanelContainer = NodePath("FilterBar")
 _clearTextButton = NodePath("FilterBar/Button")
-_searchEdit = NodePath("FilterBar/TextEdit")
-_deckNameEdit = NodePath("DeckName")
+_deckContainer = NodePath("DeckBrowser/VBoxContainer")
+_fileDialog = NodePath("FileDialog")
 _menuButton = NodePath("MenuButton")
 _createDeckButton = NodePath("CreateDeckButton")
 _saveDeckButton = NodePath("SaveDeckButton")
 _loadDeckButton = NodePath("LoadDeckButton")
-_deckContainer = NodePath("DeckBrowser/VBoxContainer")
-_fileDialog = NodePath("FileDialog")
+_searchEdit = NodePath("FilterBar/TextEdit")
+_deckNameEdit = NodePath("DeckName")
 
 [node name="CardBrowser" type="ScrollContainer" parent="."]
 layout_mode = 0
