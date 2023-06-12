@@ -8,7 +8,7 @@ public static class PackedSceneExt
     {
         var instance = scene.Instantiate<T>();
         parent.AddChild(instance);
-        
+
         return instance;
     }
 

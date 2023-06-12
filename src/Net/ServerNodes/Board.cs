@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
 
@@ -10,9 +11,16 @@ public record RemoveCardDto(string Id);
 public partial class Board : Node, IMessageReceiver<MessageType>
 {
     [Rpc]
-    public void HandleMessage(string messageJson)
+    public void HandleMessageAsync(string messageJson)
     {
-        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+        IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        throw new NotImplementedException();
     }
 
     public void PlaceCard(long peerId, CardGameStateDto cardGameStateDtoJson)
@@ -29,12 +37,5 @@ public partial class Board : Node, IMessageReceiver<MessageType>
     {
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard,
             new RemoveCardDto(cardId.ToString()));
-    }
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    public Executor GetExecutor(MessageType messageType)
-    {
-        throw new NotImplementedException();
     }
 }

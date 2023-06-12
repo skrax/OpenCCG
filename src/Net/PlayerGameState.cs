@@ -34,11 +34,11 @@ public class PlayerGameState
 
     public LinkedList<CardGameState> Deck { get; private set; } = new();
 
-    public LinkedList<CardGameState> Hand { get; private set; } = new();
+    public LinkedList<CardGameState> Hand { get; } = new();
 
-    public LinkedList<CardGameState> Board { get; private set; } = new();
+    public LinkedList<CardGameState> Board { get; } = new();
 
-    public LinkedList<CardGameState> Pit { get; private set; } = new();
+    public LinkedList<CardGameState> Pit { get; } = new();
 
     public List<CardRecord> DeckList { get; private set; }
 
@@ -72,7 +72,7 @@ public class PlayerGameState
                                })
                                .Shuffle();
 
-        Deck = new(shuffledDeckList);
+        Deck = new LinkedList<CardGameState>(shuffledDeckList);
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
     }
 
@@ -141,10 +141,7 @@ public class PlayerGameState
             Nodes.Hand.RemoveCard(PeerId, id);
             Nodes.EnemyHand.RemoveCard(EnemyPeerId);
 
-            foreach (var cardEffect in effects)
-            {
-                await cardEffect.Execute(card, this);
-            }
+            foreach (var cardEffect in effects) await cardEffect.Execute(card, this);
 
             Pit.AddLast(card);
         }
@@ -277,6 +274,6 @@ public class PlayerGameState
 
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
         UpdateEnergyRpc();
-        Draw(Rules.CardsDrawnPerTurn);
+        Draw();
     }
 }

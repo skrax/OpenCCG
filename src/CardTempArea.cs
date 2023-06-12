@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
+using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
@@ -13,6 +14,22 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
     [Export] private InputEventSystem _inputEventSystem;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget)
+        };
+    }
 
     public void ShowPermanent(string imgPath)
     {
@@ -54,7 +71,8 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             Reset();
             return _tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id));
         }
-        else if (target is EnemyAvatar)
+
+        if (target is EnemyAvatar)
         {
             Reset();
             return _tsc.TrySetResult(new RequireTargetOutputDto(null));
@@ -62,18 +80,4 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
 
         return false;
     }
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    [Rpc]
-    public async void HandleMessage(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.RequireTarget => IMessageReceiver<MessageType>
-            .MakeExecutor<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget)
-    };
 }

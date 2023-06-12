@@ -9,21 +9,20 @@ namespace OpenCCG.Data;
 
 public class DealDamageCardEffect : ICardEffect
 {
-    private record Init(int damage);
-
-    public static CardEffectRecord MakeRecord(int damage) => new(Id, JsonSerializer.Serialize(new Init(damage)));
-
     public const string Id = "TEST-E-001";
-
-    public string GetText() => $"Deal {Damage} damage";
-
-    public int Damage { get; }
 
     public DealDamageCardEffect(string initJson)
     {
         var init = JsonSerializer.Deserialize<Init>(initJson);
 
         Damage = init?.damage ?? throw new ArgumentNullException();
+    }
+
+    public int Damage { get; }
+
+    public string GetText()
+    {
+        return $"Deal {Damage} damage";
     }
 
     public async Task Execute(CardGameState card, PlayerGameState playerGameState)
@@ -44,4 +43,11 @@ public class DealDamageCardEffect : ICardEffect
             playerGameState.ResolveDamage(targetCard, 1, PlayerGameState.ControllingEntity.Enemy);
         }
     }
+
+    public static CardEffectRecord MakeRecord(int damage)
+    {
+        return new CardEffectRecord(Id, JsonSerializer.Serialize(new Init(damage)));
+    }
+
+    private record Init(int damage);
 }

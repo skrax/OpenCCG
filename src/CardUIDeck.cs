@@ -28,7 +28,10 @@ public partial class CardUIDeck : ColorRect, INodeInit<CardRecord>
         _countLabel.Text = $"{count}x";
     }
 
-    public record JsonRecord(string Id, int Count);
+    public JsonRecord ToJsonRecord()
+    {
+        return new JsonRecord(Record.Id, Count);
+    }
 
-    public JsonRecord ToJsonRecord() => new(Record.Id, Count);
+    public record JsonRecord(string Id, int Count);
 }

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -13,10 +13,31 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 {
     private readonly GameState _gameState = new();
 
+    public Dictionary<string, IObserver>? Observers { get; } = new();
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.PlayCard => Executor.Make<Guid>(PlayCard),
+            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(
+                CombatPlayerCard),
+            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer),
+            MessageType.EndTurn => Executor.Make(EndTurn),
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+        };
+    }
+
     public override void _Ready()
     {
         var peer = new ENetMultiplayerPeer();
-        var result = peer.CreateServer(8080, maxClients: 2);
+        var result = peer.CreateServer(8080, 2);
 
         if (result is Error.Ok)
         {
@@ -53,7 +74,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
                 EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyHand/StatusPanel"),
                 MidPanel = GetNode<ServerNodes.MidPanel>("MidPanel"),
                 CardTempArea = GetNode<ServerNodes.CardTempArea>("CardTempArea"),
-                EnemyCardTempArea = GetNode<ServerNodes.CardTempArea>("EnemyCardTempArea"),
+                EnemyCardTempArea = GetNode<ServerNodes.CardTempArea>("EnemyCardTempArea")
             };
 
             var p1 = new PlayerGameState
@@ -101,24 +122,6 @@ public partial class Server : Node, IMessageReceiver<MessageType>
     {
         Logger.Info<Server>($"Peer disconnected {id}");
     }
-
-    public Dictionary<string, IObserver>? Observers { get; } = new();
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public async void HandleMessage(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.PlayCard => IMessageReceiver<MessageType>.MakeExecutor<Guid>(PlayCard),
-        MessageType.CombatPlayerCard => IMessageReceiver<MessageType>.MakeExecutor<CombatPlayerCardDto>(
-            CombatPlayerCard),
-        MessageType.CombatPlayer => IMessageReceiver<MessageType>.MakeExecutor<Guid>(CombatPlayer),
-        MessageType.EndTurn => IMessageReceiver<MessageType>.MakeExecutor(EndTurn),
-        _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
-    };
 
     private async void PlayCard(int senderPeerId, Guid cardId)
     {

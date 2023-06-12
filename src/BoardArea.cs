@@ -5,6 +5,7 @@ using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
@@ -18,9 +19,20 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
     public Dictionary<string, IObserver>? Observers => null;
 
     [Rpc]
-    public void HandleMessage(string messageJson)
+    public async void HandleMessageAsync(string messageJson)
     {
-        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
+            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCard),
+            MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
+            _ => throw new NotImplementedException()
+        };
     }
 
     private void SetCardPositions()
@@ -52,12 +64,4 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 
         SetCardPositions();
     }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.PlaceCard => IMessageReceiver<MessageType>.MakeExecutor<CardGameStateDto>(PlaceCard),
-        MessageType.UpdateCard => IMessageReceiver<MessageType>.MakeExecutor<CardGameStateDto>(UpdateCard),
-        MessageType.RemoveCard => IMessageReceiver<MessageType>.MakeExecutor<RemoveCardDto>(RemoveCard),
-        _ => throw new NotImplementedException()
-    };
 }

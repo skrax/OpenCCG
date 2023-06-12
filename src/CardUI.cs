@@ -24,6 +24,7 @@ public partial class CardUI : TextureRect, INodeInit<CardRecord>
             _atkPanel.Visible = false;
             _defPanel.Visible = false;
         }
+
         Texture = GD.Load<Texture2D>(record.ImgPath);
         Record = record;
     }

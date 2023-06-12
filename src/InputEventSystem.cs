@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
-using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
@@ -17,31 +15,23 @@ public partial class InputEventSystem : Node2D
         ChoosingTargets
     }
 
-    [Export] private Line2D _line;
     [Export] private CardTempArea _cardTempArea;
-
-    private InputState _state = InputState.Idle;
-    private Vector2 _dragOffset;
     private Card? _cardToDrag;
 
     private ulong? _dragLineStartInstanceId;
+    private Vector2 _dragOffset;
+
+    [Export] private Line2D _line;
+
+    private InputState _state = InputState.Idle;
 
     public override void _UnhandledInput(InputEvent inputEvent)
     {
-        if (inputEvent.IsActionPressed(InputActions.SpriteClick))
-        {
-            OnSpriteClickedPressed(inputEvent);
-        }
+        if (inputEvent.IsActionPressed(InputActions.SpriteClick)) OnSpriteClickedPressed(inputEvent);
 
-        if (inputEvent.IsActionReleased(InputActions.SpriteClick))
-        {
-            OnSpriteClickReleased();
-        }
+        if (inputEvent.IsActionReleased(InputActions.SpriteClick)) OnSpriteClickReleased();
 
-        if (inputEvent is InputEventMouseMotion mouseMotion)
-        {
-            OnMouseMotion(mouseMotion);
-        }
+        if (inputEvent is InputEventMouseMotion mouseMotion) OnMouseMotion(mouseMotion);
 
         EventSink.Drain();
     }
@@ -59,7 +49,7 @@ public partial class InputEventSystem : Node2D
         var pos = _cardTempArea.Position;
         pos += _cardTempArea.GetRect().GetCenter();
 
-        Logger.Info<InputEventSystem>($"RequireTargets Start");
+        Logger.Info<InputEventSystem>("RequireTargets Start");
         _line.Points = new[] { _line.ToLocal(pos), _line.ToLocal(GetGlobalMousePosition()) };
     }
 
@@ -107,10 +97,7 @@ public partial class InputEventSystem : Node2D
         }
 
         var card = EventSink.PointerDownCards.MinBy(x => x.ZIndex);
-        if (card != null)
-        {
-            OnDragCardStart(card, mousePosition);
-        }
+        if (card != null) OnDragCardStart(card, mousePosition);
     }
 
     private void OnMouseMotion(InputEventMouseMotion mouseMotion)
@@ -175,21 +162,17 @@ public partial class InputEventSystem : Node2D
         {
             Logger.Info<InputEventSystem>($"DragLine End {cardBoard.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
-            {
                 GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, cardBoard.CardGameState.Id);
-            }
         }
         else if (avatar != null && _dragLineStartInstanceId.HasValue)
         {
             Logger.Info<InputEventSystem>($"DragLine End {avatar.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
-            {
                 GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
-            }
         }
         else
         {
-            Logger.Info<InputEventSystem>($"DragLine End");
+            Logger.Info<InputEventSystem>("DragLine End");
         }
 
         _dragLineStartInstanceId = null;

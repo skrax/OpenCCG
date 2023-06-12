@@ -10,12 +10,12 @@ namespace OpenCCG;
 public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
 {
     private static ulong? _dragInstanceId;
-    [Export] private Area2D _area2D;
-    [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
-    [Export] private CardInfoPanel _infoPanel, _namePanel;
-    private Vector2 _dragOffset;
 
     private readonly HashSet<CardZone> _hoverZones = new();
+    [Export] private Area2D _area2D;
+    [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
+    private Vector2 _dragOffset;
+    [Export] private CardInfoPanel _infoPanel, _namePanel;
 
     public Action? OnDragFailed;
 

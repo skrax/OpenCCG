@@ -1,11 +1,25 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
 
 public partial class StatusPanel : Node, IMessageReceiver<MessageType>
 {
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public void HandleMessageAsync(string messageJson)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        throw new NotImplementedException();
+    }
+
     public void SetEnergy(long peerId, int value)
     {
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetEnergy, value);
@@ -19,18 +33,5 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
     public void SetHealth(long peerId, int value)
     {
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetHealth, value);
-    }
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    [Rpc]
-    public void HandleMessage(string messageJson)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Executor GetExecutor(MessageType messageType)
-    {
-        throw new NotImplementedException();
     }
 }

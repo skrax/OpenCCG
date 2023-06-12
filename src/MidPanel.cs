@@ -1,13 +1,29 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 using OpenCCG.Net;
+using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
 public partial class MidPanel : Node, IMessageReceiver<MessageType>
 {
     private Button _endTurnButton;
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.EndTurnButtonSetActive => Executor.Make<bool>(EndTurnButtonSetActive)
+        };
+    }
 
     public override void _Ready()
     {
@@ -25,17 +41,4 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
         _endTurnButton.Disabled = !isActive;
         _endTurnButton.Text = isActive ? "End Turn" : "Enemy Turn";
     }
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    [Rpc]
-    public async void HandleMessage(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.EndTurnButtonSetActive => IMessageReceiver<MessageType>.MakeExecutor<bool>(EndTurnButtonSetActive)
-    };
 }

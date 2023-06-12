@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenCCG.Net;
+namespace OpenCCG.Net.Rpc;
 
 public interface IObserver : IDisposable
 {

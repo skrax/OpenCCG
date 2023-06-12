@@ -5,6 +5,7 @@ using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
@@ -12,6 +13,24 @@ public partial class HandArea : Area2D, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardScene = GD.Load<PackedScene>("res://scenes/card.tscn");
     private readonly List<Card> _cards = new();
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.RemoveCard => Executor.Make<Guid>(RemoveCard),
+            MessageType.FailPlayCard => Executor.Make(FailPlayCard),
+            MessageType.DrawCard => Executor.Make<CardGameStateDto>(DrawCard)
+        };
+    }
 
     private void RemoveCard(Guid cardId)
     {
@@ -41,19 +60,4 @@ public partial class HandArea : Area2D, IMessageReceiver<MessageType>
     {
         SpriteHelpers.OrderHorizontally(_cards.Cast<Sprite2D>().ToArray());
     }
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    [Rpc]
-    public async void HandleMessage(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.RemoveCard => IMessageReceiver<MessageType>.MakeExecutor<Guid>(RemoveCard),
-        MessageType.FailPlayCard => IMessageReceiver<MessageType>.MakeExecutor(FailPlayCard),
-        MessageType.DrawCard => IMessageReceiver<MessageType>.MakeExecutor<CardGameStateDto>(DrawCard)
-    };
 }

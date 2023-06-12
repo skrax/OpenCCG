@@ -1,13 +1,33 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 using OpenCCG.Net;
+using OpenCCG.Net.Rpc;
+
+namespace OpenCCG;
 
 public partial class StatusPanel : Node, IMessageReceiver<MessageType>
 {
-    private Label _healthLabel;
     private Label _cardCountLabel;
     private Label _energyLabel;
+    private Label _healthLabel;
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.SetEnergy => Executor.Make<int>(SetEnergy),
+            MessageType.SetCardCount => Executor.Make<int>(SetCardCount),
+            MessageType.SetHealth => Executor.Make<int>(SetHealth)
+        };
+    }
 
     public override void _Ready()
     {
@@ -30,19 +50,4 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
     {
         _healthLabel.Text = value.ToString();
     }
-
-    public Dictionary<string, IObserver>? Observers => null;
-    
-    [Rpc]
-    public async void HandleMessage(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.SetEnergy => IMessageReceiver<MessageType>.MakeExecutor<int>(SetEnergy),
-        MessageType.SetCardCount => IMessageReceiver<MessageType>.MakeExecutor<int>(SetCardCount),
-        MessageType.SetHealth => IMessageReceiver<MessageType>.MakeExecutor<int>(SetHealth),
-    };
 }

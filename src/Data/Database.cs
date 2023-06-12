@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Array = System.Array;
 
 namespace OpenCCG.Data;
 

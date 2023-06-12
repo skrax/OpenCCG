@@ -3,17 +3,13 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenCCG.Net;
+namespace OpenCCG.Net.Rpc;
 
 public class Observer<T> : IObserver
 {
-    private readonly TaskCompletionSource<T> _tsc;
     private readonly Timer _timer;
+    private readonly TaskCompletionSource<T> _tsc;
     private bool _handled;
-
-    public Observer(TaskCompletionSource<T> tsc) : this(tsc, TimeSpan.FromMinutes(3))
-    {
-    }
 
     public Observer(TaskCompletionSource<T> tsc, TimeSpan timeOut)
     {
