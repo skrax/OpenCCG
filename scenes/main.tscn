@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://b8hwvu6ghiybr" path="res://img/avatar/00056-1946604175.png" id="7_lymuw"]
 [ext_resource type="Script" path="res://src/EnemyAvatar.cs" id="9_7fk18"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
-[ext_resource type="Script" path="res://src/CardTempArea.cs" id="14_xwjvj"]
+[ext_resource type="PackedScene" uid="uid://rp3que8k4xmy" path="res://scenes/card-tmp.tscn" id="13_hy35u"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8c0a6"]
 size = Vector2(1920, 255)
@@ -311,13 +311,11 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_8ghqf")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_1jar7")
 text = "End Turn"
 
-[node name="CardTempArea" type="Sprite2D" parent="." node_paths=PackedStringArray("_inputEventSystem")]
-position = Vector2(659, 897)
-scale = Vector2(0.3, 0.3)
-script = ExtResource("14_xwjvj")
+[node name="CardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
+visible = false
 _inputEventSystem = NodePath("../InputEventSystem")
 
-[node name="EnemyCardTempArea" type="Sprite2D" parent="."]
+[node name="EnemyCardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
+visible = false
 position = Vector2(1401, 186)
-scale = Vector2(0.3, 0.3)
-script = ExtResource("14_xwjvj")
+_inputEventSystem = NodePath("../InputEventSystem")

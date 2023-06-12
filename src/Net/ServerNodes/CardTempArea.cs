@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
@@ -20,7 +21,7 @@ public enum RequireTargetSide
     Enemy
 }
 
-public record RequireTargetInputDto(string ImgPath, RequireTargetType Type, RequireTargetSide Side);
+public record RequireTargetInputDto(CardGameStateDto Card, RequireTargetType Type, RequireTargetSide Side);
 
 public record RequireTargetOutputDto(Guid? cardId);
 
@@ -29,10 +30,8 @@ public partial class CardTempArea : Node, IMessageReceiver<MessageType>
     public Dictionary<string, IObserver>? Observers { get; } = new();
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void HandleMessageAsync(string messageJson)
-    {
-        IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
-    }
+    public async void HandleMessageAsync(string messageJson) =>
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
 
     public Executor GetExecutor(MessageType messageType)
     {
@@ -46,5 +45,10 @@ public partial class CardTempArea : Node, IMessageReceiver<MessageType>
             MessageType.RequireTarget,
             input
         );
+    }
+
+    public void TmpShowCard(long peerId, CardGameStateDto cardGameStateDto)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.TmpShowCard, cardGameStateDto);
     }
 }

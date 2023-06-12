@@ -15,5 +15,6 @@ public enum MessageType
     SetHealth,
     FailPlayCard,
     DrawCard,
-    RequireTarget
+    RequireTarget,
+    TmpShowCard
 }

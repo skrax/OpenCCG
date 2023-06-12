@@ -27,8 +27,10 @@ public class DealDamageCardEffect : ICardEffect
 
     public async Task Execute(CardGameState card, PlayerGameState playerGameState)
     {
-        var input = new RequireTargetInputDto(card.Record.ImgPath, RequireTargetType.All, RequireTargetSide.Enemy);
+        var cardDto = card.AsDto();
+        var input = new RequireTargetInputDto(cardDto, RequireTargetType.All, RequireTargetSide.Enemy);
         var output = await playerGameState.Nodes.CardTempArea.RequireTargetsAsync(playerGameState.PeerId, input);
+        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         if (output.cardId == null)
         {
