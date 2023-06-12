@@ -45,12 +45,12 @@ public partial class HandArea : Area2D, IMessageReceiver<MessageType>
     public Dictionary<string, IObserver>? Observers => null;
 
     [Rpc]
-    public void HandleMessage(string messageJson)
+    public async void HandleMessage(string messageJson)
     {
-        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
     }
 
-    public Func<int, string?, string?> GetExecutor(MessageType messageType) => messageType switch
+    public Executor GetExecutor(MessageType messageType) => messageType switch
     {
         MessageType.RemoveCard => IMessageReceiver<MessageType>.MakeExecutor<Guid>(RemoveCard),
         MessageType.FailPlayCard => IMessageReceiver<MessageType>.MakeExecutor(FailPlayCard),

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
 using OpenCCG.Net.ServerNodes;
@@ -118,7 +118,7 @@ public class PlayerGameState
         Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy);
     }
 
-    public void PlayCard(Guid id)
+    public async Task PlayCard(Guid id)
     {
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
@@ -143,7 +143,7 @@ public class PlayerGameState
 
             foreach (var cardEffect in effects)
             {
-                cardEffect.Execute(card, this);
+                await cardEffect.Execute(card, this);
             }
 
             Pit.AddLast(card);

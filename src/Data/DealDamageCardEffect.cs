@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using OpenCCG.Net;
+using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Data;
 
@@ -23,12 +26,22 @@ public class DealDamageCardEffect : ICardEffect
         Damage = init?.damage ?? throw new ArgumentNullException();
     }
 
-    public void Execute(CardGameState card, PlayerGameState playerGameState)
+    public async Task Execute(CardGameState card, PlayerGameState playerGameState)
     {
-        /* TODO
-        var requestId = Guid.NewGuid().ToString();
-        playerGameState.Nodes.CardTempArea.RpcId(playerGameState.PeerId, "RequireTargets", requestId,
-            card.Record.ImgPath);
-            */
+        var input = new RequireTargetInputDto(card.Record.ImgPath, RequireTargetType.All, RequireTargetSide.Enemy);
+        var output = await playerGameState.Nodes.CardTempArea.RequireTargetsAsync(playerGameState.PeerId, input);
+
+        if (output.cardId == null)
+        {
+            playerGameState.Enemy.Health -= 1;
+
+            playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Enemy.Health);
+            playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Enemy.Health);
+        }
+        else
+        {
+            var targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
+            playerGameState.ResolveDamage(targetCard, 1, PlayerGameState.ControllingEntity.Enemy);
+        }
     }
 }

@@ -53,7 +53,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         SetCardPositions();
     }
 
-    public Func<int, string?, string?> GetExecutor(MessageType messageType) => messageType switch
+    public Executor GetExecutor(MessageType messageType) => messageType switch
     {
         MessageType.PlaceCard => IMessageReceiver<MessageType>.MakeExecutor<CardGameStateDto>(PlaceCard),
         MessageType.UpdateCard => IMessageReceiver<MessageType>.MakeExecutor<CardGameStateDto>(UpdateCard),

@@ -30,7 +30,7 @@ public partial class Hand : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public Func<int, string?, string?> GetExecutor(MessageType messageType)
+    public Executor GetExecutor(MessageType messageType)
     {
         throw new NotImplementedException();
     }

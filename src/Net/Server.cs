@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -104,12 +105,12 @@ public partial class Server : Node, IMessageReceiver<MessageType>
     public Dictionary<string, IObserver>? Observers { get; } = new();
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void HandleMessage(string messageJson)
+    public async void HandleMessage(string messageJson)
     {
-        IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
     }
 
-    public Func<int, string?, string?> GetExecutor(MessageType messageType) => messageType switch
+    public Executor GetExecutor(MessageType messageType) => messageType switch
     {
         MessageType.PlayCard => IMessageReceiver<MessageType>.MakeExecutor<Guid>(PlayCard),
         MessageType.CombatPlayerCard => IMessageReceiver<MessageType>.MakeExecutor<CombatPlayerCardDto>(
@@ -119,9 +120,9 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
     };
 
-    private void PlayCard(int senderPeerId, Guid cardId)
+    private async void PlayCard(int senderPeerId, Guid cardId)
     {
-        _gameState.PlayerGameStates[senderPeerId].PlayCard(cardId);
+        await _gameState.PlayerGameStates[senderPeerId].PlayCard(cardId);
     }
 
     private void CombatPlayerCard(int senderPeerId, CombatPlayerCardDto t)

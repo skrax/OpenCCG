@@ -33,7 +33,7 @@ public partial class Board : Node, IMessageReceiver<MessageType>
 
     public Dictionary<string, IObserver>? Observers => null;
 
-    public Func<int, string?, string?> GetExecutor(MessageType messageType)
+    public Executor GetExecutor(MessageType messageType)
     {
         throw new NotImplementedException();
     }

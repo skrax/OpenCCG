@@ -1,22 +1,24 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
+using OpenCCG.Net;
+using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
-public partial class CardTempArea : Sprite2D
+public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
 {
     [Export] private InputEventSystem _inputEventSystem;
-    private string? _requestId;
 
-    [Rpc]
+    private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
+
     public void ShowPermanent(string imgPath)
     {
         Texture = GD.Load<Texture2D>(imgPath);
     }
 
-    [Rpc]
     public async void Show(string imgPath, string timeSpan)
     {
         Texture = GD.Load<Texture2D>(imgPath);
@@ -24,49 +26,54 @@ public partial class CardTempArea : Sprite2D
         Reset();
     }
 
-    [Rpc]
     public void Reset()
     {
         Texture = null;
     }
 
-    [Rpc]
-    public void RequireTargets(string requestId, string imgPath)
+    public async Task<RequireTargetOutputDto> RequireTarget(RequireTargetInputDto input)
     {
-        if (_requestId is not null)
-        {
-            Logger.Error<CardTempArea>("There is already a request being processed");
-            return;
-        }
-
-        _requestId = requestId;
-
-        ShowPermanent(imgPath);
+        ShowPermanent(input.ImgPath);
+        _tsc = new TaskCompletionSource<RequireTargetOutputDto>();
         _inputEventSystem.OnRequireTarget();
+
+        return await _tsc.Task;
     }
 
     public bool TryUpstreamTarget<T>(T target)
     {
-        if (_requestId is null)
+        if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
+            _tsc.Task.IsFaulted)
         {
             Logger.Error<CardTempArea>($"No request id set to use {nameof(TryUpstreamTarget)}");
             return false;
-        } 
-        
-        // TODO
+        }
+
         if (target is CardBoard cardBoard)
         {
-            //GetNode("/root/Main").RpcId(1, "UpstreamTargetCard", _requestId, cardBoard.CardGameState.Id.ToString());
             Reset();
-            return true;
+            return _tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id));
         }
         else if (target is EnemyAvatar)
         {
-            //GetNode("/root/Main").RpcId(1, "UpstreamTargetEnemyAvatar", _requestId);
             Reset();
-            return true;
+            return _tsc.TrySetResult(new RequireTargetOutputDto(null));
         }
 
         return false;
     }
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessage(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType) => messageType switch
+    {
+        MessageType.RequireTarget => IMessageReceiver<MessageType>
+            .MakeExecutor<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget)
+    };
 }

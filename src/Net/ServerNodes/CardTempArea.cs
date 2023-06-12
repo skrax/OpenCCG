@@ -1,31 +1,44 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 
 namespace OpenCCG.Net.ServerNodes;
 
-public partial class CardTempArea : Node
+public enum RequireTargetType
 {
-    [Rpc]
-    public void ShowPermanent(string imgPath)
+    All,
+    Creature,
+    Avatar
+}
+
+public enum RequireTargetSide
+{
+    All,
+    Friendly,
+    Enemy
+}
+
+public record RequireTargetInputDto(string ImgPath, RequireTargetType Type, RequireTargetSide Side);
+
+public record RequireTargetOutputDto(Guid? cardId);
+
+public partial class CardTempArea : Node, IMessageReceiver<MessageType>
+{
+    public async Task<RequireTargetOutputDto> RequireTargetsAsync(long peerId, RequireTargetInputDto input)
     {
-        throw new NotImplementedException();
+        return await IMessageReceiver<MessageType>.GetAsync<RequireTargetInputDto, RequireTargetOutputDto>(this,
+            peerId,
+            MessageType.RequireTarget,
+            input
+        );
     }
 
-    [Rpc]
-    public void Show(string imgPath, string timeSpan)
-    {
-        throw new NotImplementedException();
-    }
+    public Dictionary<string, IObserver>? Observers { get; } = new();
 
-    [Rpc]
-    public void Reset()
-    {
-        throw new NotImplementedException();
-    }
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void HandleMessage(string messageJson) => IMessageReceiver<MessageType>.HandleMessage(this, messageJson);
 
-    [Rpc]
-    public void RequireTargets(string requestId, string imgPath)
-    {
-        throw new NotImplementedException();
-    }
+    public Executor GetExecutor(MessageType messageType) => throw new NotImplementedException();
+
 }
