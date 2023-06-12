@@ -14,6 +14,10 @@ config/name="openccg"
 run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
 
+[autoload]
+
+RuntimeData="*res://src/RuntimeData.cs"
+
 [display]
 
 window/size/viewport_width=1920

@@ -46,7 +46,7 @@ public partial class CardBrowser : Control
                 if (!child.IsQueuedForDeletion())
                     child.QueueFree();
 
-            foreach (var cardRecord in Database.Cards) AddCardToView(cardRecord);
+            foreach (var cardRecord in Database.Cards.Values) AddCardToView(cardRecord);
         };
 
         _searchEdit.TextChanged += () =>
@@ -56,11 +56,11 @@ public partial class CardBrowser : Control
                 if (!child.IsQueuedForDeletion())
                     child.QueueFree();
 
-            foreach (var cardRecord in Database.Cards.Where(x => x.Description.Contains(text)))
+            foreach (var cardRecord in Database.Cards.Values.Where(x => x.Description.Contains(text)))
                 AddCardToView(cardRecord);
         };
 
-        foreach (var cardRecord in Database.Cards) AddCardToView(cardRecord);
+        foreach (var cardRecord in Database.Cards.Values) AddCardToView(cardRecord);
     }
 
     private void ClearDeck()
@@ -140,7 +140,7 @@ public partial class CardBrowser : Control
 
         foreach (var jsonRecord in deserialized)
         {
-            var cardRecord = Database.Cards.First(x => x.Id == jsonRecord.Id);
+            var cardRecord = Database.Cards[jsonRecord.Id];
             AddCardToDeck(cardRecord).SetCount(jsonRecord.Count);
         }
     }

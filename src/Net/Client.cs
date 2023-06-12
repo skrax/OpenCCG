@@ -6,6 +6,8 @@ namespace OpenCCG.Net;
 
 public partial class Client : Node
 {
+    [Export] private Main _main;
+
     public override void _Ready()
     {
         var peer = new ENetMultiplayerPeer();
@@ -15,7 +17,6 @@ public partial class Client : Node
         {
             var mp = GetTree().GetMultiplayer();
             mp.MultiplayerPeer = peer;
-
 
             Multiplayer.ConnectedToServer += OnConnectedToServer;
             Multiplayer.ServerDisconnected += OnServerDisconnected;
@@ -40,6 +41,8 @@ public partial class Client : Node
     private void OnConnectedToServer()
     {
         Logger.Info<Client>("Connected to server");
+
+        _main.Enqueue();
     }
 
     private void OnPeerConnected(long id)

@@ -16,9 +16,9 @@ public class PlayerGameState
         Enemy
     }
 
-    public int PeerId { get; init; }
+    public long PeerId { get; init; }
 
-    public int EnemyPeerId { get; set; }
+    public long EnemyPeerId { get; set; }
 
     public PlayerGameState Enemy { get; set; }
 
