@@ -1,5 +1,6 @@
 using System.IO;
 using Godot;
+using OpenCCG.Core;
 
 namespace OpenCCG;
 
@@ -12,43 +13,34 @@ public partial class Menu : Node
     [Export] private FileDialog _fileDialog;
     [Export] private CheckButton _usePasswordCheckButton;
     [Export] private LineEdit _password;
-    private string? _deckPath;
-    private bool _inQueue;
+    private RuntimeData _runtimeData;
 
     public override void _Ready()
     {
+        _runtimeData = this.GetAutoloaded<RuntimeData>();
+        _password.Text = _runtimeData._queuePassword ?? string.Empty;
+        _usePasswordCheckButton.ButtonPressed = _runtimeData._useQueuePassword;
+        if (_runtimeData._deckPath != null)
+        {
+            SetDeck(_runtimeData._deckPath);
+        }
+        else
+        {
+            _deckNameLabel.Text = "No Deck Selected";
+            _deckNameLabel.AddThemeColorOverride("font_color", Colors.Red);
+        }
+
         _playButton.Pressed += () =>
         {
-            if (_inQueue)
-            {
-                _inQueue = false;
-                _playButton.Text = "Play";
-
-                _loadDeckButton.Disabled = false;
-                _cardsButton.Disabled = false;
-                _usePasswordCheckButton.Disabled = false;
-                _password.Editable = true;
-
-                return;
-            }
-
-            if (_deckPath == null) return;
+            if (_runtimeData._deckPath == null) return;
             if (_usePasswordCheckButton.ButtonPressed && _password.Text == string.Empty) return;
 
-            _inQueue = true;
-            _playButton.Text = "Cancel Queue";
-            _loadDeckButton.Disabled = true;
-            _cardsButton.Disabled = true;
-            _usePasswordCheckButton.Disabled = true;
-            _password.Editable = false;
-
-            //GetTree().ChangeSceneToPacked(MainScene);
+            GetTree().ChangeSceneToPacked(MainScene);
         };
 
         _cardsButton.Pressed += () => { GetTree().ChangeSceneToPacked(CardBrowserScene); };
-
-        _deckNameLabel.Text = "No Deck Selected";
-        _deckNameLabel.AddThemeColorOverride("font_color", Colors.Red);
+        _usePasswordCheckButton.Pressed += () => _runtimeData._useQueuePassword = _usePasswordCheckButton.ButtonPressed;
+        _password.TextChanged += s => _runtimeData._queuePassword = s;
 
         _loadDeckButton.Pressed += () => _fileDialog.Visible = true;
         _fileDialog.FileSelected += SetDeck;
@@ -56,7 +48,7 @@ public partial class Menu : Node
 
     private void SetDeck(string path)
     {
-        _deckPath = path;
+        _runtimeData._deckPath = path;
         _deckNameLabel.Text = Path.GetFileNameWithoutExtension(path);
         _deckNameLabel.AddThemeColorOverride("font_color", Colors.Green);
         _playButton.Disabled = false;

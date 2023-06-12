@@ -16,5 +16,6 @@ public enum MessageType
     FailPlayCard,
     DrawCard,
     RequireTarget,
-    TmpShowCard
+    TmpShowCard,
+    Queue,
 }

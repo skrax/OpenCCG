@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 
 namespace OpenCCG.Net.Rpc;
 
-public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, string?, Task<string?>>? AsyncOp)
+public record Executor(bool IsAsync, Func<long, string?, string?>? Op, Func<long, string?, Task<string?>>? AsyncOp)
 {
-    private static Executor MakeOp(Func<int, string?, string?> op)
+    private static Executor MakeOp(Func<long, string?, string?> op)
     {
         return new Executor(false, op, null);
     }
 
-    private static Executor MakeAsyncOp(Func<int, string?, Task<string?>> op)
+    private static Executor MakeAsyncOp(Func<long, string?, Task<string?>> op)
     {
         return new Executor(true, null, op);
     }
@@ -25,7 +25,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make(Action<int> act)
+    public static Executor Make(Action<long> act)
     {
         return MakeOp((senderPeerId, _) =>
         {
@@ -44,7 +44,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
     }
 
 
-    public static Executor Make<TIn>(Action<int, TIn> act)
+    public static Executor Make<TIn>(Action<long, TIn> act)
     {
         return MakeOp((senderPeerId, input) =>
         {
@@ -62,7 +62,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make<TOut>(Func<int, TOut> act)
+    public static Executor Make<TOut>(Func<long, TOut> act)
     {
         return MakeOp((senderPeerId, _) =>
         {
@@ -80,7 +80,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make<TIn, TOut>(Func<int, TIn, TOut> act)
+    public static Executor Make<TIn, TOut>(Func<long, TIn, TOut> act)
     {
         return MakeOp((senderPeerId, input) =>
         {
@@ -98,7 +98,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make(Func<int, Task> act)
+    public static Executor Make(Func<long, Task> act)
     {
         return MakeAsyncOp(async (senderPeerId, _) =>
         {
@@ -116,7 +116,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make<TIn>(Func<int, TIn, Task> act)
+    public static Executor Make<TIn>(Func<long, TIn, Task> act)
     {
         return MakeAsyncOp(async (senderPeerId, input) =>
         {
@@ -134,7 +134,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make<TOut>(Func<int, Task<TOut>> act)
+    public static Executor Make<TOut>(Func<long, Task<TOut>> act)
     {
         return MakeAsyncOp(async (senderPeerId, _) =>
         {
@@ -152,7 +152,7 @@ public record Executor(bool IsAsync, Func<int, string?, string?>? Op, Func<int, 
         });
     }
 
-    public static Executor Make<TIn, TOut>(Func<int, TIn, Task<TOut>> act)
+    public static Executor Make<TIn, TOut>(Func<long, TIn, Task<TOut>> act)
     {
         return MakeAsyncOp(
             async (senderPeerId, input) =>
