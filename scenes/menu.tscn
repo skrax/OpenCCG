@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/Menu.cs" id="1_pr0qs"]
 
-[node name="menu" type="Control"]
+[node name="menu" type="Control" node_paths=PackedStringArray("_playButton", "_cardsButton", "_loadDeckButton", "_deckNameLabel", "_fileDialog", "_usePasswordCheckButton", "_password")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,24 +10,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_pr0qs")
+_playButton = NodePath("Panel/PlayButton")
+_cardsButton = NodePath("CardBrowserButton")
+_loadDeckButton = NodePath("Panel/LoadDeckButton")
+_deckNameLabel = NodePath("Panel/Deck Name")
+_fileDialog = NodePath("FileDialog")
+_usePasswordCheckButton = NodePath("Panel/CheckButton")
+_password = NodePath("Panel/TextEdit")
 
-[node name="Button" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -149.0
-offset_top = -243.0
-offset_right = 151.0
-offset_bottom = -143.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 64
-text = "PLAY"
-
-[node name="Button2" type="Button" parent="."]
+[node name="CardBrowserButton" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -42,3 +33,84 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 64
 text = "CARDS"
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 811.0
+offset_top = 219.0
+offset_right = 1112.0
+offset_bottom = 425.0
+
+[node name="PlayButton" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.5
+offset_top = -102.0
+offset_right = 16.5
+offset_bottom = -63.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "PLAY"
+
+[node name="LoadDeckButton" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 20.5
+offset_top = -103.0
+offset_right = 150.5
+offset_bottom = -64.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "LOAD DECK"
+
+[node name="Deck Name" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 51.0
+offset_right = 289.0
+offset_bottom = 86.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 23
+text = "Current Deck"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckButton" type="CheckButton" parent="Panel"]
+layout_mode = 0
+offset_top = 117.0
+offset_right = 156.0
+offset_bottom = 148.0
+text = "Use Password"
+
+[node name="TextEdit" type="LineEdit" parent="Panel"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 114.0
+offset_right = 294.0
+offset_bottom = 146.0
+theme_override_font_sizes/font_size = 14
+placeholder_text = "Enter Password .."
+max_length = 12
+secret = true
+clear_button_enabled = true
+
+[node name="FileDialog" type="FileDialog" parent="."]
+initial_position = 1
+title = "Open a File"
+size = Vector2i(500, 500)
+ok_button_text = "Open"
+dialog_hide_on_ok = true
+file_mode = 0
+access = 1
+filters = PackedStringArray("*.deck")
