@@ -12,7 +12,8 @@ public partial class InputEventSystem : Node2D
         Idle,
         DraggingCard,
         DraggingLine,
-        ChoosingTargets
+        ChoosingTargets,
+        PreviewHoverCardHand
     }
 
     [Export] private CardTempArea _cardTempArea;
@@ -24,6 +25,8 @@ public partial class InputEventSystem : Node2D
     [Export] private Line2D _line;
 
     private InputState _state = InputState.Idle;
+
+    public Action OnInputStateChanged;
 
     public override void _UnhandledInput(InputEvent inputEvent)
     {
@@ -121,12 +124,19 @@ public partial class InputEventSystem : Node2D
             }
             case InputState.Idle:
             {
+                var card = EventSink.PointerEnterCards.MinBy(x => x.ZIndex);
+                if (card != null) card.ShowPreview();
                 break;
             }
             default:
             {
                 throw new ArgumentOutOfRangeException();
             }
+        }
+
+        foreach (var pointerExitCard in EventSink.PointerExitCards)
+        {
+            pointerExitCard.DisablePreview();
         }
     }
 
@@ -203,6 +213,7 @@ public partial class InputEventSystem : Node2D
 
     private void OnDragCardStart(Card card, Vector2 mousePosition)
     {
+        card.DisablePreview();
         _state = InputState.DraggingCard;
         _dragOffset = mousePosition - card.Position;
         _cardToDrag = card;
@@ -212,7 +223,7 @@ public partial class InputEventSystem : Node2D
     private void OnDragCardEnd()
     {
         _cardToDrag!.ZIndex = 0;
-        _cardToDrag!.PlayOrInvokeDragFailure();
+        _cardToDrag.PlayOrInvokeDragFailure();
         _cardToDrag = null;
         _dragOffset = Vector2.Zero;
         _state = InputState.Idle;
