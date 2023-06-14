@@ -12,9 +12,11 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
     [Export] private Panel _dmgPopup;
     private bool _isDragging, _canStopDrag;
     public CardGameStateDto CardGameState;
+    public bool IsEnemy { get; private set; }
 
     public void Init(CardGameStateDto record)
     {
+        IsEnemy = GetParent<BoardArea>().IsEnemy;
         CardGameState = record;
         _atkPanel.Value = CardGameState.Atk;
         _defPanel.Value = record.Def;
@@ -23,6 +25,11 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         var shader = Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", record.ISummoningProtectionOn);
+        if (!IsEnemy)
+        {
+            var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+            shader?.SetShaderParameter("drawOutline", canAttack);
+        }
     }
 
     public async Task UpdateAsync(CardGameStateDto cardGameState)
@@ -35,6 +42,11 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         var shader = Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
+        if (!IsEnemy)
+        {
+            var canAttack = cardGameState is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+            shader?.SetShaderParameter("drawOutline", canAttack);
+        }
 
         if (diff != 0)
         {

@@ -9,7 +9,9 @@
 resource_local_to_scene = true
 shader = ExtResource("1_0ggqa")
 shader_parameter/doMix = false
+shader_parameter/drawOutline = false
 shader_parameter/mixColor = Color(0, 0, 0, 1)
+shader_parameter/outlineColor = Color(0, 1, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_5ex16"]
 font_size = 60

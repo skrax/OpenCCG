@@ -7,7 +7,9 @@ namespace OpenCCG;
 
 public partial class MidPanel : Node, IMessageReceiver<MessageType>
 {
-    private Button _endTurnButton;
+    [Export] private Button _endTurnButton, _exitButton;
+    [Export] private Label _statusLabel;
+    [Export] private PackedScene _menuScene;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -21,14 +23,20 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive)
+            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive),
+            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage)
         };
+    }
+
+    private void SetStatusMessage(string message)
+    {
+        _statusLabel.Text = message;
     }
 
     public override void _Ready()
     {
-        _endTurnButton = GetChild<Button>(0);
         _endTurnButton.Pressed += OnEndTurnPressed;
+        _exitButton.Pressed += () => GetTree().ChangeSceneToPacked(_menuScene);
     }
 
     private void OnEndTurnPressed()

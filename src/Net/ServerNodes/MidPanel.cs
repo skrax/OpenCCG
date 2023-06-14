@@ -24,4 +24,9 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
     {
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.EndTurnButtonSetActive, dto);
     }
+
+    public void SetStatusMessage(long peerId, string message)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetStatusMessage, message);
+    }
 }

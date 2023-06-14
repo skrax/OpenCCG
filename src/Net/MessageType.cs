@@ -18,4 +18,5 @@ public enum MessageType
     RequireTarget,
     TmpShowCard,
     Queue,
+    SetStatusMessage
 }
