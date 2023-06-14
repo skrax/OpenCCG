@@ -191,24 +191,24 @@ public partial class InputEventSystem : Node2D
     private void OnTargetDetect()
     {
         var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
-        var avatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
+        var enemyAvatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
+        var avatar = EventSink.PointerUpAvatars.MinBy(x => x.ZIndex);
 
         if (cardBoard != null)
         {
-            if (_cardTempArea.TryUpstreamTarget(cardBoard))
-            {
-                _state = InputState.Idle;
-                _line.Points = Array.Empty<Vector2>();
-            }
+            if (!_cardTempArea.TryUpstreamTarget(cardBoard)) return;
         }
         else if (avatar != null)
         {
-            if (_cardTempArea.TryUpstreamTarget(avatar))
-            {
-                _state = InputState.Idle;
-                _line.Points = Array.Empty<Vector2>();
-            }
+            if (!_cardTempArea.TryUpstreamTarget(avatar)) return;
         }
+        else if (enemyAvatar != null)
+        {
+            if (!_cardTempArea.TryUpstreamTarget(enemyAvatar)) return;
+        }
+
+        _state = InputState.Idle;
+        _line.Points = Array.Empty<Vector2>();
     }
 
     private void OnDragCardStart(Card card, Vector2 mousePosition)

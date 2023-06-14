@@ -12,6 +12,7 @@ namespace OpenCCG;
 
 public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 {
+    [Export] public bool IsEnemy; 
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();

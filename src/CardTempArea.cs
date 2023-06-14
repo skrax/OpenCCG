@@ -17,6 +17,7 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
+    private RequireTargetInputDto? _currentInputDto;
 
     private void Show(CardGameStateDto cardGameStateDto)
     {
@@ -31,12 +32,14 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
     {
         Texture = null;
         Visible = false;
+        _currentInputDto = null;
     }
 
     private async Task<RequireTargetOutputDto> RequireTarget(RequireTargetInputDto input)
     {
         Show(input.Card);
         _tsc = new TaskCompletionSource<RequireTargetOutputDto>();
+        _currentInputDto = input;
         _inputEventSystem.OnRequireTarget();
 
         return await _tsc.Task;
@@ -58,16 +61,33 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             return false;
         }
 
-        if (target is CardBoard cardBoard)
+        if (target is CardBoard cardBoard && _currentInputDto!.Type != RequireTargetType.Avatar)
         {
+            var isEnemyBoard = cardBoard.GetParent<BoardArea>().IsEnemy;
+            if ((isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Friendly) ||
+                (!isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Enemy))
+            {
+                return false;
+            }
+
             Reset();
-            return _tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id));
+            return _tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id, null));
         }
 
-        if (target is EnemyAvatar)
+        if (target is Avatar &&
+            _currentInputDto!.Type != RequireTargetType.Creature &&
+            _currentInputDto!.Side != RequireTargetSide.Enemy)
         {
             Reset();
-            return _tsc.TrySetResult(new RequireTargetOutputDto(null));
+            return _tsc.TrySetResult(new RequireTargetOutputDto(null, false));
+        }
+
+        if (target is EnemyAvatar &&
+            _currentInputDto!.Type != RequireTargetType.Creature &&
+            _currentInputDto.Side != RequireTargetSide.Friendly)
+        {
+            Reset();
+            return _tsc.TrySetResult(new RequireTargetOutputDto(null, true));
         }
 
         return false;

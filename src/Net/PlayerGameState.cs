@@ -73,7 +73,7 @@ public class PlayerGameState
                                .Shuffle();
 
         Deck = new LinkedList<CardGameState>(shuffledDeckList);
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
     }
 
     public LinkedList<CardGameState> GetListByZone(CardZone zone)
@@ -253,14 +253,14 @@ public class PlayerGameState
         if (!isTurn) return;
 
         isTurn = false;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
         Enemy.StartTurn();
     }
 
     public void StartTurn()
     {
         isTurn = true;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, true);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
         foreach (var cardGameState in Board)
         {
             cardGameState.IsSummoningProtectionOn = false;

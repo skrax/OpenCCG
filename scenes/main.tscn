@@ -185,6 +185,7 @@ position = Vector2(960, 382)
 monitoring = false
 monitorable = false
 script = ExtResource("4_4t5gh")
+IsEnemy = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyBoard"]
 shape = SubResource("RectangleShape2D_ameoq")

@@ -21,7 +21,7 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.EndTurnButtonSetActive => Executor.Make<bool>(EndTurnButtonSetActive)
+            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive)
         };
     }
 
@@ -36,9 +36,16 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
         GetNode<Main>("/root/Main").EndTurn();
     }
 
-    public void EndTurnButtonSetActive(bool isActive)
+    public void EndTurnButtonSetActive(EndTurnButtonSetActiveDto dto)
     {
-        _endTurnButton.Disabled = !isActive;
-        _endTurnButton.Text = isActive ? "End Turn" : "Enemy Turn";
+        _endTurnButton.Disabled = !dto.isActive;
+        if (dto.reason != null)
+        {
+            _endTurnButton.Text = dto.reason;
+        }
+        else
+        {
+            _endTurnButton.Text = dto.isActive ? "End Turn" : "Enemy Turn";
+        }
     }
 }
