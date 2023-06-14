@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=35 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://src/EnemyAvatar.cs" id="9_7fk18"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
 [ext_resource type="PackedScene" uid="uid://rp3que8k4xmy" path="res://scenes/card-tmp.tscn" id="13_hy35u"]
+[ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="13_xdsvr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8c0a6"]
 size = Vector2(1920, 255)
@@ -34,6 +35,9 @@ font_size = 32
 
 [sub_resource type="LabelSettings" id="LabelSettings_iyv0j"]
 font_size = 31
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nn7et"]
+bg_color = Color(1, 0.266667, 0.607843, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ramgb"]
 size = Vector2(1920, 255)
@@ -80,6 +84,9 @@ bg_color = Color(0.94902, 0.419608, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1jar7"]
 bg_color = Color(0.6, 0, 0.6, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yymb1"]
+bg_color = Color(0.70261, 0.0548099, 0.36398, 1)
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_pq47c")
 
@@ -95,13 +102,14 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_xrtuc")
 
-[node name="StatusPanel" type="Panel" parent="Hand"]
+[node name="StatusPanel" type="Panel" parent="Hand" node_paths=PackedStringArray("_dmgPopup")]
 self_modulate = Color(1, 1, 1, 0.294118)
 offset_left = 65.0
 offset_top = -253.0
 offset_right = 961.0
 offset_bottom = -127.0
 script = ExtResource("3_a0id7")
+_dmgPopup = NodePath("../../Avatar/DamagePanel")
 
 [node name="HealthCount" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
@@ -168,6 +176,28 @@ scale = Vector2(0.242188, 0.242188)
 texture = ExtResource("4_f02f3")
 script = ExtResource("5_ce2ri")
 
+[node name="DamagePanel" type="Panel" parent="Avatar"]
+visible = false
+offset_left = -116.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nn7et")
+
+[node name="Label" type="Label" parent="Avatar/DamagePanel"]
+layout_mode = 2
+offset_right = 236.0
+offset_bottom = 120.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+text = "- 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Board" type="Area2D" parent="."]
 position = Vector2(960, 699)
 script = ExtResource("4_4t5gh")
@@ -185,6 +215,7 @@ position = Vector2(960, 382)
 monitoring = false
 monitorable = false
 script = ExtResource("4_4t5gh")
+IsEnemy = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyBoard"]
 shape = SubResource("RectangleShape2D_ameoq")
@@ -200,6 +231,28 @@ scale = Vector2(0.242, 0.242)
 texture = ExtResource("7_lymuw")
 script = ExtResource("9_7fk18")
 
+[node name="DamagePanel" type="Panel" parent="EnemyAvatar"]
+visible = false
+offset_left = -116.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nn7et")
+
+[node name="Label" type="Label" parent="EnemyAvatar/DamagePanel"]
+layout_mode = 2
+offset_right = 236.0
+offset_bottom = 120.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+text = "- 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="EnemyHand" type="Area2D" parent="."]
 position = Vector2(960, 2.08165e-12)
 monitoring = false
@@ -214,13 +267,14 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_d05ec")
 
-[node name="StatusPanel" type="Panel" parent="EnemyHand"]
+[node name="StatusPanel" type="Panel" parent="EnemyHand" node_paths=PackedStringArray("_dmgPopup")]
 self_modulate = Color(1, 1, 1, 0.294118)
 offset_left = 62.0
 offset_top = 127.0
 offset_right = 960.0
 offset_bottom = 253.0
 script = ExtResource("3_a0id7")
+_dmgPopup = NodePath("../../EnemyAvatar/DamagePanel")
 
 [node name="HealthCount" type="Label" parent="EnemyHand/StatusPanel"]
 layout_mode = 0
@@ -294,13 +348,17 @@ top_level = true
 width = 12.0
 gradient = SubResource("Gradient_48kgg")
 
-[node name="MidPanel" type="Panel" parent="."]
+[node name="MidPanel" type="Panel" parent="." node_paths=PackedStringArray("_endTurnButton", "_exitButton", "_statusLabel")]
 offset_top = 509.0
 offset_right = 1921.0
 offset_bottom = 570.0
 script = ExtResource("9_d8cg4")
+_endTurnButton = NodePath("EndTurnButton")
+_exitButton = NodePath("ExitButton")
+_statusLabel = NodePath("StatusLabel")
+_menuScene = ExtResource("13_xdsvr")
 
-[node name="Button" type="Button" parent="MidPanel"]
+[node name="EndTurnButton" type="Button" parent="MidPanel"]
 layout_mode = 0
 offset_left = 1661.0
 offset_right = 1920.0
@@ -311,6 +369,40 @@ theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_8ghqf")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_1jar7")
 text = "End Turn"
+
+[node name="ExitButton" type="Button" parent="MidPanel"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -29.5
+offset_right = 82.0
+offset_bottom = 29.5
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBoxFlat_yymb1")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_1jar7")
+text = "Exit"
+
+[node name="StatusLabel" type="Label" parent="MidPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -546.5
+offset_top = -34.5
+offset_right = 548.5
+offset_bottom = 35.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 48
+text = "STATUS MESSAGE"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
 visible = false

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Data;
 
@@ -30,7 +31,7 @@ public static class Database
                 CardRecordType.Creature,
                 4, 4, 5, "res://img/cards/dragon5.png"),
             new("TEST-006", "Throwing Knife",
-                new[] { DealDamageCardEffect.MakeRecord(2) },
+                new[] { DealDamageCardEffect.MakeRecord(2, RequireTargetSide.Enemy, RequireTargetType.All) },
                 CardRecordType.Spell,
                 0, 0, 1, "res://img/cards/throwing_knife.png")
         }.ToDictionary(x => x.Id);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
@@ -12,6 +13,7 @@ namespace OpenCCG;
 
 public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 {
+    [Export] public bool IsEnemy; 
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
@@ -29,7 +31,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
-            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCard),
+            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync),
             MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
             _ => throw new NotImplementedException()
         };
@@ -49,11 +51,11 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         SetCardPositions();
     }
 
-    private void UpdateCard(CardGameStateDto cardGameStateDto)
+    private async Task UpdateCardAsync(CardGameStateDto cardGameStateDto)
     {
-        _cards
+        await _cards
             .First(x => x.CardGameState.Id == cardGameStateDto.Id)
-            .Update(cardGameStateDto);
+            .UpdateAsync(cardGameStateDto);
     }
 
     private void RemoveCard(RemoveCardDto removeCardDto)

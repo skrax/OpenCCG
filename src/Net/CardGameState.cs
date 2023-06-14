@@ -44,7 +44,8 @@ public class CardGameState
             recordMod,
             Zone,
             IsSummoningSicknessOn,
-            IsSummoningProtectionOn
+            IsSummoningProtectionOn,
+            AttacksAvailable
         );
     }
 }

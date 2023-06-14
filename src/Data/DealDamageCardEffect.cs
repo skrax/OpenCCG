@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using OpenCCG.Net;
@@ -15,21 +16,62 @@ public class DealDamageCardEffect : ICardEffect
     {
         var init = JsonSerializer.Deserialize<Init>(initJson);
 
-        Damage = init?.damage ?? throw new ArgumentNullException();
+        Damage = init?.Damage ?? throw new ArgumentNullException();
+        TargetSide = init.Side;
+        TargetType = init.Type;
     }
 
     public int Damage { get; }
 
+    public RequireTargetSide TargetSide { get; }
+
+    public RequireTargetType TargetType { get; }
+
     public string GetText()
     {
-        return $"Deal {Damage} damage";
+        var sb = new StringBuilder();
+        sb.Append($"Deal {Damage} damage");
+
+        switch (TargetSide)
+        {
+            case RequireTargetSide.All:
+                break;
+            case RequireTargetSide.Friendly:
+                sb.Append(" a friendly");
+                break;
+            case RequireTargetSide.Enemy:
+                sb.Append(" an enemy");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        switch (TargetType)
+        {
+            case RequireTargetType.All:
+                break;
+            case RequireTargetType.Creature:
+                sb.Append(" creature");
+                break;
+            case RequireTargetType.Avatar:
+                sb.Append(" avatar");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return sb.ToString();
     }
 
     public async Task Execute(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
+        playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
+            new EndTurnButtonSetActiveDto(false, "Select a Target"));
         var input = new RequireTargetInputDto(cardDto, RequireTargetType.All, RequireTargetSide.Enemy);
         var output = await playerGameState.Nodes.CardTempArea.RequireTargetsAsync(playerGameState.PeerId, input);
+        playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
+            new EndTurnButtonSetActiveDto(true, null));
         playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         if (output.cardId == null)
@@ -46,10 +88,10 @@ public class DealDamageCardEffect : ICardEffect
         }
     }
 
-    public static CardEffectRecord MakeRecord(int damage)
+    public static CardEffectRecord MakeRecord(int damage, RequireTargetSide side, RequireTargetType type)
     {
-        return new CardEffectRecord(Id, JsonSerializer.Serialize(new Init(damage)));
+        return new CardEffectRecord(Id, JsonSerializer.Serialize(new Init(damage, side, type)));
     }
 
-    private record Init(int damage);
+    private record Init(int Damage, RequireTargetSide Side, RequireTargetType Type);
 }

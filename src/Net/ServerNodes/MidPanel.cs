@@ -20,8 +20,13 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public void EndTurnButtonSetActive(long peerId, bool isActive)
+    public void EndTurnButtonSetActive(long peerId, EndTurnButtonSetActiveDto dto)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.EndTurnButtonSetActive, isActive);
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.EndTurnButtonSetActive, dto);
+    }
+
+    public void SetStatusMessage(long peerId, string message)
+    {
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetStatusMessage, message);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
+using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -47,6 +48,7 @@ public class PlayerGameState
 
     public void Init(List<CardRecord> deckList)
     {
+        Nodes.MidPanel.SetStatusMessage(PeerId, "");
         Energy = MaxEnergy = 0;
         Deck.Clear();
         Hand.Clear();
@@ -73,7 +75,7 @@ public class PlayerGameState
                                .Shuffle();
 
         Deck = new LinkedList<CardGameState>(shuffledDeckList);
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
     }
 
     public LinkedList<CardGameState> GetListByZone(CardZone zone)
@@ -175,6 +177,7 @@ public class PlayerGameState
         if (attacker.AttacksAvailable <= 0) return;
 
         --attacker.AttacksAvailable;
+        Nodes.Board.UpdateCard(PeerId, attacker.AsDto());
         Enemy.Health -= Math.Max(0, attacker.Atk);
 
         Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
@@ -235,6 +238,7 @@ public class PlayerGameState
         if (attacker.AttacksAvailable <= 0) return;
 
         --attacker.AttacksAvailable;
+        Nodes.Board.UpdateCard(PeerId, attacker.AsDto());
         ResolveDamage(attacker, target.Atk, ControllingEntity.Self);
         ResolveDamage(target, attacker.Atk, ControllingEntity.Enemy);
     }
@@ -253,14 +257,14 @@ public class PlayerGameState
         if (!isTurn) return;
 
         isTurn = false;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, false);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
         Enemy.StartTurn();
     }
 
     public void StartTurn()
     {
         isTurn = true;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, true);
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
         foreach (var cardGameState in Board)
         {
             cardGameState.IsSummoningProtectionOn = false;
@@ -275,5 +279,15 @@ public class PlayerGameState
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
         UpdateEnergyRpc();
         Draw();
+    }
+
+    public void Disconnect()
+    {
+        Enemy.NotifyDisconnected();
+    }
+
+    private void NotifyDisconnected()
+    {
+        Nodes.MidPanel.SetStatusMessage(PeerId, "Opponent disconnected");
     }
 }

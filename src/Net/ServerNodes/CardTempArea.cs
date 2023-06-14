@@ -7,24 +7,6 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
 
-public enum RequireTargetType
-{
-    All,
-    Creature,
-    Avatar
-}
-
-public enum RequireTargetSide
-{
-    All,
-    Friendly,
-    Enemy
-}
-
-public record RequireTargetInputDto(CardGameStateDto Card, RequireTargetType Type, RequireTargetSide Side);
-
-public record RequireTargetOutputDto(Guid? cardId);
-
 public partial class CardTempArea : Node, IMessageReceiver<MessageType>
 {
     public Dictionary<string, IObserver>? Observers { get; } = new();

@@ -12,7 +12,8 @@ public partial class InputEventSystem : Node2D
         Idle,
         DraggingCard,
         DraggingLine,
-        ChoosingTargets
+        ChoosingTargets,
+        PreviewHoverCardHand
     }
 
     [Export] private CardTempArea _cardTempArea;
@@ -24,6 +25,8 @@ public partial class InputEventSystem : Node2D
     [Export] private Line2D _line;
 
     private InputState _state = InputState.Idle;
+
+    public Action OnInputStateChanged;
 
     public override void _UnhandledInput(InputEvent inputEvent)
     {
@@ -89,7 +92,7 @@ public partial class InputEventSystem : Node2D
 
         var mousePosition = ((InputEventMouseButton)inputEvent).Position;
         var cardBoard = EventSink.PointerDownCardBoard.MinBy(x => x.ZIndex);
-        if (cardBoard != null)
+        if (cardBoard is { IsEnemy: false, CardGameState: { AttacksAvailable: > 0, IsSummoningSicknessOn: false } })
         {
             if (cardBoard.GetParentOrNull<BoardArea>() != null)
                 OnDragLineStart(cardBoard, mousePosition);
@@ -121,12 +124,20 @@ public partial class InputEventSystem : Node2D
             }
             case InputState.Idle:
             {
+                var card = EventSink.PointerEnterCards.MinBy(x => x.ZIndex);
+                if (card != null) card.ShowPreview();
                 break;
             }
             default:
             {
                 throw new ArgumentOutOfRangeException();
             }
+        }
+
+        foreach (var pointerExitCard in EventSink.PointerExitCards)
+        {
+            if (pointerExitCard.IsQueuedForDeletion()) continue;
+            pointerExitCard.DisablePreview();
         }
     }
 
@@ -158,7 +169,7 @@ public partial class InputEventSystem : Node2D
         _line.Points = Array.Empty<Vector2>();
         _state = InputState.Idle;
 
-        if (cardBoard != null && _dragLineStartInstanceId.HasValue)
+        if (cardBoard is { CardGameState.ISummoningProtectionOn: false } && _dragLineStartInstanceId.HasValue)
         {
             Logger.Info<InputEventSystem>($"DragLine End {cardBoard.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
@@ -181,28 +192,33 @@ public partial class InputEventSystem : Node2D
     private void OnTargetDetect()
     {
         var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
-        var avatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
+        var enemyAvatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
+        var avatar = EventSink.PointerUpAvatars.MinBy(x => x.ZIndex);
 
         if (cardBoard != null)
         {
-            if (_cardTempArea.TryUpstreamTarget(cardBoard))
-            {
-                _state = InputState.Idle;
-                _line.Points = Array.Empty<Vector2>();
-            }
+            if (!_cardTempArea.TryUpstreamTarget(cardBoard)) return;
         }
         else if (avatar != null)
         {
-            if (_cardTempArea.TryUpstreamTarget(avatar))
-            {
-                _state = InputState.Idle;
-                _line.Points = Array.Empty<Vector2>();
-            }
+            if (!_cardTempArea.TryUpstreamTarget(avatar)) return;
         }
+        else if (enemyAvatar != null)
+        {
+            if (!_cardTempArea.TryUpstreamTarget(enemyAvatar)) return;
+        }
+        else
+        {
+            return;
+        }
+
+        _state = InputState.Idle;
+        _line.Points = Array.Empty<Vector2>();
     }
 
     private void OnDragCardStart(Card card, Vector2 mousePosition)
     {
+        card.DisablePreview();
         _state = InputState.DraggingCard;
         _dragOffset = mousePosition - card.Position;
         _cardToDrag = card;
@@ -212,7 +228,7 @@ public partial class InputEventSystem : Node2D
     private void OnDragCardEnd()
     {
         _cardToDrag!.ZIndex = 0;
-        _cardToDrag!.PlayOrInvokeDragFailure();
+        _cardToDrag.PlayOrInvokeDragFailure();
         _cardToDrag = null;
         _dragOffset = Vector2.Zero;
         _state = InputState.Idle;

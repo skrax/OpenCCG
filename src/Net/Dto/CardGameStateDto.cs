@@ -3,14 +3,14 @@ using OpenCCG.Data;
 
 namespace OpenCCG.Net.Dto;
 
-public record CardGameStateDto
-(
+public record CardGameStateDto(
     Guid Id,
     CardRecord Record,
     CardRecordMod RecordMod,
     CardZone Zone,
     bool IsSummoningSicknessOn,
-    bool ISummoningProtectionOn
+    bool ISummoningProtectionOn,
+    int AttacksAvailable
 )
 {
     public int Atk => Record.Atk + RecordMod.Atk;

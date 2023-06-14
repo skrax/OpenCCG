@@ -3,26 +3,30 @@ using System.Collections.Generic;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
+using OpenCCG.Net;
 using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
 public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
 {
-    private static ulong? _dragInstanceId;
-
     private readonly HashSet<CardZone> _hoverZones = new();
     [Export] private Area2D _area2D;
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     private Vector2 _dragOffset;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
+    [Export] private PackedScene _cardPreviewScene;
 
     public Action? OnDragFailed;
+    private bool _hovering, _canHover = true;
+    private CardGameStateDto _cardGameState;
+    private CardPreview? _preview;
 
     public Guid Id { get; private set; }
 
     public void Init(CardGameStateDto card)
     {
+        _cardGameState = card;
         var record = card.Record;
         Id = card.Id;
         _infoPanel.Value = record.Description;
@@ -73,13 +77,6 @@ public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
         }
     }
 
-
-    public override void _ExitTree()
-    {
-        if (_dragInstanceId == GetInstanceId())
-            _dragInstanceId = null;
-    }
-
     public override void _Input(InputEvent inputEvent)
     {
         var rect = GetRect();
@@ -98,6 +95,41 @@ public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
 
             EventSink.ReportPointerUp(this);
         }
+
+        if (inputEvent is InputEventMouseMotion mouseMotion)
+        {
+            switch (_hovering)
+            {
+                case false when rect.HasPoint(ToLocal(mouseMotion.Position)):
+                    if (!_canHover) return;
+
+                    _hovering = true;
+                    EventSink.ReportPointerEnter(this);
+                    break;
+                case true when !rect.HasPoint(ToLocal(mouseMotion.Position)):
+                    _hovering = false;
+
+                    EventSink.ReportPointerExit(this);
+                    break;
+            }
+        }
+    }
+
+    public void ShowPreview()
+    {
+        Visible = false;
+        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent());
+        _preview.Init(_cardGameState);
+        var pos = Position;
+        pos.Y -= 256;
+        _preview.Position = pos;
+        _preview.Visible = true;
+    }
+
+    public void DisablePreview()
+    {
+        Visible = true;
+        _preview!.Visible = false;
     }
 
     public void PlayOrInvokeDragFailure()

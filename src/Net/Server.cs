@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -63,6 +64,12 @@ public partial class Server : Node, IMessageReceiver<MessageType>
     private void OnPeerDisconnected(long id)
     {
         Logger.Info<Server>($"Peer disconnected {id}");
+        if (_gameState.PlayerGameStates.TryGetValue(id, out var playerGameState))
+        {
+            playerGameState.Disconnect();
+            _gameState.PlayerGameStates.Remove(id);
+            _gameState.PlayerGameStates.Remove(playerGameState.EnemyPeerId);
+        }
     }
 
     private async void PlayCard(long senderPeerId, Guid cardId)
@@ -98,6 +105,12 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
         if (_queuesByPassword.TryGetValue(key, out var other))
         {
+            if (!Multiplayer.GetPeers().Contains((int)other.peerId))
+            {
+                _queuesByPassword[key] = new QueuedPlayer(senderPeerId, deckList);
+                return;
+            }
+
             _queuesByPassword.Remove(key);
 
             var p1 = new PlayerGameState
@@ -131,6 +144,8 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         else
         {
             _queuesByPassword.Add(key, new QueuedPlayer(senderPeerId, deckList));
+            _rpcNodes.MidPanel.SetStatusMessage(senderPeerId, "Looking for opponent");
+            _rpcNodes.MidPanel.EndTurnButtonSetActive(senderPeerId, new EndTurnButtonSetActiveDto(false, ""));
         }
     }
 
