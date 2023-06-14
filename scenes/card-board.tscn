@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d0fb3ln1oyfld"]
+[gd_scene load_steps=9 format=3 uid="uid://d0fb3ln1oyfld"]
 
 [ext_resource type="Shader" path="res://shaders/card-board.gdshader" id="1_0ggqa"]
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="2_wipga"]
@@ -17,13 +17,17 @@ font_size = 60
 [sub_resource type="LabelSettings" id="LabelSettings_6jk6c"]
 font_size = 60
 
-[node name="CardBoard" type="Sprite2D" node_paths=PackedStringArray("_atkPanel", "_defPanel")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xfup"]
+bg_color = Color(1, 0.266667, 0.607843, 1)
+
+[node name="CardBoard" type="Sprite2D" node_paths=PackedStringArray("_atkPanel", "_defPanel", "_dmgPopup")]
 material = SubResource("ShaderMaterial_4a4ib")
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_wipga")
 script = ExtResource("3_7q1kr")
 _atkPanel = NodePath("AttackPanel")
 _defPanel = NodePath("DefPanel")
+_dmgPopup = NodePath("DamagePanel")
 
 [node name="AttackPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 2
@@ -74,5 +78,27 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "12"
 label_settings = SubResource("LabelSettings_6jk6c")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DamagePanel" type="Panel" parent="."]
+visible = false
+offset_left = -116.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_8xfup")
+
+[node name="Label" type="Label" parent="DamagePanel"]
+layout_mode = 2
+offset_right = 236.0
+offset_bottom = 120.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+text = "- 10"
 horizontal_alignment = 1
 vertical_alignment = 1

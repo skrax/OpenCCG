@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
+using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;

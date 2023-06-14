@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=33 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -34,6 +34,9 @@ font_size = 32
 
 [sub_resource type="LabelSettings" id="LabelSettings_iyv0j"]
 font_size = 31
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nn7et"]
+bg_color = Color(1, 0.266667, 0.607843, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ramgb"]
 size = Vector2(1920, 255)
@@ -95,13 +98,14 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_xrtuc")
 
-[node name="StatusPanel" type="Panel" parent="Hand"]
+[node name="StatusPanel" type="Panel" parent="Hand" node_paths=PackedStringArray("_dmgPopup")]
 self_modulate = Color(1, 1, 1, 0.294118)
 offset_left = 65.0
 offset_top = -253.0
 offset_right = 961.0
 offset_bottom = -127.0
 script = ExtResource("3_a0id7")
+_dmgPopup = NodePath("../../Avatar/DamagePanel")
 
 [node name="HealthCount" type="Label" parent="Hand/StatusPanel"]
 layout_mode = 0
@@ -168,6 +172,28 @@ scale = Vector2(0.242188, 0.242188)
 texture = ExtResource("4_f02f3")
 script = ExtResource("5_ce2ri")
 
+[node name="DamagePanel" type="Panel" parent="Avatar"]
+visible = false
+offset_left = -116.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nn7et")
+
+[node name="Label" type="Label" parent="Avatar/DamagePanel"]
+layout_mode = 2
+offset_right = 236.0
+offset_bottom = 120.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+text = "- 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Board" type="Area2D" parent="."]
 position = Vector2(960, 699)
 script = ExtResource("4_4t5gh")
@@ -201,6 +227,28 @@ scale = Vector2(0.242, 0.242)
 texture = ExtResource("7_lymuw")
 script = ExtResource("9_7fk18")
 
+[node name="DamagePanel" type="Panel" parent="EnemyAvatar"]
+visible = false
+offset_left = -116.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nn7et")
+
+[node name="Label" type="Label" parent="EnemyAvatar/DamagePanel"]
+layout_mode = 2
+offset_right = 236.0
+offset_bottom = 120.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+text = "- 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="EnemyHand" type="Area2D" parent="."]
 position = Vector2(960, 2.08165e-12)
 monitoring = false
@@ -215,13 +263,14 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_d05ec")
 
-[node name="StatusPanel" type="Panel" parent="EnemyHand"]
+[node name="StatusPanel" type="Panel" parent="EnemyHand" node_paths=PackedStringArray("_dmgPopup")]
 self_modulate = Color(1, 1, 1, 0.294118)
 offset_left = 62.0
 offset_top = 127.0
 offset_right = 960.0
 offset_bottom = 253.0
 script = ExtResource("3_a0id7")
+_dmgPopup = NodePath("../../EnemyAvatar/DamagePanel")
 
 [node name="HealthCount" type="Label" parent="EnemyHand/StatusPanel"]
 layout_mode = 0

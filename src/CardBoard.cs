@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net.Dto;
@@ -7,6 +9,7 @@ namespace OpenCCG;
 public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 {
     [Export] private CardStatPanel _atkPanel, _defPanel;
+    [Export] private Panel _dmgPopup;
     private bool _isDragging, _canStopDrag;
     public CardGameStateDto CardGameState;
 
@@ -22,15 +25,24 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         shader?.SetShaderParameter("doMix", record.ISummoningProtectionOn);
     }
 
-    public void Update(CardGameStateDto cardGameState)
+    public async Task UpdateAsync(CardGameStateDto cardGameState)
     {
         _atkPanel.Value = cardGameState.Atk;
+        var diff = cardGameState.Def - _defPanel.Value;
         _defPanel.Value = cardGameState.Def;
 
         CardGameState = cardGameState;
 
         var shader = Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
+
+        if (diff != 0)
+        {
+            _dmgPopup.GetChild<Label>(0).Text = diff > 0 ? $"+ {diff}" : $"{diff}";
+            _dmgPopup.Visible = true;
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            _dmgPopup.Visible = false;
+        }
     }
 
     public override void _Input(InputEvent inputEvent)
