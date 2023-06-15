@@ -337,6 +337,7 @@ label_settings = SubResource("LabelSettings_iyv0j")
 
 [node name="Client" parent="." node_paths=PackedStringArray("_main") instance=ExtResource("3_uxwq6")]
 _main = NodePath("..")
+_serverAddress = "localhost"
 
 [node name="InputEventSystem" type="Node2D" parent="." node_paths=PackedStringArray("_cardTempArea", "_line")]
 script = ExtResource("7_di0s5")

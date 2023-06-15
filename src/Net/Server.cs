@@ -23,11 +23,11 @@ public partial class Server : Node, IMessageReceiver<MessageType>
     public override void _Ready()
     {
         var peer = new ENetMultiplayerPeer();
-        var result = peer.CreateServer(8080, 16);
+        var result = peer.CreateServer(57618, 16);
 
         if (result is Error.Ok)
         {
-            Logger.Info<Server>("listening on port 8080");
+            Logger.Info<Server>("listening on port 57618");
             GetTree().GetMultiplayer().MultiplayerPeer = peer;
             Multiplayer.PeerConnected += OnPeerConnected;
             Multiplayer.PeerDisconnected += OnPeerDisconnected;
