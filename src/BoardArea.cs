@@ -67,7 +67,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         await card.UpdateAsync(cardGameStateDto);
     }
 
-    private void RemoveCard(RemoveCardDto removeCardDto)
+    private async Task RemoveCard(RemoveCardDto removeCardDto)
     {
         Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} remove: ${removeCardDto.Id}");
         var card = _cards.FirstOrDefault(x => x.CardGameState.Id == removeCardDto.Id);
@@ -79,8 +79,6 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         }
 
         _cards.Remove(card);
-        card.QueueFree();
-
-        SetCardPositions();
+        card.Destroy(SetCardPositions);
     }
 }

@@ -10,6 +10,7 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 {
     [Export] private CardStatPanel _atkPanel, _defPanel;
     [Export] private Panel _dmgPopup;
+    [Export] private AnimationPlayer _anim;
     private bool _isDragging, _canStopDrag;
     public CardGameStateDto CardGameState;
     public bool IsEnemy { get; private set; }
@@ -30,6 +31,16 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
             var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
+    }
+
+    public void Destroy(Action act)
+    {
+        _anim.AnimationFinished += _ =>
+        {
+            QueueFree();
+            act();
+        };
+        _anim.Play("shake");
     }
 
     public async Task UpdateAsync(CardGameStateDto cardGameState)
