@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -138,7 +137,7 @@ public class PlayerGameState
 
         if (card.Record.Type is CardRecordType.Spell)
         {
-            var effects = card.Record.Effects.Select(x => Database.CardEffects[x.Id](x.initJson));
+            var effects = card.Record.Effects.Select(x => Database.CardEffects[x.Id](x.InitJson));
 
             Nodes.Hand.RemoveCard(PeerId, id);
             Nodes.EnemyHand.RemoveCard(EnemyPeerId);
@@ -146,6 +145,7 @@ public class PlayerGameState
             foreach (var cardEffect in effects) await cardEffect.Execute(card, this);
 
             Pit.AddLast(card);
+            card.Zone = CardZone.Pit;
         }
         else if (card.Record.Type is CardRecordType.Creature)
         {
@@ -177,7 +177,7 @@ public class PlayerGameState
         if (attacker.AttacksAvailable <= 0) return;
 
         --attacker.AttacksAvailable;
-        Nodes.Board.UpdateCard(PeerId, attacker.AsDto());
+        UpdateSelfCreature(attacker);
         Enemy.Health -= Math.Max(0, attacker.Atk);
 
         Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
@@ -192,36 +192,38 @@ public class PlayerGameState
         {
             if (card.Def <= 0)
             {
-                Board.Remove(card);
-                Pit.AddLast(card);
-
-                Nodes.Board.RemoveCard(PeerId, card.Id);
-                Nodes.EnemyBoard.RemoveCard(EnemyPeerId, card.Id);
+                DestroySelfCreature(card);
             }
             else
             {
-                var dto = card.AsDto();
-                Nodes.Board.UpdateCard(PeerId, dto);
-                Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
+                UpdateSelfCreature(card);
             }
         }
         else
         {
             if (card.Def <= 0)
             {
-                Enemy.Board.Remove(card);
-                Enemy.Pit.AddLast(card);
-
-                Nodes.EnemyBoard.RemoveCard(PeerId, card.Id);
-                Nodes.Board.RemoveCard(EnemyPeerId, card.Id);
+                DestroyEnemyCreature(card);
             }
             else
             {
-                var dto = card.AsDto();
-                Nodes.EnemyBoard.UpdateCard(PeerId, dto);
-                Nodes.Board.UpdateCard(EnemyPeerId, dto);
+                UpdateEnemyCreature(card);
             }
         }
+    }
+
+    public void UpdateEnemyCreature(CardGameState card)
+    {
+        var dto = card.AsDto();
+        Nodes.EnemyBoard.UpdateCard(PeerId, dto);
+        Nodes.Board.UpdateCard(EnemyPeerId, dto);
+    }
+
+    public void UpdateSelfCreature(CardGameState card)
+    {
+        var dto = card.AsDto();
+        Nodes.Board.UpdateCard(PeerId, dto);
+        Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
     }
 
     public void Combat(Guid attackerId, Guid targetId)
@@ -238,7 +240,7 @@ public class PlayerGameState
         if (attacker.AttacksAvailable <= 0) return;
 
         --attacker.AttacksAvailable;
-        Nodes.Board.UpdateCard(PeerId, attacker.AsDto());
+        UpdateSelfCreature(attacker);
         ResolveDamage(attacker, target.Atk, ControllingEntity.Self);
         ResolveDamage(target, attacker.Atk, ControllingEntity.Enemy);
     }
@@ -289,5 +291,25 @@ public class PlayerGameState
     private void NotifyDisconnected()
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "Opponent disconnected");
+    }
+
+    public void DestroyEnemyCreature(CardGameState cardGameState)
+    {
+        Enemy.Board.Remove(cardGameState);
+        Enemy.Pit.AddLast(cardGameState);
+        cardGameState.Zone = CardZone.Pit;
+
+        Nodes.EnemyBoard.RemoveCard(PeerId, cardGameState.Id);
+        Nodes.Board.RemoveCard(EnemyPeerId, cardGameState.Id);
+    }
+
+    public void DestroySelfCreature(CardGameState cardGameState)
+    {
+        Board.Remove(cardGameState);
+        Pit.AddLast(cardGameState);
+        cardGameState.Zone = CardZone.Pit;
+
+        Nodes.Board.RemoveCard(PeerId, cardGameState.Id);
+        Nodes.EnemyBoard.RemoveCard(EnemyPeerId, cardGameState.Id);
     }
 }

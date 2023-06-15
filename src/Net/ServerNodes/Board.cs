@@ -6,14 +6,14 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
 
-public record RemoveCardDto(string Id);
+public record RemoveCardDto(Guid Id);
 
 public partial class Board : Node, IMessageReceiver<MessageType>
 {
     [Rpc]
-    public void HandleMessageAsync(string messageJson)
+    public async void HandleMessageAsync(string messageJson)
     {
-        IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
     public Dictionary<string, IObserver>? Observers => null;
@@ -36,6 +36,6 @@ public partial class Board : Node, IMessageReceiver<MessageType>
     public void RemoveCard(long peerId, Guid cardId)
     {
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard,
-            new RemoveCardDto(cardId.ToString()));
+            new RemoveCardDto(cardId));
     }
 }

@@ -33,15 +33,28 @@ public static class Database
             new("TEST-006", "Throwing Knife",
                 new[] { DealDamageCardEffect.MakeRecord(2, RequireTargetSide.Enemy, RequireTargetType.All) },
                 CardRecordType.Spell,
-                0, 0, 1, "res://img/cards/throwing_knife.png")
+                0, 0, 1, "res://img/cards/throwing_knife.png"),
+            new("TEST-007", "Fell the Mighty",
+                new CardEffectRecord[] { new(FellTheMightyCardEffect.Id) },
+                CardRecordType.Spell,
+                0, 0, 4, "res://img/cards/fell_the_mighty.png"),
+            new("TEST-008", "Squish the Wimpy",
+                new CardEffectRecord[] { new(SquishTheWimpyCardEffect.Id) },
+                CardRecordType.Spell,
+                0, 0, 3, "res://img/cards/squish_the_wimpy.png"),
         }.ToDictionary(x => x.Id);
 
-    public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(new[]
-    {
-        new KeyValuePair<string, Func<string?, ICardEffect>>(DealDamageCardEffect.Id, s =>
+    public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(
+        new KeyValuePair<string, Func<string?, ICardEffect>>[]
         {
-            if (s == null) throw new ArgumentNullException();
-            return new DealDamageCardEffect(s);
-        })
-    });
+            new(DealDamageCardEffect.Id, s =>
+            {
+                if (s == null) throw new ArgumentNullException();
+                return new DealDamageCardEffect(s);
+            }),
+
+            new(FellTheMightyCardEffect.Id, _ => new FellTheMightyCardEffect()),
+
+            new(SquishTheWimpyCardEffect.Id, _ => new SquishTheWimpyCardEffect()),
+        });
 }

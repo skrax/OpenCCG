@@ -10,7 +10,7 @@ public enum CardRecordType
     Spell
 }
 
-public record CardEffectRecord(string Id, string initJson);
+public record CardEffectRecord(string Id, string? InitJson = null);
 
 public record CardRecord(
     string Id,
@@ -36,7 +36,7 @@ public record CardRecord(
 
             foreach (var cardEffectRecord in Effects)
             {
-                var effect = Database.CardEffects[cardEffectRecord.Id](cardEffectRecord.initJson);
+                var effect = Database.CardEffects[cardEffectRecord.Id](cardEffectRecord.InitJson);
                 _cachedEffects.Add(effect);
 
                 sb.AppendLine(effect.GetText());

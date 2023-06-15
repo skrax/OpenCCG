@@ -13,7 +13,7 @@ namespace OpenCCG;
 
 public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 {
-    [Export] public bool IsEnemy; 
+    [Export] public bool IsEnemy;
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
@@ -45,6 +45,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
     private void PlaceCard(CardGameStateDto cardGameStateDto)
     {
         var card = CardBoardScene.Make<CardBoard, CardGameStateDto>(cardGameStateDto, this);
+        Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} placed: ${cardGameStateDto.Id} ${cardGameStateDto.Record.Name}");
 
         _cards.Add(card);
 
@@ -53,14 +54,30 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 
     private async Task UpdateCardAsync(CardGameStateDto cardGameStateDto)
     {
-        await _cards
-            .First(x => x.CardGameState.Id == cardGameStateDto.Id)
-            .UpdateAsync(cardGameStateDto);
+        Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} update: ${cardGameStateDto.Id}");
+
+        var card = _cards.FirstOrDefault(x => x.CardGameState.Id == cardGameStateDto.Id);
+
+        if (card == null)
+        {
+            Logger.Error<BoardArea>($"IsEnemy: {IsEnemy} update: ${cardGameStateDto.Id} not found");
+            return;
+        }
+
+        await card.UpdateAsync(cardGameStateDto);
     }
 
     private void RemoveCard(RemoveCardDto removeCardDto)
     {
-        var card = _cards.First(x => x.CardGameState.Id == Guid.Parse(removeCardDto.Id));
+        Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} remove: ${removeCardDto.Id}");
+        var card = _cards.FirstOrDefault(x => x.CardGameState.Id == removeCardDto.Id);
+
+        if (card == null)
+        {
+            Logger.Error<BoardArea>($"IsEnemy: {IsEnemy} remove: ${removeCardDto.Id} not found");
+            return;
+        }
+
         _cards.Remove(card);
         card.QueueFree();
 
