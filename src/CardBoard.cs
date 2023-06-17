@@ -90,4 +90,32 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
             EventSink.ReportPointerUp(this);
         }
     }
+
+    public async Task AttackAsync(Sprite2D sprite2D)
+    {
+        var f = 0f;
+        var targetPosition = sprite2D.GlobalPosition;
+        var off = sprite2D.GetRect().Size.Y * sprite2D.Scale.Y * 0.9f;
+        if (sprite2D is Avatar { IsEnemy: true } or CardBoard { IsEnemy: true })
+        {
+            targetPosition.Y += off;
+        }
+        else
+        {
+            targetPosition.Y -= off;
+        }
+
+        var oldPosition = GlobalPosition;
+        ZIndex = 1;
+
+        while (f < 0.7f)
+        {
+            f += 0.012800001F;
+            GlobalPosition = GlobalPosition.Lerp(targetPosition, f);
+            await Task.Delay(TimeSpan.FromMilliseconds(16D));
+        }
+
+        GlobalPosition = oldPosition;
+        ZIndex = 0;
+    }
 }

@@ -74,7 +74,7 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             return _tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id, null));
         }
 
-        if (target is Avatar &&
+        if (target is Avatar { IsEnemy: false } &&
             _currentInputDto!.Type != RequireTargetType.Creature &&
             _currentInputDto!.Side != RequireTargetSide.Enemy)
         {
@@ -82,7 +82,7 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             return _tsc.TrySetResult(new RequireTargetOutputDto(null, false));
         }
 
-        if (target is EnemyAvatar &&
+        if (target is Avatar { IsEnemy: true } &&
             _currentInputDto!.Type != RequireTargetType.Creature &&
             _currentInputDto.Side != RequireTargetSide.Friendly)
         {

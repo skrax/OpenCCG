@@ -26,4 +26,11 @@ public partial class CardPreview : Sprite2D, INodeInit<CardGameStateDto>
 
         Texture = GD.Load<Texture2D>(record.ImgPath);
     }
+
+    public void DrawOutline(bool enabled)
+    {
+        var shader = Material as ShaderMaterial;
+
+        shader?.SetShaderParameter("drawOutline", enabled);
+    }
 }

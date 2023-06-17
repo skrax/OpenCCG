@@ -1,9 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://crilm4jimvs04"]
+[gd_scene load_steps=10 format=3 uid="uid://crilm4jimvs04"]
 
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_8alop"]
+[ext_resource type="Shader" path="res://shaders/card.gdshader" id="1_q01sy"]
 [ext_resource type="Script" path="res://src/CardPreview.cs" id="2_dtpyv"]
 [ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_xmmfn"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_unx0o"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jvqyj"]
+resource_local_to_scene = true
+shader = ExtResource("1_q01sy")
+shader_parameter/drawOutline = false
+shader_parameter/outlineColor = Color(0, 0.988235, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_1wc8l"]
 font_size = 40
@@ -16,6 +23,7 @@ font_size = 34
 
 [node name="CardPreview" type="Sprite2D" node_paths=PackedStringArray("_costPanel", "_atkPanel", "_defPanel", "_infoPanel", "_namePanel")]
 z_index = 3
+material = SubResource("ShaderMaterial_jvqyj")
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_8alop")
 script = ExtResource("2_dtpyv")
@@ -29,9 +37,9 @@ _namePanel = NodePath("NamePanel")
 self_modulate = Color(0, 0, 0, 1)
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = -256.0
-offset_top = -384.0
-offset_right = -345.0
+offset_left = -250.0
+offset_top = -376.0
+offset_right = -356.0
 offset_bottom = -263.0
 grow_horizontal = 2
 mouse_filter = 2
@@ -58,10 +66,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -256.0
+offset_left = -250.0
 offset_top = -613.0
-offset_right = -256.0
-offset_bottom = -384.0
+offset_right = -262.0
+offset_bottom = -392.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
@@ -86,7 +94,7 @@ text_overrun_behavior = 3
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = -256.0
+offset_left = -250.0
 offset_top = -429.0
 offset_right = -166.0
 offset_bottom = -309.0
@@ -128,7 +136,7 @@ anchor_right = 1.0
 anchor_bottom = 0.5
 offset_left = -346.0
 offset_top = -429.0
-offset_right = -256.0
+offset_right = -262.0
 offset_bottom = -309.0
 grow_horizontal = 0
 grow_vertical = 2
@@ -165,9 +173,9 @@ vertical_alignment = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -346.0
-offset_top = -384.0
-offset_right = -256.0
+offset_left = -352.0
+offset_top = -376.0
+offset_right = -262.0
 offset_bottom = -264.0
 grow_horizontal = 0
 mouse_filter = 2

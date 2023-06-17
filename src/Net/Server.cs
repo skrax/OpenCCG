@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -77,14 +78,14 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         await _gameState.PlayerGameStates[senderPeerId].PlayCard(cardId);
     }
 
-    private void CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
+    private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
     {
-        _gameState.PlayerGameStates[senderPeerId].Combat(t.AttackerId, t.TargetId);
+        await _gameState.PlayerGameStates[senderPeerId].CombatAsync(t.AttackerId, t.TargetId);
     }
 
-    private void CombatPlayer(long senderPeerId, Guid cardId)
+    private async Task CombatPlayer(long senderPeerId, Guid cardId)
     {
-        _gameState.PlayerGameStates[senderPeerId].CombatPlayer(cardId);
+        await _gameState.PlayerGameStates[senderPeerId].CombatPlayerAsync(cardId);
     }
 
     private void EndTurn(long senderPeerId)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=34 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -10,7 +10,6 @@
 [ext_resource type="Script" path="res://src/Avatar.cs" id="5_ce2ri"]
 [ext_resource type="Script" path="res://src/InputEventSystem.cs" id="7_di0s5"]
 [ext_resource type="Texture2D" uid="uid://b8hwvu6ghiybr" path="res://img/avatar/00056-1946604175.png" id="7_lymuw"]
-[ext_resource type="Script" path="res://src/EnemyAvatar.cs" id="9_7fk18"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
 [ext_resource type="PackedScene" uid="uid://rp3que8k4xmy" path="res://scenes/card-tmp.tscn" id="13_hy35u"]
 [ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="13_xdsvr"]
@@ -198,9 +197,12 @@ text = "- 10"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Board" type="Area2D" parent="."]
+[node name="Board" type="Area2D" parent="." node_paths=PackedStringArray("EnemyBoardArea", "Avatar", "EnemyAvatar")]
 position = Vector2(960, 699)
 script = ExtResource("4_4t5gh")
+EnemyBoardArea = NodePath("../EnemyBoard")
+Avatar = NodePath("../Avatar")
+EnemyAvatar = NodePath("../EnemyAvatar")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Board"]
 shape = SubResource("RectangleShape2D_ramgb")
@@ -210,12 +212,15 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_gjihd")
 
-[node name="EnemyBoard" type="Area2D" parent="."]
+[node name="EnemyBoard" type="Area2D" parent="." node_paths=PackedStringArray("EnemyBoardArea", "Avatar", "EnemyAvatar")]
 position = Vector2(960, 382)
 monitoring = false
 monitorable = false
 script = ExtResource("4_4t5gh")
 IsEnemy = true
+EnemyBoardArea = NodePath("../Board")
+Avatar = NodePath("../EnemyAvatar")
+EnemyAvatar = NodePath("../Avatar")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyBoard"]
 shape = SubResource("RectangleShape2D_ameoq")
@@ -229,7 +234,8 @@ texture = SubResource("GradientTexture2D_n57q8")
 position = Vector2(960, 190)
 scale = Vector2(0.242, 0.242)
 texture = ExtResource("7_lymuw")
-script = ExtResource("9_7fk18")
+script = ExtResource("5_ce2ri")
+IsEnemy = true
 
 [node name="DamagePanel" type="Panel" parent="EnemyAvatar"]
 visible = false

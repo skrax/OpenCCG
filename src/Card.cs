@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
-using OpenCCG.Net;
 using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
@@ -42,6 +41,7 @@ public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
 
         Logger.Info<Card>($"Init Card: {card.Atk}/{card.Def}/{card.Cost}");
         Texture = GD.Load<Texture2D>(record.ImgPath);
+
     }
 
     public override void _Ready()
@@ -142,5 +142,13 @@ public partial class Card : Sprite2D, INodeInit<CardGameStateDto>
         }
 
         OnDragFailed?.Invoke();
+    }
+
+    public void DrawOutline(bool enabled)
+    {
+        var shader = Material as ShaderMaterial;
+        shader?.SetShaderParameter("drawOutline", true);
+        
+        _preview?.DrawOutline(enabled);
     }
 }

@@ -4,5 +4,5 @@ namespace OpenCCG.Net.Rpc;
 
 public interface IObserver : IDisposable
 {
-    void Handle(string json);
+    void Handle(string? json);
 }

@@ -4,6 +4,8 @@ namespace OpenCCG;
 
 public partial class Avatar : Sprite2D
 {
+    [Export] public bool IsEnemy;
+
     public override void _Input(InputEvent inputEvent)
     {
         if (inputEvent.IsActionPressed(InputActions.SpriteClick))

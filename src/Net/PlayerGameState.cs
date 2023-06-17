@@ -167,7 +167,7 @@ public class PlayerGameState
         UpdateCardCountRpc();
     }
 
-    public void CombatPlayer(Guid attackerId)
+    public async Task CombatPlayerAsync(Guid attackerId)
     {
         if (!isTurn) return;
 
@@ -175,6 +175,11 @@ public class PlayerGameState
 
         if (attacker.IsSummoningSicknessOn) return;
         if (attacker.AttacksAvailable <= 0) return;
+
+        var t1 = Nodes.Board.PlayCombatAvatarAnimAsync(PeerId, attackerId);
+        var t2 = Nodes.EnemyBoard.PlayCombatAvatarAnimAsync(EnemyPeerId, attackerId);
+
+        await Task.WhenAll(t1, t2);
 
         --attacker.AttacksAvailable;
         UpdateSelfCreature(attacker);
@@ -226,7 +231,7 @@ public class PlayerGameState
         Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
     }
 
-    public void Combat(Guid attackerId, Guid targetId)
+    public async Task CombatAsync(Guid attackerId, Guid targetId)
     {
         // TODO feedback
         if (!isTurn) return;
@@ -238,6 +243,11 @@ public class PlayerGameState
         if (attacker.IsSummoningSicknessOn) return;
         if (target.IsSummoningProtectionOn) return;
         if (attacker.AttacksAvailable <= 0) return;
+
+        var t1 = Nodes.Board.PlayCombatAnimAsync(PeerId, attackerId, targetId);
+        var t2 = Nodes.EnemyBoard.PlayCombatAnimAsync(EnemyPeerId, attackerId, targetId);
+
+        await Task.WhenAll(t1, t2);
 
         --attacker.AttacksAvailable;
         UpdateSelfCreature(attacker);
