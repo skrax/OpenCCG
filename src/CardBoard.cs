@@ -152,7 +152,7 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
     public void DisablePreview()
     {
-        if (IsQueuedForDeletion()) return;
-        _preview!.Visible = false;
+        if (IsQueuedForDeletion() || _preview == null) return;
+        _preview.Visible = false;
     }
 }

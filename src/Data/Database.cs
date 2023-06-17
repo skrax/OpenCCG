@@ -43,8 +43,7 @@ public static class Database
             new("TEST-006", "Throwing Knife",
                 new CardEffects
                 {
-                    Enter = new[]
-                        { DealDamageCardEffect.MakeRecord(2, RequireTargetSide.Enemy, RequireTargetType.All) }
+                    Spell = DealDamageCardEffect.MakeRecord(2, RequireTargetSide.Enemy, RequireTargetType.All)
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -53,7 +52,7 @@ public static class Database
             new("TEST-007", "Fell the Mighty",
                 new CardEffects
                 {
-                    Enter = new CardEffectRecord[] { new(FellTheMightyCardEffect.Id) },
+                    Spell = new(FellTheMightyCardEffect.Id),
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -62,7 +61,7 @@ public static class Database
             new("TEST-008", "Squish the Wimpy",
                 new CardEffects
                 {
-                    Enter = new CardEffectRecord[] { new(SquishTheWimpyCardEffect.Id) },
+                    Spell = new(SquishTheWimpyCardEffect.Id),
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -91,8 +90,7 @@ public static class Database
             new("TEST-011", "Firebomb",
                 new CardEffects
                 {
-                    Enter = new[]
-                        { DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All) },
+                    Spell = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All),
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -112,19 +110,37 @@ public static class Database
                 CardRecordType.Creature,
                 1, 1, 1, "res://img/cards/missing.png")
 #endif
+
+            new("TEST-012", "Black Leech",
+                new CardEffects(),
+                new CardAbilities()
+                {
+                    Drain = true
+                },
+                CardRecordType.Creature,
+                1, 3, 1, "res://img/cards/black_leech.png"),
+
+
+            new("TEST-013", "Imminent Catastrophe",
+                new CardEffects
+                {
+                    Spell = AoeDamageCardEffect.MakeRecord(7, RequireTargetSide.Enemy, RequireTargetType.Creature),
+                },
+                new CardAbilities(),
+                CardRecordType.Spell,
+                0, 0, 5, "res://img/cards/imminent_catastrophe.png"
+            ),
         }.ToDictionary(x => x.Id);
 
     public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(
         new KeyValuePair<string, Func<string?, ICardEffect>>[]
         {
-            new(DealDamageCardEffect.Id, s =>
-            {
-                if (s == null) throw new ArgumentNullException();
-                return new DealDamageCardEffect(s);
-            }),
+            new(DealDamageCardEffect.Id, s =>new DealDamageCardEffect(s!)),
 
             new(FellTheMightyCardEffect.Id, _ => new FellTheMightyCardEffect()),
 
             new(SquishTheWimpyCardEffect.Id, _ => new SquishTheWimpyCardEffect()),
+            
+            new(AoeDamageCardEffect.Id, s => new AoeDamageCardEffect(s!))
         });
 }

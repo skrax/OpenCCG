@@ -140,7 +140,7 @@ public class PlayerGameState
             Nodes.Hand.RemoveCard(PeerId, id);
             Nodes.EnemyHand.RemoveCard(EnemyPeerId);
 
-            card.OnEnter(this);
+            card.OnSpell(this);
 
             Pit.AddLast(card);
             card.Zone = CardZone.Pit;

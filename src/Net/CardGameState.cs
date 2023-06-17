@@ -51,27 +51,32 @@ public class CardGameState
     }
 
 
-    public void OnEnter(PlayerGameState playerGameState) => ExecuteEffects(Record.CardEffects.Enter, playerGameState);
-    public void OnExit(PlayerGameState playerGameState) => ExecuteEffects(Record.CardEffects.Exit, playerGameState);
+    public void OnSpell(PlayerGameState playerGameState) =>
+        ExecuteEffect(Record.CardEffects.Spell, playerGameState);
+
+    public void OnEnter(PlayerGameState playerGameState) =>
+        ExecuteEffect(Record.CardEffects.Enter, playerGameState);
+
+    public void OnExit(PlayerGameState playerGameState) =>
+        ExecuteEffect(Record.CardEffects.Exit, playerGameState);
 
     public void OnStartTurn(PlayerGameState playerGameState) =>
-        ExecuteEffects(Record.CardEffects.StartTurn, playerGameState);
+        ExecuteEffect(Record.CardEffects.StartTurn, playerGameState);
 
     public void OnEndTurn(PlayerGameState playerGameState) =>
-        ExecuteEffects(Record.CardEffects.EndTurn, playerGameState);
+        ExecuteEffect(Record.CardEffects.EndTurn, playerGameState);
 
     public void OnStartCombat(PlayerGameState playerGameState) =>
-        ExecuteEffects(Record.CardEffects.StartCombat, playerGameState);
+        ExecuteEffect(Record.CardEffects.StartCombat, playerGameState);
 
     public void OnEndCombat(PlayerGameState playerGameState) =>
-        ExecuteEffects(Record.CardEffects.EndCombat, playerGameState);
+        ExecuteEffect(Record.CardEffects.EndCombat, playerGameState);
 
 
-    private void ExecuteEffects(CardEffectRecord[] effects, PlayerGameState playerGameState)
+    private void ExecuteEffect(CardEffectRecord? effect, PlayerGameState playerGameState)
     {
-        foreach (var cardEffect in effects.Select(x => Database.CardEffects[x.Id](x.InitJson)))
-        {
-            cardEffect.Execute(this, playerGameState);
-        }
+        if (effect == null) return;
+
+        Database.CardEffects[effect.Id](effect.InitJson).Execute(this, playerGameState);
     }
 }

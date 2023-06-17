@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Godot.Collections;
-using OpenCCG.Net;
-using Array = System.Array;
 
 namespace OpenCCG.Data;
 
@@ -15,7 +10,10 @@ public enum CardRecordType
     Spell
 }
 
-public record CardEffectRecord(string Id, string? InitJson = null);
+public record CardEffectRecord(string Id, string? InitJson = null)
+{
+    public string GetText() => Database.CardEffects[Id](InitJson).GetText();
+}
 
 public class CardAbilities
 {
@@ -42,19 +40,28 @@ public class CardAbilities
 
 public class CardEffects
 {
-    public CardEffectRecord[] Enter { get; init; } = Array.Empty<CardEffectRecord>();
-    public CardEffectRecord[] Exit { get; init; } = Array.Empty<CardEffectRecord>();
-    public CardEffectRecord[] StartTurn { get; init; } = Array.Empty<CardEffectRecord>();
-    public CardEffectRecord[] EndTurn { get; init; } = Array.Empty<CardEffectRecord>();
-    public CardEffectRecord[] StartCombat { get; init; } = Array.Empty<CardEffectRecord>();
-    public CardEffectRecord[] EndCombat { get; init; } = Array.Empty<CardEffectRecord>();
+    public CardEffectRecord? Spell { get; init; }
+    public CardEffectRecord? Enter { get; init; }
+    public CardEffectRecord? Exit { get; init; }
+    public CardEffectRecord? StartTurn { get; init; }
+    public CardEffectRecord? EndTurn { get; init; }
+    public CardEffectRecord? StartCombat { get; init; }
+    public CardEffectRecord? EndCombat { get; init; }
 
-    public CardEffectRecord[] Effects => Enter.Concat(Exit)
-                                              .Concat(StartTurn)
-                                              .Concat(EndTurn)
-                                              .Concat(StartCombat)
-                                              .Concat(EndCombat)
-                                              .ToArray();
+    public string GetText()
+    {
+        var sb = new StringBuilder();
+
+        if (Spell != null) sb.AppendLine($"{Spell.GetText()}");
+        if (Enter != null) sb.AppendLine($"Enter: {Enter.GetText()}");
+        if (Exit != null) sb.AppendLine($"Exit: {Exit.GetText()}");
+        if (StartTurn != null) sb.AppendLine($"Start of Turn: {StartTurn.GetText()}");
+        if (EndTurn != null) sb.AppendLine($"End of Turn: {EndTurn.GetText()}");
+        if (StartCombat != null) sb.AppendLine($"Start of Combat: {StartCombat.GetText()}");
+        if (EndCombat != null) sb.AppendLine($"End of Combat: {EndCombat.GetText()}");
+
+        return sb.ToString();
+    }
 }
 
 public record CardRecord(
@@ -76,37 +83,10 @@ public record CardRecord(
         var sb = new StringBuilder();
 
         var abilitiesText = Abilities.GetText();
+        var effectsText = CardEffects.GetText();
+
         if (abilitiesText.Length > 0) sb.AppendLine(Abilities.GetText());
-        sb.AppendLine(GetEffectText());
-
-        return sb.ToString();
-    }
-
-    private List<ICardEffect>? _cachedEffects;
-
-
-    private string GetEffectText()
-    {
-        var sb = new StringBuilder();
-        if (_cachedEffects == null)
-        {
-            _cachedEffects = new List<ICardEffect>(CardEffects.Effects.Length);
-
-            foreach (var cardEffectRecord in CardEffects.Effects)
-            {
-                var effect = Database.CardEffects[cardEffectRecord.Id](cardEffectRecord.InitJson);
-                _cachedEffects.Add(effect);
-
-                sb.AppendLine(effect.GetText());
-            }
-
-            return sb.ToString();
-        }
-
-        foreach (var cachedEffect in _cachedEffects)
-        {
-            sb.AppendLine(cachedEffect.GetText());
-        }
+        if (effectsText.Length > 0) sb.AppendLine(effectsText);
 
         return sb.ToString();
     }
