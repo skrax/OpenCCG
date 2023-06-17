@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Godot.Collections;
+using OpenCCG.Net;
+using Array = System.Array;
 
 namespace OpenCCG.Data;
 
@@ -36,13 +40,27 @@ public class CardAbilities
                                                           .ToArray();
 }
 
+public class CardEffects
+{
+    public CardEffectRecord[] Enter { get; init; } = Array.Empty<CardEffectRecord>();
+    public CardEffectRecord[] Exit { get; init; } = Array.Empty<CardEffectRecord>();
+    public CardEffectRecord[] StartTurn { get; init; } = Array.Empty<CardEffectRecord>();
+    public CardEffectRecord[] EndTurn { get; init; } = Array.Empty<CardEffectRecord>();
+    public CardEffectRecord[] StartCombat { get; init; } = Array.Empty<CardEffectRecord>();
+    public CardEffectRecord[] EndCombat { get; init; } = Array.Empty<CardEffectRecord>();
+
+    public CardEffectRecord[] Effects => Enter.Concat(Exit)
+                                              .Concat(StartTurn)
+                                              .Concat(EndTurn)
+                                              .Concat(StartCombat)
+                                              .Concat(EndCombat)
+                                              .ToArray();
+}
+
 public record CardRecord(
     string Id,
     string Name,
-    CardEffectRecord[] PlayEffects,
-    CardEffectRecord[] ExitEffects,
-    CardEffectRecord[] StartTurnEffects,
-    CardEffectRecord[] EndTurnEffects,
+    CardEffects CardEffects,
     CardAbilities Abilities,
     CardRecordType Type,
     int Atk,
@@ -66,19 +84,15 @@ public record CardRecord(
 
     private List<ICardEffect>? _cachedEffects;
 
-    private CardEffectRecord[] Effects => PlayEffects.Concat(ExitEffects)
-                                                     .Concat(StartTurnEffects)
-                                                     .Concat(EndTurnEffects)
-                                                     .ToArray();
 
     private string GetEffectText()
     {
         var sb = new StringBuilder();
         if (_cachedEffects == null)
         {
-            _cachedEffects = new List<ICardEffect>(Effects.Length);
+            _cachedEffects = new List<ICardEffect>(CardEffects.Effects.Length);
 
-            foreach (var cardEffectRecord in Effects)
+            foreach (var cardEffectRecord in CardEffects.Effects)
             {
                 var effect = Database.CardEffects[cardEffectRecord.Id](cardEffectRecord.InitJson);
                 _cachedEffects.Add(effect);

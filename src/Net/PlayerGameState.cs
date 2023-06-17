@@ -137,12 +137,10 @@ public class PlayerGameState
 
         if (card.Record.Type is CardRecordType.Spell)
         {
-            var effects = card.Record.PlayEffects.Select(x => Database.CardEffects[x.Id](x.InitJson));
-
             Nodes.Hand.RemoveCard(PeerId, id);
             Nodes.EnemyHand.RemoveCard(EnemyPeerId);
 
-            foreach (var cardEffect in effects) await cardEffect.Execute(card, this);
+            card.OnEnter(this);
 
             Pit.AddLast(card);
             card.Zone = CardZone.Pit;
@@ -155,8 +153,7 @@ public class PlayerGameState
             card.IsSummoningProtectionOn = !card.Record.Abilities.Exposed;
             card.IsSummoningSicknessOn = !card.Record.Abilities.Haste;
 
-            var effects = card.Record.PlayEffects.Select(x => Database.CardEffects[x.Id](x.InitJson));
-            foreach (var cardEffect in effects) await cardEffect.Execute(card, this);
+            card.OnEnter(this);
 
             var dto = card.AsDto();
 
@@ -253,6 +250,8 @@ public class PlayerGameState
         if (attacker.IsSummoningSicknessOn) return;
         if (target.IsSummoningProtectionOn) return;
         if (attacker.AttacksAvailable <= 0) return;
+        
+        attacker.OnStartCombat(this);
 
         var t1 = Nodes.Board.PlayCombatAnimAsync(PeerId, attackerId, targetId);
         var t2 = Nodes.EnemyBoard.PlayCombatAnimAsync(EnemyPeerId, attackerId, targetId);
@@ -275,6 +274,11 @@ public class PlayerGameState
             Nodes.StatusPanel.SetHealth(EnemyPeerId, Health + target.Atk);
             Nodes.EnemyStatusPanel.SetHealth(PeerId, Health + target.Atk);
         }
+
+        if (attacker.Zone == CardZone.Board)
+        {
+            attacker.OnEndCombat(this);
+        }
     }
 
     public void Start()
@@ -290,8 +294,14 @@ public class PlayerGameState
     {
         if (!isTurn) return;
 
+        foreach (var cardGameState in Board)
+        {
+            cardGameState.OnEndTurn(this);
+        }
+        
         isTurn = false;
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
+        
         Enemy.StartTurn();
     }
 
@@ -299,6 +309,7 @@ public class PlayerGameState
     {
         isTurn = true;
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
+        
         foreach (var cardGameState in Board)
         {
             cardGameState.IsSummoningProtectionOn = false;
@@ -308,6 +319,8 @@ public class PlayerGameState
             var dto = cardGameState.AsDto();
             Nodes.Board.UpdateCard(PeerId, dto);
             Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
+            
+            cardGameState.OnStartTurn(this);
         }
 
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
@@ -333,6 +346,8 @@ public class PlayerGameState
 
         Nodes.EnemyBoard.RemoveCard(PeerId, cardGameState.Id);
         Nodes.Board.RemoveCard(EnemyPeerId, cardGameState.Id);
+        
+        cardGameState.OnExit(Enemy);
     }
 
     public void DestroySelfCreature(CardGameState cardGameState)
@@ -343,5 +358,7 @@ public class PlayerGameState
 
         Nodes.Board.RemoveCard(PeerId, cardGameState.Id);
         Nodes.EnemyBoard.RemoveCard(EnemyPeerId, cardGameState.Id);
+        
+        cardGameState.OnExit(this);
     }
 }

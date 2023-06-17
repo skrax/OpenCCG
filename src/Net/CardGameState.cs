@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using OpenCCG.Data;
 using OpenCCG.Net.Dto;
 
@@ -47,5 +48,30 @@ public class CardGameState
             IsSummoningProtectionOn,
             AttacksAvailable
         );
+    }
+
+
+    public void OnEnter(PlayerGameState playerGameState) => ExecuteEffects(Record.CardEffects.Enter, playerGameState);
+    public void OnExit(PlayerGameState playerGameState) => ExecuteEffects(Record.CardEffects.Exit, playerGameState);
+
+    public void OnStartTurn(PlayerGameState playerGameState) =>
+        ExecuteEffects(Record.CardEffects.StartTurn, playerGameState);
+
+    public void OnEndTurn(PlayerGameState playerGameState) =>
+        ExecuteEffects(Record.CardEffects.EndTurn, playerGameState);
+
+    public void OnStartCombat(PlayerGameState playerGameState) =>
+        ExecuteEffects(Record.CardEffects.StartCombat, playerGameState);
+
+    public void OnEndCombat(PlayerGameState playerGameState) =>
+        ExecuteEffects(Record.CardEffects.EndCombat, playerGameState);
+
+
+    private void ExecuteEffects(CardEffectRecord[] effects, PlayerGameState playerGameState)
+    {
+        foreach (var cardEffect in effects.Select(x => Database.CardEffects[x.Id](x.InitJson)))
+        {
+            cardEffect.Execute(this, playerGameState);
+        }
     }
 }

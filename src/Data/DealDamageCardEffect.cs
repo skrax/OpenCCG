@@ -71,7 +71,7 @@ public class DealDamageCardEffect : ICardEffect
         var input = new RequireTargetInputDto(cardDto, RequireTargetType.All, RequireTargetSide.Enemy);
         var output = await playerGameState.Nodes.CardTempArea.RequireTargetsAsync(playerGameState.PeerId, input);
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
-            new EndTurnButtonSetActiveDto(true, null));
+            new EndTurnButtonSetActiveDto(playerGameState.isTurn, null));
         playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         if (output.cardId == null)
