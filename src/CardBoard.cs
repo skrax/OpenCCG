@@ -15,6 +15,10 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
     public CardGameStateDto CardGameState;
     public bool IsEnemy { get; private set; }
 
+    private bool _hovering, _canHover = true;
+    [Export] private PackedScene _cardPreviewScene;
+    private CardPreview? _preview;
+
     public void Init(CardGameStateDto record)
     {
         IsEnemy = GetParent<BoardArea>().IsEnemy;
@@ -70,9 +74,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
     public override void _Input(InputEvent inputEvent)
     {
+        var rect = GetRect();
         if (inputEvent.IsActionPressed(InputActions.SpriteClick))
         {
-            var rect = GetRect();
             var inputEventMouseButton = (InputEventMouseButton)inputEvent;
 
             if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
@@ -82,12 +86,29 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         if (inputEvent.IsActionReleased(InputActions.SpriteClick))
         {
-            var rect = GetRect();
             var inputEventMouseButton = (InputEventMouseButton)inputEvent;
 
             if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
 
             EventSink.ReportPointerUp(this);
+        }
+
+        if (inputEvent is InputEventMouseMotion mouseMotion)
+        {
+            switch (_hovering)
+            {
+                case false when rect.HasPoint(ToLocal(mouseMotion.Position)):
+                    if (!_canHover) return;
+
+                    _hovering = true;
+                    EventSink.ReportPointerEnter(this);
+                    break;
+                case true when !rect.HasPoint(ToLocal(mouseMotion.Position)):
+                    _hovering = false;
+
+                    EventSink.ReportPointerExit(this);
+                    break;
+            }
         }
     }
 
@@ -117,5 +138,21 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         GlobalPosition = oldPosition;
         ZIndex = 0;
+    }
+
+    public void ShowPreview()
+    {
+        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent());
+        _preview.Init(CardGameState);
+        var pos = Position;
+        pos.X += 256;
+        _preview.Position = pos;
+        _preview.Visible = true;
+    }
+
+    public void DisablePreview()
+    {
+        if (IsQueuedForDeletion()) return;
+        _preview!.Visible = false;
     }
 }

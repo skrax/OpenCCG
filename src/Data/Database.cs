@@ -98,7 +98,8 @@ public static class Database
                 CardRecordType.Spell,
                 0, 0, 3, "res://img/cards/firebomb.png"
             ),
-
+#if false
+// TODO disabled for now, since triggering the ability is possible on enemy turn
             new("TEST-012", "Ravaging Crawler",
                 new CardEffects
                 {
@@ -110,6 +111,7 @@ public static class Database
                 new CardAbilities(),
                 CardRecordType.Creature,
                 1, 1, 1, "res://img/cards/missing.png")
+#endif
         }.ToDictionary(x => x.Id);
 
     public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(

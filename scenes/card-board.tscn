@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://d0fb3ln1oyfld"]
+[gd_scene load_steps=13 format=3 uid="uid://d0fb3ln1oyfld"]
 
 [ext_resource type="Shader" path="res://shaders/card-board.gdshader" id="1_0ggqa"]
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="2_wipga"]
 [ext_resource type="Script" path="res://src/CardBoard.cs" id="3_7q1kr"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_0j6jh"]
+[ext_resource type="PackedScene" uid="uid://crilm4jimvs04" path="res://scenes/card-preview.tscn" id="4_sw4rk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4a4ib"]
 resource_local_to_scene = true
@@ -60,6 +61,7 @@ _atkPanel = NodePath("AttackPanel")
 _defPanel = NodePath("DefPanel")
 _dmgPopup = NodePath("DamagePanel")
 _anim = NodePath("AnimationPlayer")
+_cardPreviewScene = ExtResource("4_sw4rk")
 
 [node name="AttackPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 anchors_preset = 2
