@@ -37,10 +37,10 @@ public class DealDamageCardEffect : ICardEffect
             case RequireTargetSide.All:
                 break;
             case RequireTargetSide.Friendly:
-                sb.Append(" a friendly");
+                sb.Append(" to a friendly");
                 break;
             case RequireTargetSide.Enemy:
-                sb.Append(" an enemy");
+                sb.Append(" to an enemy");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -51,10 +51,10 @@ public class DealDamageCardEffect : ICardEffect
             case RequireTargetType.All:
                 break;
             case RequireTargetType.Creature:
-                sb.Append(" creature");
+                sb.Append(TargetSide == RequireTargetSide.All ? " to a creature" : " creature");
                 break;
             case RequireTargetType.Avatar:
-                sb.Append(" avatar");
+                sb.Append(TargetSide == RequireTargetSide.All ? " to an avatar": " avatar");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

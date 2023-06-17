@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace OpenCCG.Data;
@@ -12,10 +13,37 @@ public enum CardRecordType
 
 public record CardEffectRecord(string Id, string? InitJson = null);
 
+public class CardAbilities
+{
+    public bool Exposed { get; init; }
+
+    public bool Haste { get; init; }
+
+    public bool Drain { get; init; }
+
+    public string GetText()
+    {
+        var sb = new StringBuilder();
+        var abilities = AllAbilities.Where(x => (bool)x.GetValue(this)!).Select(x => x.Name);
+        sb.AppendJoin(", ", abilities);
+
+        return sb.ToString();
+    }
+
+    private static readonly PropertyInfo[] AllAbilities = typeof(CardAbilities)
+                                                          .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                                          .Where(x => x.PropertyType == typeof(bool))
+                                                          .ToArray();
+}
+
 public record CardRecord(
     string Id,
     string Name,
-    CardEffectRecord[] Effects,
+    CardEffectRecord[] PlayEffects,
+    CardEffectRecord[] ExitEffects,
+    CardEffectRecord[] StartTurnEffects,
+    CardEffectRecord[] EndTurnEffects,
+    CardAbilities Abilities,
     CardRecordType Type,
     int Atk,
     int Def,
@@ -23,9 +51,25 @@ public record CardRecord(
     string ImgPath
 )
 {
-    public string Description => GetEffectText();
+    public string Description => GetDescription();
+
+    private string GetDescription()
+    {
+        var sb = new StringBuilder();
+
+        var abilitiesText = Abilities.GetText();
+        if (abilitiesText.Length > 0) sb.AppendLine(Abilities.GetText());
+        sb.AppendLine(GetEffectText());
+
+        return sb.ToString();
+    }
 
     private List<ICardEffect>? _cachedEffects;
+
+    private CardEffectRecord[] Effects => PlayEffects.Concat(ExitEffects)
+                                                     .Concat(StartTurnEffects)
+                                                     .Concat(EndTurnEffects)
+                                                     .ToArray();
 
     private string GetEffectText()
     {

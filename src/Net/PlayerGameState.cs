@@ -137,7 +137,7 @@ public class PlayerGameState
 
         if (card.Record.Type is CardRecordType.Spell)
         {
-            var effects = card.Record.Effects.Select(x => Database.CardEffects[x.Id](x.InitJson));
+            var effects = card.Record.PlayEffects.Select(x => Database.CardEffects[x.Id](x.InitJson));
 
             Nodes.Hand.RemoveCard(PeerId, id);
             Nodes.EnemyHand.RemoveCard(EnemyPeerId);
@@ -152,8 +152,11 @@ public class PlayerGameState
             card.Zone = CardZone.Board;
             Board.AddLast(card);
 
-            card.IsSummoningProtectionOn = true;
-            card.IsSummoningSicknessOn = true;
+            card.IsSummoningProtectionOn = !card.Record.Abilities.Exposed;
+            card.IsSummoningSicknessOn = !card.Record.Abilities.Haste;
+
+            var effects = card.Record.PlayEffects.Select(x => Database.CardEffects[x.Id](x.InitJson));
+            foreach (var cardEffect in effects) await cardEffect.Execute(card, this);
 
             var dto = card.AsDto();
 
@@ -183,10 +186,17 @@ public class PlayerGameState
 
         --attacker.AttacksAvailable;
         UpdateSelfCreature(attacker);
-        Enemy.Health -= Math.Max(0, attacker.Atk);
+        var atk = Math.Max(0, attacker.Atk);
+        Enemy.Health -= atk;
 
         Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
         Nodes.StatusPanel.SetHealth(EnemyPeerId, Enemy.Health);
+
+        if (attacker.Record.Abilities.Drain)
+        {
+            Nodes.StatusPanel.SetHealth(PeerId, Health + atk);
+            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health + atk);
+        }
     }
 
     public void ResolveDamage(CardGameState card, int damage, ControllingEntity controllingEntity)
@@ -253,6 +263,18 @@ public class PlayerGameState
         UpdateSelfCreature(attacker);
         ResolveDamage(attacker, target.Atk, ControllingEntity.Self);
         ResolveDamage(target, attacker.Atk, ControllingEntity.Enemy);
+
+        if (attacker.Record.Abilities.Drain)
+        {
+            Nodes.StatusPanel.SetHealth(PeerId, Health + attacker.Atk);
+            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health + attacker.Atk);
+        }
+
+        if (target.Record.Abilities.Drain)
+        {
+            Nodes.StatusPanel.SetHealth(EnemyPeerId, Health + target.Atk);
+            Nodes.EnemyStatusPanel.SetHealth(PeerId, Health + target.Atk);
+        }
     }
 
     public void Start()

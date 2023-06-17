@@ -2,7 +2,7 @@ namespace OpenCCG;
 
 public static class Rules
 {
-    public const int MaxEnergy = 10;
+    public const int MaxEnergy = 15;
 
     public const int InitialCardsDrawn = 3;
 
@@ -10,5 +10,5 @@ public static class Rules
 
     public const int CardsDrawnPerTurn = 1;
 
-    public const int InitialHealth = 30;
+    public const int InitialHealth = 40;
 }
