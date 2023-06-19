@@ -152,11 +152,33 @@ public static class Database
             new("TEST-017", "Beren Morne",
                 new CardEffects
                 {
-                   EndTurn = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All),
+                    EndTurn = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All),
                 },
-                new CardAbilities() ,
+                new CardAbilities(),
                 CardRecordType.Creature,
-                5, 5, 5, "res://img/cards/beren_morne.png"
+                5, 5, 8, "res://img/cards/beren_morne.png"
+            ),
+
+
+            new("TEST-018", "Deep Analysis",
+                new CardEffects
+                {
+                    Spell = DrawCardEffect.MakeRecord(2)
+                },
+                new CardAbilities(),
+                CardRecordType.Spell,
+                0, 0, 4, "res://img/cards/deep_analysis.png"
+            ),
+
+
+            new("TEST-019", "Heed the Call",
+                new CardEffects
+                {
+                    Spell = new(HeedTheCallCardEffect.Id)
+                },
+                new CardAbilities(),
+                CardRecordType.Spell,
+                0, 0, 5, "res://img/cards/heed_the_call.png"
             ),
         }.ToDictionary(x => x.Id);
 
@@ -171,6 +193,10 @@ public static class Database
 
             new(AoeDamageCardEffect.Id, s => new AoeDamageCardEffect(s!)),
 
-            new(RandomDamageCardEffect.Id, s => new RandomDamageCardEffect(s!))
+            new(RandomDamageCardEffect.Id, s => new RandomDamageCardEffect(s!)),
+
+            new(DrawCardEffect.Id, s => new DrawCardEffect(s!)),
+
+            new(HeedTheCallCardEffect.Id, s => new HeedTheCallCardEffect()),
         });
 }

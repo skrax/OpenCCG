@@ -121,6 +121,12 @@ public class PlayerGameState
 
     public async Task PlayCardAsync(Guid id)
     {
+        if (!IsTurn)
+        {
+            Nodes.Hand.FailPlayCard(PeerId);
+            return;
+        }
+        
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
         if (card == null) throw new ApplicationException();
