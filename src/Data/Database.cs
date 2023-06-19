@@ -96,22 +96,17 @@ public static class Database
                 CardRecordType.Spell,
                 0, 0, 3, "res://img/cards/firebomb.png"
             ),
-#if false
-// TODO disabled for now, since triggering the ability is possible on enemy turn
-            new("TEST-012", "Ravaging Crawler",
+
+            new("TEST-012", "Mornehold Spectre",
                 new CardEffects
                 {
-                    Exit = new[]
-                    {
-                        DealDamageCardEffect.MakeRecord(2, RequireTargetSide.Enemy, RequireTargetType.All)
-                    }
+                    Exit = RandomDamageCardEffect.MakeRecord(3, RequireTargetSide.Enemy, RequireTargetType.Creature, 1)
                 },
                 new CardAbilities(),
                 CardRecordType.Creature,
-                1, 1, 1, "res://img/cards/missing.png")
-#endif
+                2, 1, 2, "res://img/cards/mornehold_spectre.png"),
 
-            new("TEST-012", "Black Leech",
+            new("TEST-013", "Black Leech",
                 new CardEffects(),
                 new CardAbilities()
                 {
@@ -121,26 +116,61 @@ public static class Database
                 1, 3, 1, "res://img/cards/black_leech.png"),
 
 
-            new("TEST-013", "Imminent Catastrophe",
+            new("TEST-014", "Imminent Catastrophe",
                 new CardEffects
                 {
-                    Spell = AoeDamageCardEffect.MakeRecord(7, RequireTargetSide.Enemy, RequireTargetType.Creature),
+                    Spell = AoeDamageCardEffect.MakeRecord(7, RequireTargetSide.All, RequireTargetType.Creature),
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
-                0, 0, 5, "res://img/cards/imminent_catastrophe.png"
+                0, 0, 7, "res://img/cards/imminent_catastrophe.png"
+            ),
+
+            new("TEST-015", "Towering Giant",
+                new CardEffects()
+                ,
+                new CardAbilities
+                {
+                    Defender = true
+                },
+                CardRecordType.Creature,
+                4, 8, 6, "res://img/cards/towering_giant.png"
+            ),
+
+            new("TEST-016", "Mornehold Assassin",
+                new CardEffects
+                {
+                    Enter = DealDamageCardEffect.MakeRecord(2, RequireTargetSide.Enemy, RequireTargetType.All)
+                }
+                ,
+                new CardAbilities()
+                ,
+                CardRecordType.Creature,
+                3, 3, 2, "res://img/cards/mornehold_assassin.png"
+            ),
+
+            new("TEST-017", "Beren Morne",
+                new CardEffects
+                {
+                   EndTurn = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All),
+                },
+                new CardAbilities() ,
+                CardRecordType.Creature,
+                5, 5, 5, "res://img/cards/beren_morne.png"
             ),
         }.ToDictionary(x => x.Id);
 
     public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(
         new KeyValuePair<string, Func<string?, ICardEffect>>[]
         {
-            new(DealDamageCardEffect.Id, s =>new DealDamageCardEffect(s!)),
+            new(DealDamageCardEffect.Id, s => new DealDamageCardEffect(s!)),
 
             new(FellTheMightyCardEffect.Id, _ => new FellTheMightyCardEffect()),
 
             new(SquishTheWimpyCardEffect.Id, _ => new SquishTheWimpyCardEffect()),
-            
-            new(AoeDamageCardEffect.Id, s => new AoeDamageCardEffect(s!))
+
+            new(AoeDamageCardEffect.Id, s => new AoeDamageCardEffect(s!)),
+
+            new(RandomDamageCardEffect.Id, s => new RandomDamageCardEffect(s!))
         });
 }

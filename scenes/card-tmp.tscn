@@ -5,11 +5,11 @@
 [ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_nvm4n"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_lylxl"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_hn1g8"]
-font_size = 40
+[sub_resource type="LabelSettings" id="LabelSettings_y0dwu"]
+font_size = 36
 
 [sub_resource type="LabelSettings" id="LabelSettings_i5ksn"]
-font_size = 40
+font_size = 34
 
 [sub_resource type="LabelSettings" id="LabelSettings_8mu2l"]
 font_size = 60
@@ -47,7 +47,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Golthrang, Destroyer of Worlds"
-label_settings = SubResource("LabelSettings_hn1g8")
+label_settings = SubResource("LabelSettings_y0dwu")
 vertical_alignment = 1
 autowrap_mode = 3
 text_overrun_behavior = 3

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -65,10 +66,13 @@ public class AoeDamageCardEffect : ICardEffect
         return sb.ToString();
     }
 
-    public Task Execute(CardGameState card, PlayerGameState playerGameState)
+    public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
         playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
+
+        var killedSelfCreatures = new List<CardGameState>();
+        var killedEnemyCreatures = new List<CardGameState>();
 
         if (TargetType == RequireTargetType.Creature)
         {
@@ -78,6 +82,8 @@ public class AoeDamageCardEffect : ICardEffect
                 foreach (var cardGameState in board)
                 {
                     playerGameState.ResolveDamage(cardGameState, Damage, PlayerGameState.ControllingEntity.Self);
+                    if (cardGameState.Zone == CardZone.Pit)
+                        killedSelfCreatures.Add(cardGameState);
                 }
             }
 
@@ -87,6 +93,8 @@ public class AoeDamageCardEffect : ICardEffect
                 foreach (var cardGameState in board)
                 {
                     playerGameState.ResolveDamage(cardGameState, Damage, PlayerGameState.ControllingEntity.Enemy);
+                    if (cardGameState.Zone == CardZone.Pit)
+                        killedEnemyCreatures.Add(cardGameState);
                 }
             }
         }
@@ -111,7 +119,15 @@ public class AoeDamageCardEffect : ICardEffect
             }
         }
 
-        return Task.CompletedTask;
+        foreach (var cardGameState in killedSelfCreatures)
+        {
+            await cardGameState.OnExitAsync(playerGameState);
+        }
+
+        foreach (var killedEnemyCreature in killedEnemyCreatures)
+        {
+            await killedEnemyCreature.OnExitAsync(playerGameState.Enemy);
+        }
     }
 
     public static CardEffectRecord MakeRecord(int damage, RequireTargetSide side, RequireTargetType type)

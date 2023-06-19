@@ -11,7 +11,7 @@ public class FellTheMightyCardEffect : ICardEffect
 
     public string GetText() => "Destroy the highest attack creature(s)";
 
-    public Task Execute(CardGameState card, PlayerGameState playerGameState)
+    public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var selfHasCreatures = playerGameState.Board.Any();
         var enemyHasCreatures = playerGameState.Enemy.Board.Any();
@@ -23,64 +23,85 @@ public class FellTheMightyCardEffect : ICardEffect
 
         else if (!selfHasCreatures)
         {
-            DestroyHighestEnemyCreatures(playerGameState);
+            await DestroyHighestEnemyCreaturesAsync(playerGameState);
         }
 
         else if (!enemyHasCreatures)
         {
-            DestroyHighestSelfCreatures(playerGameState);
+            await DestroyHighestSelfCreaturesAsync(playerGameState);
         }
 
         else
         {
-            DestroyHighestAllCreatures(playerGameState);
+            await DestroyHighestAllCreaturesAsync(playerGameState);
         }
         
         playerGameState.Enemy.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
-
-        return Task.CompletedTask;
     }
 
-    private static void DestroyHighestAllCreatures(PlayerGameState playerGameState)
+    private static async Task DestroyHighestAllCreaturesAsync(PlayerGameState playerGameState)
     {
         var selfByAtk = playerGameState.Board.OrderByDescending(x => x.Atk).ToArray();
         var enemyByAtk = playerGameState.Enemy.Board.OrderByDescending(x => x.Atk).ToArray();
 
         var highest = Math.Max(selfByAtk.First().Atk, enemyByAtk.First().Atk);
 
-        foreach (var cardGameState in selfByAtk.TakeWhile(x => x.Atk == highest))
+        var toDestroySelf = selfByAtk.TakeWhile(x => x.Atk == highest).ToArray();
+        var toDestroyEnemy = enemyByAtk.TakeWhile(x => x.Atk == highest).ToArray();
+
+        foreach (var cardGameState in toDestroySelf)
         {
             playerGameState.DestroySelfCreature(cardGameState);
         }
 
-        foreach (var cardGameState in enemyByAtk.TakeWhile(x => x.Atk == highest))
+        foreach (var cardGameState in toDestroyEnemy)
         {
             playerGameState.DestroyEnemyCreature(cardGameState);
+        }
+        
+        foreach (var cardGameState in toDestroySelf)
+        {
+            await cardGameState.OnExitAsync(playerGameState);
+        }
+
+        foreach (var cardGameState in toDestroyEnemy)
+        {
+            await cardGameState.OnExitAsync(playerGameState.Enemy);
         }
     }
 
 
-    private static void DestroyHighestSelfCreatures(PlayerGameState playerGameState)
+    private static async Task DestroyHighestSelfCreaturesAsync(PlayerGameState playerGameState)
     {
         var selfByAtk = playerGameState.Board.OrderByDescending(x => x.Atk).ToArray();
         var selfHighest = selfByAtk.First().Atk;
 
-        var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfHighest);
+        var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfHighest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
             playerGameState.DestroySelfCreature(cardGameState);
         }
+        
+        foreach (var cardGameState in toDestroy)
+        {
+           await cardGameState.OnExitAsync(playerGameState); 
+        }
     }
 
-    private static void DestroyHighestEnemyCreatures(PlayerGameState playerGameState)
+    private static async Task DestroyHighestEnemyCreaturesAsync(PlayerGameState playerGameState)
     {
         var enemyByAtk = playerGameState.Enemy.Board.OrderByDescending(x => x.Atk).ToArray();
         var enemyHighest = enemyByAtk.First().Atk;
 
-        var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyHighest);
+        var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyHighest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
             playerGameState.DestroyEnemyCreature(cardGameState);
+        }
+        
+        foreach (var cardGameState in toDestroy)
+        {
+           await cardGameState.OnExitAsync(playerGameState.Enemy); 
         }
     }
 }

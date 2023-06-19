@@ -22,6 +22,8 @@ public class CardAbilities
     public bool Haste { get; init; }
 
     public bool Drain { get; init; }
+    
+    public bool Defender { get; init; }
 
     public string GetText()
     {

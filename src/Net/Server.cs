@@ -73,9 +73,9 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         }
     }
 
-    private async void PlayCard(long senderPeerId, Guid cardId)
+    private void PlayCard(long senderPeerId, Guid cardId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].PlayCard(cardId);
+        _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
     }
 
     private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
@@ -90,7 +90,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
     private void EndTurn(long senderPeerId)
     {
-        _gameState.PlayerGameStates[senderPeerId].EndTurn();
+        _gameState.PlayerGameStates[senderPeerId].EndTurnAsync();
     }
 
     private void QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
@@ -140,7 +140,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
             p1.Start();
             p2.Start();
-            p1.StartTurn();
+            p1.StartTurnAsync();
         }
         else
         {

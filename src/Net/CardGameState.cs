@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenCCG.Data;
 using OpenCCG.Net.Dto;
 
@@ -51,32 +52,32 @@ public class CardGameState
     }
 
 
-    public void OnSpell(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.Spell, playerGameState);
+    public async Task OnSpellAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.Spell, playerGameState);
 
-    public void OnEnter(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.Enter, playerGameState);
+    public async Task OnEnterAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.Enter, playerGameState);
 
-    public void OnExit(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.Exit, playerGameState);
+    public async Task OnExitAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.Exit, playerGameState);
 
-    public void OnStartTurn(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.StartTurn, playerGameState);
+    public async Task OnStartTurnAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.StartTurn, playerGameState);
 
-    public void OnEndTurn(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.EndTurn, playerGameState);
+    public async Task OnEndTurnAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.EndTurn, playerGameState);
 
-    public void OnStartCombat(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.StartCombat, playerGameState);
+    public async Task OnStartCombatAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.StartCombat, playerGameState);
 
-    public void OnEndCombat(PlayerGameState playerGameState) =>
-        ExecuteEffect(Record.CardEffects.EndCombat, playerGameState);
+    public async Task OnEndCombatAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.EndCombat, playerGameState);
 
 
-    private void ExecuteEffect(CardEffectRecord? effect, PlayerGameState playerGameState)
+    private async Task ExecuteEffectAsync(CardEffectRecord? effect, PlayerGameState playerGameState)
     {
         if (effect == null) return;
 
-        Database.CardEffects[effect.Id](effect.InitJson).Execute(this, playerGameState);
+        await Database.CardEffects[effect.Id](effect.InitJson).ExecuteAsync(this, playerGameState);
     }
 }

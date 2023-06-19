@@ -9,7 +9,7 @@
 font_size = 12
 
 [sub_resource type="LabelSettings" id="LabelSettings_i7brf"]
-font_size = 12
+font_size = 11
 
 [sub_resource type="LabelSettings" id="LabelSettings_jwlpm"]
 font_size = 18

@@ -11,7 +11,7 @@ public class SquishTheWimpyCardEffect : ICardEffect
 
     public string GetText() => "Destroy the lowest attack creature(s)";
 
-    public Task Execute(CardGameState card, PlayerGameState playerGameState)
+    public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var selfHasCreatures = playerGameState.Board.Any();
         var enemyHasCreatures = playerGameState.Enemy.Board.Any();
@@ -21,67 +21,88 @@ public class SquishTheWimpyCardEffect : ICardEffect
             // pass
         }
 
-
         else if (!selfHasCreatures)
         {
-            DestroyLowestEnemyCreatures(playerGameState);
+            await DestroyLowestEnemyCreaturesAsync(playerGameState);
         }
 
         else if (!enemyHasCreatures)
         {
-            DestroyLowestSelfCreatures(playerGameState);
+            await DestroyLowestSelfCreaturesAsync(playerGameState);
         }
 
         else
         {
-            DestroyLowestAllCreatures(playerGameState);
+            await DestroyLowestAllCreaturesAsync(playerGameState);
         }
 
         playerGameState.Enemy.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
-
-        return Task.CompletedTask;
     }
 
-    private static void DestroyLowestAllCreatures(PlayerGameState playerGameState)
+    private static async Task DestroyLowestAllCreaturesAsync(PlayerGameState playerGameState)
     {
         var selfByAtk = playerGameState.Board.OrderBy(x => x.Atk).ToArray();
         var enemyByAtk = playerGameState.Enemy.Board.OrderBy(x => x.Atk).ToArray();
 
         var lowest = Math.Min(selfByAtk.First().Atk, enemyByAtk.First().Atk);
 
-        foreach (var cardGameState in selfByAtk.TakeWhile(x => x.Atk == lowest))
+        var selfToDestroy = selfByAtk.TakeWhile(x => x.Atk == lowest).ToArray();
+
+        foreach (var cardGameState in selfToDestroy)
         {
             playerGameState.DestroySelfCreature(cardGameState);
         }
 
-        foreach (var cardGameState in enemyByAtk.TakeWhile(x => x.Atk == lowest))
+        var enemyToDestroy = enemyByAtk.TakeWhile(x => x.Atk == lowest).ToArray();
+
+        foreach (var cardGameState in enemyToDestroy)
         {
             playerGameState.DestroyEnemyCreature(cardGameState);
+        }
+        
+        foreach (var cardGameState in selfToDestroy)
+        {
+            await cardGameState.OnExitAsync(playerGameState);
+        }
+
+        foreach (var cardGameState in enemyToDestroy)
+        {
+           await cardGameState.OnExitAsync(playerGameState.Enemy);
         }
     }
 
 
-    private static void DestroyLowestSelfCreatures(PlayerGameState playerGameState)
+    private static async Task DestroyLowestSelfCreaturesAsync(PlayerGameState playerGameState)
     {
         var selfByAtk = playerGameState.Board.OrderBy(x => x.Atk).ToArray();
         var selfLowest = selfByAtk.First().Atk;
 
-        var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfLowest);
+        var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfLowest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
             playerGameState.DestroySelfCreature(cardGameState);
         }
+        
+        foreach (var cardGameState in toDestroy)
+        {
+            await cardGameState.OnExitAsync(playerGameState);
+        }
     }
 
-    private static void DestroyLowestEnemyCreatures(PlayerGameState playerGameState)
+    private static async Task DestroyLowestEnemyCreaturesAsync(PlayerGameState playerGameState)
     {
         var enemyByAtk = playerGameState.Enemy.Board.OrderBy(x => x.Atk).ToArray();
         var enemyLowest = enemyByAtk.First().Atk;
 
-        var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyLowest);
+        var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyLowest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
             playerGameState.DestroyEnemyCreature(cardGameState);
+        }
+        
+        foreach (var cardGameState in toDestroy)
+        {
+           await cardGameState.OnExitAsync(playerGameState.Enemy); 
         }
     }
 }
