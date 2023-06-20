@@ -114,7 +114,7 @@ public class PlayerGameState
             Nodes.Hand.FailPlayCard(PeerId);
             return;
         }
-        
+
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
         if (card == null) throw new ApplicationException();
@@ -187,8 +187,9 @@ public class PlayerGameState
 
         if (attacker.Record.Abilities.Drain)
         {
-            Nodes.StatusPanel.SetHealth(PeerId, Health + atk);
-            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health + atk);
+            Health += Math.Max(0, atk);
+            Nodes.StatusPanel.SetHealth(PeerId, Health);
+            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
         }
     }
 
@@ -257,14 +258,16 @@ public class PlayerGameState
 
         if (attacker.Record.Abilities.Drain)
         {
-            Nodes.StatusPanel.SetHealth(PeerId, Health + attacker.Atk);
-            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health + attacker.Atk);
+            Health += Math.Max(0, attacker.Atk);
+            Nodes.StatusPanel.SetHealth(PeerId, Health);
+            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
         }
 
         if (target.Record.Abilities.Drain)
         {
-            Nodes.StatusPanel.SetHealth(EnemyPeerId, Health + target.Atk);
-            Nodes.EnemyStatusPanel.SetHealth(PeerId, Health + target.Atk);
+            Enemy.Health += Math.Max(0, target.Atk);
+            Nodes.StatusPanel.SetHealth(EnemyPeerId, Enemy.Health);
+            Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
         }
 
         if (attacker.Zone == CardZone.Board)
@@ -275,8 +278,8 @@ public class PlayerGameState
         {
             await attacker.OnExitAsync(this);
         }
-        
-        if(target.Zone != CardZone.Board)
+
+        if (target.Zone != CardZone.Board)
         {
             await target.OnExitAsync(Enemy);
         }
