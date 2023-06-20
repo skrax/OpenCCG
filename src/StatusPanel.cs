@@ -7,6 +7,8 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
+public record SetEnergyDto(int Current, int Max);
+
 public partial class StatusPanel : Node, IMessageReceiver<MessageType>
 {
     private Label _cardCountLabel;
@@ -26,7 +28,7 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.SetEnergy => Executor.Make<int>(SetEnergy),
+            MessageType.SetEnergy => Executor.Make<SetEnergyDto>(SetEnergy),
             MessageType.SetCardCount => Executor.Make<int>(SetCardCount),
             MessageType.SetHealth => Executor.Make<int>(SetHealth)
         };
@@ -39,9 +41,9 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
         _energyLabel = GetChild<Label>(4);
     }
 
-    private void SetEnergy(int value)
+    private void SetEnergy(SetEnergyDto dto)
     {
-        _energyLabel.Text = value.ToString();
+        _energyLabel.Text = $"{dto.Current} / {dto.Max}";
     }
 
     private void SetCardCount(int value)

@@ -103,8 +103,8 @@ public class PlayerGameState
 
     private void UpdateEnergyRpc()
     {
-        Nodes.StatusPanel.SetEnergy(PeerId, Energy);
-        Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy);
+        Nodes.StatusPanel.SetEnergy(PeerId, Energy, MaxEnergy);
+        Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy, MaxEnergy);
     }
 
     public async Task PlayCardAsync(Guid id)

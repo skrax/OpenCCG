@@ -20,9 +20,9 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public void SetEnergy(long peerId, int value)
+    public void SetEnergy(long peerId, int current, int max)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetEnergy, value);
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetEnergy, new SetEnergyDto(current, max));
     }
 
     public void SetCardCount(long peerId, int value)

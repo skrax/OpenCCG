@@ -75,9 +75,9 @@ label_settings = SubResource("LabelSettings_o1b6m")
 
 [node name="CardCount" type="Label" parent="StatusPanel"]
 layout_mode = 0
-offset_left = 677.0
+offset_left = 544.0
 offset_top = 32.0
-offset_right = 756.0
+offset_right = 623.0
 offset_bottom = 101.0
 text = "10"
 label_settings = SubResource("LabelSettings_fgagx")
@@ -86,20 +86,20 @@ vertical_alignment = 1
 
 [node name="CardSymbol" type="Label" parent="StatusPanel"]
 layout_mode = 0
-offset_left = 744.0
+offset_left = 613.0
 offset_top = 52.0
-offset_right = 784.0
+offset_right = 653.0
 offset_bottom = 97.0
 text = "🀆"
 label_settings = SubResource("LabelSettings_o1b6m")
 
 [node name="EnergyCount" type="Label" parent="StatusPanel"]
 layout_mode = 0
-offset_left = 790.0
+offset_left = 731.0
 offset_top = 32.0
-offset_right = 869.0
+offset_right = 854.0
 offset_bottom = 101.0
-text = "10"
+text = "10 / 10"
 label_settings = SubResource("LabelSettings_fgagx")
 horizontal_alignment = 1
 vertical_alignment = 1
