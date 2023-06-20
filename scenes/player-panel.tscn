@@ -1,0 +1,114 @@
+[gd_scene load_steps=8 format=3 uid="uid://usm5ti5ecytg"]
+
+[ext_resource type="Texture2D" uid="uid://wart73b367qr" path="res://img/avatar/00018-679053703.png" id="1_ptxdf"]
+[ext_resource type="Script" path="res://src/Avatar.cs" id="2_1l014"]
+[ext_resource type="Script" path="res://src/StatusPanel.cs" id="3_13snm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nn7et"]
+bg_color = Color(1, 0.266667, 0.607843, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_fgagx"]
+font_size = 38
+
+[sub_resource type="LabelSettings" id="LabelSettings_o1b6m"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_iyv0j"]
+font_size = 31
+
+[node name="PlayerPanel" type="Node2D"]
+
+[node name="Avatar" type="Sprite2D" parent="."]
+scale = Vector2(0.242188, 0.242188)
+texture = ExtResource("1_ptxdf")
+script = ExtResource("2_1l014")
+
+[node name="DamagePanel" type="Panel" parent="Avatar"]
+visible = false
+offset_left = -116.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nn7et")
+
+[node name="Label" type="Label" parent="Avatar/DamagePanel"]
+layout_mode = 2
+offset_right = 236.0
+offset_bottom = 120.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+text = "- 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatusPanel" type="Panel" parent="." node_paths=PackedStringArray("_dmgPopup")]
+self_modulate = Color(1, 1, 1, 0.294118)
+offset_left = 65.0
+offset_top = -61.0
+offset_right = 961.0
+offset_bottom = 65.0
+script = ExtResource("3_13snm")
+_dmgPopup = NodePath("../Avatar/DamagePanel")
+
+[node name="HealthCount" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 79.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HealthSymbol" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 52.0
+offset_right = 108.0
+offset_bottom = 97.0
+text = "🖤"
+label_settings = SubResource("LabelSettings_o1b6m")
+
+[node name="CardCount" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 677.0
+offset_top = 32.0
+offset_right = 756.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardSymbol" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 744.0
+offset_top = 52.0
+offset_right = 784.0
+offset_bottom = 97.0
+text = "🀆"
+label_settings = SubResource("LabelSettings_o1b6m")
+
+[node name="EnergyCount" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 32.0
+offset_right = 869.0
+offset_bottom = 101.0
+text = "10"
+label_settings = SubResource("LabelSettings_fgagx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergySymbol" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 854.0
+offset_top = 51.0
+offset_right = 894.0
+offset_bottom = 96.0
+text = "⚡"
+label_settings = SubResource("LabelSettings_iyv0j")
