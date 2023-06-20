@@ -15,7 +15,9 @@ script = ExtResource("1_337q5")
 [node name="Hand" type="Node" parent="."]
 script = ExtResource("2_btlg5")
 
-[node name="StatusPanel" type="Node" parent="Hand"]
+[node name="PlayerPanel" type="Node" parent="."]
+
+[node name="StatusPanel" type="Node" parent="PlayerPanel"]
 script = ExtResource("3_bmwaj")
 
 [node name="Board" type="Node" parent="."]
@@ -27,7 +29,9 @@ script = ExtResource("5_3a7jm")
 [node name="EnemyHand" type="Node" parent="."]
 script = ExtResource("4_dvbuv")
 
-[node name="StatusPanel" type="Node" parent="EnemyHand"]
+[node name="EnemyPlayerPanel" type="Node" parent="."]
+
+[node name="StatusPanel" type="Node" parent="EnemyPlayerPanel"]
 script = ExtResource("3_bmwaj")
 
 [node name="Client" type="Node" parent="."]
