@@ -95,6 +95,8 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
             return;
         }
 
+        if (card.IsQueuedForDeletion()) return;
+
         await card.UpdateAsync(cardGameStateDto);
     }
 
