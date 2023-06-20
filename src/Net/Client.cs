@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Godot;
 using OpenCCG.Core;
 
@@ -8,12 +7,13 @@ namespace OpenCCG.Net;
 public partial class Client : Node
 {
     [Export] private Main _main;
+    [Export] private string _serverAddress;
     private ENetMultiplayerPeer _peer;
 
     public override void _Ready()
     {
         _peer = new ENetMultiplayerPeer();
-        var result = _peer.CreateClient("127.0.0.1", 8080);
+        var result = _peer.CreateClient(_serverAddress, 57618);
 
         if (result is Error.Ok)
         {
@@ -24,6 +24,7 @@ public partial class Client : Node
             Multiplayer.ServerDisconnected += OnServerDisconnected;
             Multiplayer.PeerConnected += OnPeerConnected;
             Multiplayer.PeerDisconnected += OnPeerDisconnected;
+            Multiplayer.ConnectionFailed += OnConnectionFailed;
         }
         else if (result is Error.AlreadyInUse)
         {
@@ -33,6 +34,11 @@ public partial class Client : Node
         {
             throw new ApplicationException("Failed to connect to server");
         }
+    }
+
+    private void OnConnectionFailed()
+    {
+        Logger.Error<Client>("Connection failed");
     }
 
     public override void _ExitTree()

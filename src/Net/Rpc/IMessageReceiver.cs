@@ -40,18 +40,18 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
 
         if (self.Observers != null && self.Observers.TryGetValue(message.Id, out var observer))
         {
-            observer.Handle(message.Json!);
+            observer.Handle(message.Json);
             self.Observers.Remove(message.Id);
             observer.Dispose();
         }
         else
         {
             var executor = self.GetExecutor(message.Type);
-            var responseData = executor.IsAsync
+            var responseData = executor.Execution is Executor.ExecutionMode.Async
                 ? await executor.AsyncOp!(senderPeerId, message.Json)
                 : executor.Op!(senderPeerId, message.Json);
 
-            if (responseData == null) return;
+            if (executor.Response == Executor.ResponseMode.NoResponse) return;
 
             var response = message with { Json = responseData };
             var responseJson = JsonSerializer.Serialize(response);
@@ -86,6 +86,34 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
 
         return await tsc.Task;
+    }
+    
+    
+    /// <summary>
+    ///     Send a message to a peer and adds a new entry to <see cref="Observers" /> which awaits a response.
+    /// </summary>
+    /// <param name="self">Implementation</param>
+    /// <param name="peerId">Peer to message</param>
+    /// <param name="messageType">Type of message</param>
+    /// <param name="input">Data to send</param>
+    /// <param name="timeOut">TimeSpan until awaiting a response is canceled. Defaults to 3 minutes</param>
+    /// <typeparam name="TIn">Type of sent data</typeparam>
+    /// <typeparam name="TOut">Type of received data</typeparam>
+    /// <returns></returns>
+    static async Task GetAsync<TIn>(IMessageReceiver<TMessageType> self, long peerId,
+        TMessageType messageType, TIn input, TimeSpan? timeOut = null)
+    {
+        var id = Guid.NewGuid().ToString();
+        var message = new Message<TMessageType>(id, messageType, JsonSerializer.Serialize(input));
+
+        var tsc = new TaskCompletionSource();
+        timeOut ??= TimeSpan.FromMinutes(3);
+        var observer = new Observer(tsc, timeOut.Value);
+        self.Observers!.Add(id, observer);
+
+        self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
+
+        await tsc.Task;
     }
 
     /// <summary>

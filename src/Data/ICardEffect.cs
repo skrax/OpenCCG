@@ -7,5 +7,5 @@ public interface ICardEffect
 {
     public string GetText();
 
-    public Task Execute(CardGameState card, PlayerGameState playerGameState);
+    public Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState);
 }

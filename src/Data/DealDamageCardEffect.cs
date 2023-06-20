@@ -37,10 +37,10 @@ public class DealDamageCardEffect : ICardEffect
             case RequireTargetSide.All:
                 break;
             case RequireTargetSide.Friendly:
-                sb.Append(" a friendly");
+                sb.Append(" to a friendly");
                 break;
             case RequireTargetSide.Enemy:
-                sb.Append(" an enemy");
+                sb.Append(" to an enemy");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -51,10 +51,10 @@ public class DealDamageCardEffect : ICardEffect
             case RequireTargetType.All:
                 break;
             case RequireTargetType.Creature:
-                sb.Append(" creature");
+                sb.Append(TargetSide == RequireTargetSide.All ? " to a creature" : " creature");
                 break;
             case RequireTargetType.Avatar:
-                sb.Append(" avatar");
+                sb.Append(TargetSide == RequireTargetSide.All ? " to an avatar" : " avatar");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -63,7 +63,7 @@ public class DealDamageCardEffect : ICardEffect
         return sb.ToString();
     }
 
-    public async Task Execute(CardGameState card, PlayerGameState playerGameState)
+    public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
@@ -71,20 +71,59 @@ public class DealDamageCardEffect : ICardEffect
         var input = new RequireTargetInputDto(cardDto, RequireTargetType.All, RequireTargetSide.Enemy);
         var output = await playerGameState.Nodes.CardTempArea.RequireTargetsAsync(playerGameState.PeerId, input);
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
-            new EndTurnButtonSetActiveDto(true, null));
+            new EndTurnButtonSetActiveDto(playerGameState.IsTurn, null));
         playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         if (output.cardId == null)
         {
-            playerGameState.Enemy.Health -= Damage;
+            if (output.isEnemyAvatar!.Value)
+            {
+                playerGameState.Enemy.Health -= Damage;
 
-            playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Enemy.Health);
-            playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Enemy.Health);
+                playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Enemy.Health);
+                playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Enemy.Health);
+            }
+            else if (!output.isEnemyAvatar.Value)
+            {
+                playerGameState.Health -= Damage;
+
+                playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Health);
+                playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Health);
+            }
         }
         else
         {
-            var targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-            playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+            if (TargetSide == RequireTargetSide.Friendly)
+            {
+                var targetCard = playerGameState.Board.Single(x => x.Id == output.cardId);
+                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
+                if (targetCard.Zone == CardZone.Pit)
+                    await targetCard.OnExitAsync(playerGameState);
+            }
+            else if (TargetSide == RequireTargetSide.Enemy)
+            {
+                var targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
+                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+
+                if (targetCard.Zone == CardZone.Pit)
+                    await targetCard.OnExitAsync(playerGameState.Enemy);
+            }
+            else
+            {
+                var targetCard = playerGameState.Board.SingleOrDefault(x => x.Id == output.cardId);
+                if (targetCard != null)
+                {
+                    playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
+                    if (targetCard.Zone == CardZone.Pit)
+                        await targetCard.OnExitAsync(playerGameState);
+                }
+
+                targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
+                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+
+                if (targetCard.Zone == CardZone.Pit)
+                    await targetCard.OnExitAsync(playerGameState.Enemy);
+            }
         }
     }
 

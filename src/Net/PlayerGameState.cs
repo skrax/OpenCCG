@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -43,7 +42,7 @@ public class PlayerGameState
 
     public List<CardRecord> DeckList { get; private set; }
 
-    public bool isTurn { get; set; }
+    public bool IsTurn { get; set; }
 
 
     public void Init(List<CardRecord> deckList)
@@ -78,18 +77,6 @@ public class PlayerGameState
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
     }
 
-    public LinkedList<CardGameState> GetListByZone(CardZone zone)
-    {
-        return zone switch
-        {
-            CardZone.Deck => Deck,
-            CardZone.Hand => Hand,
-            CardZone.Board => Board,
-            CardZone.Pit => Pit,
-            _ => throw new ArgumentOutOfRangeException(nameof(zone), zone, null)
-        };
-    }
-
     public void Draw(int count = 1)
     {
         for (var i = 0; i < count; ++i)
@@ -120,8 +107,14 @@ public class PlayerGameState
         Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy);
     }
 
-    public async Task PlayCard(Guid id)
+    public async Task PlayCardAsync(Guid id)
     {
+        if (!IsTurn)
+        {
+            Nodes.Hand.FailPlayCard(PeerId);
+            return;
+        }
+        
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
         if (card == null) throw new ApplicationException();
@@ -138,22 +131,23 @@ public class PlayerGameState
 
         if (card.Record.Type is CardRecordType.Spell)
         {
-            var effects = card.Record.Effects.Select(x => Database.CardEffects[x.Id](x.initJson));
-
             Nodes.Hand.RemoveCard(PeerId, id);
             Nodes.EnemyHand.RemoveCard(EnemyPeerId);
 
-            foreach (var cardEffect in effects) await cardEffect.Execute(card, this);
+            await card.OnSpellAsync(this);
 
             Pit.AddLast(card);
+            card.Zone = CardZone.Pit;
         }
         else if (card.Record.Type is CardRecordType.Creature)
         {
             card.Zone = CardZone.Board;
             Board.AddLast(card);
 
-            card.IsSummoningProtectionOn = true;
-            card.IsSummoningSicknessOn = true;
+            card.IsSummoningProtectionOn = card.Record.Abilities is { Exposed: false, Defender: false };
+            card.IsSummoningSicknessOn = !card.Record.Abilities.Haste;
+
+            await card.OnEnterAsync(this);
 
             var dto = card.AsDto();
 
@@ -167,21 +161,35 @@ public class PlayerGameState
         UpdateCardCountRpc();
     }
 
-    public void CombatPlayer(Guid attackerId)
+    public async Task CombatPlayerAsync(Guid attackerId)
     {
-        if (!isTurn) return;
+        if (!IsTurn) return;
 
         var attacker = Board.First(x => x.Id == attackerId);
 
         if (attacker.IsSummoningSicknessOn) return;
         if (attacker.AttacksAvailable <= 0) return;
+        if (Enemy.Board.Any(x => x.Record.Abilities.Defender)) return;
+
+        var t1 = Nodes.Board.PlayCombatAvatarAnimAsync(PeerId, attackerId);
+        var t2 = Nodes.EnemyBoard.PlayCombatAvatarAnimAsync(EnemyPeerId, attackerId);
+
+        await Task.WhenAll(t1, t2);
 
         --attacker.AttacksAvailable;
-        Nodes.Board.UpdateCard(PeerId, attacker.AsDto());
-        Enemy.Health -= Math.Max(0, attacker.Atk);
+        attacker.IsSummoningProtectionOn = false;
+        UpdateSelfCreature(attacker);
+        var atk = Math.Max(0, attacker.Atk);
+        Enemy.Health -= atk;
 
         Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
         Nodes.StatusPanel.SetHealth(EnemyPeerId, Enemy.Health);
+
+        if (attacker.Record.Abilities.Drain)
+        {
+            Nodes.StatusPanel.SetHealth(PeerId, Health + atk);
+            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health + atk);
+        }
     }
 
     public void ResolveDamage(CardGameState card, int damage, ControllingEntity controllingEntity)
@@ -190,44 +198,40 @@ public class PlayerGameState
 
         if (controllingEntity is ControllingEntity.Self)
         {
+            UpdateSelfCreature(card);
             if (card.Def <= 0)
             {
-                Board.Remove(card);
-                Pit.AddLast(card);
-
-                Nodes.Board.RemoveCard(PeerId, card.Id);
-                Nodes.EnemyBoard.RemoveCard(EnemyPeerId, card.Id);
-            }
-            else
-            {
-                var dto = card.AsDto();
-                Nodes.Board.UpdateCard(PeerId, dto);
-                Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
+                DestroySelfCreature(card);
             }
         }
         else
         {
+            UpdateEnemyCreature(card);
             if (card.Def <= 0)
             {
-                Enemy.Board.Remove(card);
-                Enemy.Pit.AddLast(card);
-
-                Nodes.EnemyBoard.RemoveCard(PeerId, card.Id);
-                Nodes.Board.RemoveCard(EnemyPeerId, card.Id);
-            }
-            else
-            {
-                var dto = card.AsDto();
-                Nodes.EnemyBoard.UpdateCard(PeerId, dto);
-                Nodes.Board.UpdateCard(EnemyPeerId, dto);
+                DestroyEnemyCreature(card);
             }
         }
     }
 
-    public void Combat(Guid attackerId, Guid targetId)
+    private void UpdateEnemyCreature(CardGameState card)
+    {
+        var dto = card.AsDto();
+        Nodes.EnemyBoard.UpdateCard(PeerId, dto);
+        Nodes.Board.UpdateCard(EnemyPeerId, dto);
+    }
+
+    private void UpdateSelfCreature(CardGameState card)
+    {
+        var dto = card.AsDto();
+        Nodes.Board.UpdateCard(PeerId, dto);
+        Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
+    }
+
+    public async Task CombatAsync(Guid attackerId, Guid targetId)
     {
         // TODO feedback
-        if (!isTurn) return;
+        if (!IsTurn) return;
 
         var attacker = Board.First(x => x.Id == attackerId);
         var target = Enemy.Board.First(x => x.Id == targetId);
@@ -236,11 +240,46 @@ public class PlayerGameState
         if (attacker.IsSummoningSicknessOn) return;
         if (target.IsSummoningProtectionOn) return;
         if (attacker.AttacksAvailable <= 0) return;
+        if (Enemy.Board.Any(x => x.Record.Abilities.Defender) && !target.Record.Abilities.Defender) return;
+
+        await attacker.OnStartCombatAsync(this);
+
+        var t1 = Nodes.Board.PlayCombatAnimAsync(PeerId, attackerId, targetId);
+        var t2 = Nodes.EnemyBoard.PlayCombatAnimAsync(EnemyPeerId, attackerId, targetId);
+
+        await Task.WhenAll(t1, t2);
 
         --attacker.AttacksAvailable;
-        Nodes.Board.UpdateCard(PeerId, attacker.AsDto());
+        attacker.IsSummoningProtectionOn = false;
+        UpdateSelfCreature(attacker);
         ResolveDamage(attacker, target.Atk, ControllingEntity.Self);
         ResolveDamage(target, attacker.Atk, ControllingEntity.Enemy);
+
+        if (attacker.Record.Abilities.Drain)
+        {
+            Nodes.StatusPanel.SetHealth(PeerId, Health + attacker.Atk);
+            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health + attacker.Atk);
+        }
+
+        if (target.Record.Abilities.Drain)
+        {
+            Nodes.StatusPanel.SetHealth(EnemyPeerId, Health + target.Atk);
+            Nodes.EnemyStatusPanel.SetHealth(PeerId, Health + target.Atk);
+        }
+
+        if (attacker.Zone == CardZone.Board)
+        {
+            await attacker.OnEndCombatAsync(this);
+        }
+        else
+        {
+            await attacker.OnExitAsync(this);
+        }
+        
+        if(target.Zone != CardZone.Board)
+        {
+            await target.OnExitAsync(Enemy);
+        }
     }
 
     public void Start()
@@ -252,19 +291,26 @@ public class PlayerGameState
         Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
     }
 
-    public void EndTurn()
+    public async Task EndTurnAsync()
     {
-        if (!isTurn) return;
+        if (!IsTurn) return;
 
-        isTurn = false;
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnEndTurnAsync(this);
+        }
+
+        IsTurn = false;
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
-        Enemy.StartTurn();
+
+        await Enemy.StartTurnAsync();
     }
 
-    public void StartTurn()
+    public async Task StartTurnAsync()
     {
-        isTurn = true;
+        IsTurn = true;
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
+
         foreach (var cardGameState in Board)
         {
             cardGameState.IsSummoningProtectionOn = false;
@@ -274,6 +320,8 @@ public class PlayerGameState
             var dto = cardGameState.AsDto();
             Nodes.Board.UpdateCard(PeerId, dto);
             Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
+
+            await cardGameState.OnStartTurnAsync(this);
         }
 
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
@@ -289,5 +337,25 @@ public class PlayerGameState
     private void NotifyDisconnected()
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "Opponent disconnected");
+    }
+
+    public void DestroyEnemyCreature(CardGameState cardGameState)
+    {
+        Enemy.Board.Remove(cardGameState);
+        Enemy.Pit.AddLast(cardGameState);
+        cardGameState.Zone = CardZone.Pit;
+
+        Nodes.EnemyBoard.RemoveCard(PeerId, cardGameState.Id);
+        Nodes.Board.RemoveCard(EnemyPeerId, cardGameState.Id);
+    }
+
+    public void DestroySelfCreature(CardGameState cardGameState)
+    {
+        Board.Remove(cardGameState);
+        Pit.AddLast(cardGameState);
+        cardGameState.Zone = CardZone.Pit;
+
+        Nodes.Board.RemoveCard(PeerId, cardGameState.Id);
+        Nodes.EnemyBoard.RemoveCard(EnemyPeerId, cardGameState.Id);
     }
 }

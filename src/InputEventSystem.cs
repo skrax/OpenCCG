@@ -13,7 +13,6 @@ public partial class InputEventSystem : Node2D
         DraggingCard,
         DraggingLine,
         ChoosingTargets,
-        PreviewHoverCardHand
     }
 
     [Export] private CardTempArea _cardTempArea;
@@ -126,12 +125,22 @@ public partial class InputEventSystem : Node2D
             {
                 var card = EventSink.PointerEnterCards.MinBy(x => x.ZIndex);
                 if (card != null) card.ShowPreview();
+
+                var cardBoard = EventSink.PointerEnterCardBoard.MinBy(x => x.ZIndex);
+                if (cardBoard != null) cardBoard.ShowPreview();
+
                 break;
             }
             default:
             {
                 throw new ArgumentOutOfRangeException();
             }
+        }
+
+        foreach (var pointerExitCardBoard in EventSink.PointerExitCardBoard)
+        {
+            if (pointerExitCardBoard.IsQueuedForDeletion()) continue;
+            pointerExitCardBoard.DisablePreview();
         }
 
         foreach (var pointerExitCard in EventSink.PointerExitCards)
@@ -164,7 +173,7 @@ public partial class InputEventSystem : Node2D
     private void OnDragLineEnd()
     {
         var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
-        var avatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
+        var avatar = EventSink.PointerUpAvatars.MinBy(x => x.ZIndex);
 
         _line.Points = Array.Empty<Vector2>();
         _state = InputState.Idle;
@@ -172,14 +181,22 @@ public partial class InputEventSystem : Node2D
         if (cardBoard is { CardGameState.ISummoningProtectionOn: false } && _dragLineStartInstanceId.HasValue)
         {
             Logger.Info<InputEventSystem>($"DragLine End {cardBoard.GetInstanceId()}");
+
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
+            {
+                //attacker.Attack(cardBoard);
                 GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, cardBoard.CardGameState.Id);
+            }
         }
-        else if (avatar != null && _dragLineStartInstanceId.HasValue)
+        else if (avatar is { IsEnemy: true }
+                 && _dragLineStartInstanceId.HasValue)
         {
             Logger.Info<InputEventSystem>($"DragLine End {avatar.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
+            {
+                //attacker.Attack(avatar);
                 GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
+            }
         }
         else
         {
@@ -192,7 +209,6 @@ public partial class InputEventSystem : Node2D
     private void OnTargetDetect()
     {
         var cardBoard = EventSink.PointerUpCardBoard.MinBy(x => x.ZIndex);
-        var enemyAvatar = EventSink.PointerUpEnemyAvatars.MinBy(x => x.ZIndex);
         var avatar = EventSink.PointerUpAvatars.MinBy(x => x.ZIndex);
 
         if (cardBoard != null)
@@ -202,10 +218,6 @@ public partial class InputEventSystem : Node2D
         else if (avatar != null)
         {
             if (!_cardTempArea.TryUpstreamTarget(avatar)) return;
-        }
-        else if (enemyAvatar != null)
-        {
-            if (!_cardTempArea.TryUpstreamTarget(enemyAvatar)) return;
         }
         else
         {

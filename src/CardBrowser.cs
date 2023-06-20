@@ -60,7 +60,7 @@ public partial class CardBrowser : Control
                 AddCardToView(cardRecord);
         };
 
-        foreach (var cardRecord in Database.Cards.Values) AddCardToView(cardRecord);
+        foreach (var cardRecord in Database.Cards.Values.OrderBy(x => x.Cost)) AddCardToView(cardRecord);
     }
 
     private void ClearDeck()

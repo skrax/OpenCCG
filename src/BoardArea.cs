@@ -13,7 +13,9 @@ namespace OpenCCG;
 
 public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 {
-    [Export] public bool IsEnemy; 
+    [Export] public bool IsEnemy;
+    [Export] public BoardArea EnemyBoardArea;
+    [Export] public Avatar Avatar, EnemyAvatar;
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
@@ -33,8 +35,37 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
             MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
             MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync),
             MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
+            MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
+                Executor.ResponseMode.Respond),
             _ => throw new NotImplementedException()
         };
+    }
+
+    private async Task PlayCombatAnimAsync(PlayCombatDto dto)
+    {
+        var card = _cards.FirstOrDefault(x => x.CardGameState.Id == dto.From);
+
+        if (card == null)
+        {
+            Logger.Error<BoardArea>($"IsEnemy: {IsEnemy} play combat: ${dto.From} not found");
+            return;
+        }
+
+        if (dto.IsAvatar)
+        {
+            await card.AttackAsync(EnemyAvatar);
+        }
+        else
+        {
+            var other = EnemyBoardArea._cards.FirstOrDefault(x => x.CardGameState.Id == dto.To);
+            if (other == null)
+            {
+                Logger.Error<BoardArea>($"IsEnemy: {IsEnemy} play combat: ${dto.To} not found");
+                return;
+            }
+
+            await card.AttackAsync(other);
+        }
     }
 
     private void SetCardPositions()
@@ -45,6 +76,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
     private void PlaceCard(CardGameStateDto cardGameStateDto)
     {
         var card = CardBoardScene.Make<CardBoard, CardGameStateDto>(cardGameStateDto, this);
+        Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} placed: ${cardGameStateDto.Id} ${cardGameStateDto.Record.Name}");
 
         _cards.Add(card);
 
@@ -53,17 +85,31 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 
     private async Task UpdateCardAsync(CardGameStateDto cardGameStateDto)
     {
-        await _cards
-            .First(x => x.CardGameState.Id == cardGameStateDto.Id)
-            .UpdateAsync(cardGameStateDto);
+        Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} update: ${cardGameStateDto.Id}");
+
+        var card = _cards.FirstOrDefault(x => x.CardGameState.Id == cardGameStateDto.Id);
+
+        if (card == null)
+        {
+            Logger.Error<BoardArea>($"IsEnemy: {IsEnemy} update: ${cardGameStateDto.Id} not found");
+            return;
+        }
+
+        await card.UpdateAsync(cardGameStateDto);
     }
 
     private void RemoveCard(RemoveCardDto removeCardDto)
     {
-        var card = _cards.First(x => x.CardGameState.Id == Guid.Parse(removeCardDto.Id));
-        _cards.Remove(card);
-        card.QueueFree();
+        Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} remove: ${removeCardDto.Id}");
+        var card = _cards.FirstOrDefault(x => x.CardGameState.Id == removeCardDto.Id);
 
-        SetCardPositions();
+        if (card == null)
+        {
+            Logger.Error<BoardArea>($"IsEnemy: {IsEnemy} remove: ${removeCardDto.Id} not found");
+            return;
+        }
+
+        _cards.Remove(card);
+        card.Destroy(SetCardPositions);
     }
 }

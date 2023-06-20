@@ -10,9 +10,14 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 {
     [Export] private CardStatPanel _atkPanel, _defPanel;
     [Export] private Panel _dmgPopup;
+    [Export] private AnimationPlayer _anim;
     private bool _isDragging, _canStopDrag;
     public CardGameStateDto CardGameState;
     public bool IsEnemy { get; private set; }
+
+    private bool _hovering, _canHover = true;
+    [Export] private PackedScene _cardPreviewScene;
+    private CardPreview? _preview;
 
     public void Init(CardGameStateDto record)
     {
@@ -30,6 +35,16 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
             var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
+    }
+
+    public void Destroy(Action act)
+    {
+        _anim.AnimationFinished += _ =>
+        {
+            QueueFree();
+            act();
+        };
+        _anim.Play("shake");
     }
 
     public async Task UpdateAsync(CardGameStateDto cardGameState)
@@ -59,9 +74,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
     public override void _Input(InputEvent inputEvent)
     {
+        var rect = GetRect();
         if (inputEvent.IsActionPressed(InputActions.SpriteClick))
         {
-            var rect = GetRect();
             var inputEventMouseButton = (InputEventMouseButton)inputEvent;
 
             if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
@@ -71,12 +86,73 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         if (inputEvent.IsActionReleased(InputActions.SpriteClick))
         {
-            var rect = GetRect();
             var inputEventMouseButton = (InputEventMouseButton)inputEvent;
 
             if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
 
             EventSink.ReportPointerUp(this);
         }
+
+        if (inputEvent is InputEventMouseMotion mouseMotion)
+        {
+            switch (_hovering)
+            {
+                case false when rect.HasPoint(ToLocal(mouseMotion.Position)):
+                    if (!_canHover) return;
+
+                    _hovering = true;
+                    EventSink.ReportPointerEnter(this);
+                    break;
+                case true when !rect.HasPoint(ToLocal(mouseMotion.Position)):
+                    _hovering = false;
+
+                    EventSink.ReportPointerExit(this);
+                    break;
+            }
+        }
+    }
+
+    public async Task AttackAsync(Sprite2D sprite2D)
+    {
+        var f = 0f;
+        var targetPosition = sprite2D.GlobalPosition;
+        var off = sprite2D.GetRect().Size.Y * sprite2D.Scale.Y * 0.9f;
+        if (sprite2D is Avatar { IsEnemy: true } or CardBoard { IsEnemy: true })
+        {
+            targetPosition.Y += off;
+        }
+        else
+        {
+            targetPosition.Y -= off;
+        }
+
+        var oldPosition = GlobalPosition;
+        ZIndex = 1;
+
+        while (f < 0.7f)
+        {
+            f += 0.012800001F;
+            GlobalPosition = GlobalPosition.Lerp(targetPosition, f);
+            await Task.Delay(TimeSpan.FromMilliseconds(16D));
+        }
+
+        GlobalPosition = oldPosition;
+        ZIndex = 0;
+    }
+
+    public void ShowPreview()
+    {
+        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent());
+        _preview.Init(CardGameState);
+        var pos = Position;
+        pos.X += 256;
+        _preview.Position = pos;
+        _preview.Visible = true;
+    }
+
+    public void DisablePreview()
+    {
+        if (IsQueuedForDeletion() || _preview == null) return;
+        _preview.Visible = false;
     }
 }

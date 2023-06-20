@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -23,11 +24,11 @@ public partial class Server : Node, IMessageReceiver<MessageType>
     public override void _Ready()
     {
         var peer = new ENetMultiplayerPeer();
-        var result = peer.CreateServer(8080, 16);
+        var result = peer.CreateServer(57618, 16);
 
         if (result is Error.Ok)
         {
-            Logger.Info<Server>("listening on port 8080");
+            Logger.Info<Server>("listening on port 57618");
             GetTree().GetMultiplayer().MultiplayerPeer = peer;
             Multiplayer.PeerConnected += OnPeerConnected;
             Multiplayer.PeerDisconnected += OnPeerDisconnected;
@@ -72,24 +73,24 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         }
     }
 
-    private async void PlayCard(long senderPeerId, Guid cardId)
+    private void PlayCard(long senderPeerId, Guid cardId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].PlayCard(cardId);
+        _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
     }
 
-    private void CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
+    private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
     {
-        _gameState.PlayerGameStates[senderPeerId].Combat(t.AttackerId, t.TargetId);
+        await _gameState.PlayerGameStates[senderPeerId].CombatAsync(t.AttackerId, t.TargetId);
     }
 
-    private void CombatPlayer(long senderPeerId, Guid cardId)
+    private async Task CombatPlayer(long senderPeerId, Guid cardId)
     {
-        _gameState.PlayerGameStates[senderPeerId].CombatPlayer(cardId);
+        await _gameState.PlayerGameStates[senderPeerId].CombatPlayerAsync(cardId);
     }
 
     private void EndTurn(long senderPeerId)
     {
-        _gameState.PlayerGameStates[senderPeerId].EndTurn();
+        _gameState.PlayerGameStates[senderPeerId].EndTurnAsync();
     }
 
     private void QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
@@ -139,7 +140,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
             p1.Start();
             p2.Start();
-            p1.StartTurn();
+            p1.StartTurnAsync();
         }
         else
         {

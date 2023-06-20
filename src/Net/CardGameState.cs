@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using OpenCCG.Data;
 using OpenCCG.Net.Dto;
 
@@ -47,5 +49,35 @@ public class CardGameState
             IsSummoningProtectionOn,
             AttacksAvailable
         );
+    }
+
+
+    public async Task OnSpellAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.Spell, playerGameState);
+
+    public async Task OnEnterAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.Enter, playerGameState);
+
+    public async Task OnExitAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.Exit, playerGameState);
+
+    public async Task OnStartTurnAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.StartTurn, playerGameState);
+
+    public async Task OnEndTurnAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.EndTurn, playerGameState);
+
+    public async Task OnStartCombatAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.StartCombat, playerGameState);
+
+    public async Task OnEndCombatAsync(PlayerGameState playerGameState) =>
+        await ExecuteEffectAsync(Record.CardEffects.EndCombat, playerGameState);
+
+
+    private async Task ExecuteEffectAsync(CardEffectRecord? effect, PlayerGameState playerGameState)
+    {
+        if (effect == null) return;
+
+        await Database.CardEffects[effect.Id](effect.InitJson).ExecuteAsync(this, playerGameState);
     }
 }

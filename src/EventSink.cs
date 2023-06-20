@@ -17,10 +17,6 @@ public static class EventSink
     public static readonly List<Avatar> PointerUpAvatars = new();
     public static readonly List<Avatar> PointerEnterAvatars = new();
     public static readonly List<Avatar> PointerExitAvatars = new();
-    public static readonly List<EnemyAvatar> PointerDownEnemyAvatars = new();
-    public static readonly List<EnemyAvatar> PointerUpEnemyAvatars = new();
-    public static readonly List<EnemyAvatar> PointerEnterEnemyAvatars = new();
-    public static readonly List<EnemyAvatar> PointerExitEnemyAvatars = new();
 
     public static void Drain()
     {
@@ -36,10 +32,6 @@ public static class EventSink
         PointerUpAvatars.Clear();
         PointerEnterAvatars.Clear();
         PointerExitAvatars.Clear();
-        PointerDownEnemyAvatars.Clear();
-        PointerUpEnemyAvatars.Clear();
-        PointerEnterEnemyAvatars.Clear();
-        PointerExitEnemyAvatars.Clear();
     }
 
     public static void ReportPointerUp<T>(T entity)
@@ -54,9 +46,6 @@ public static class EventSink
                 break;
             case Avatar x:
                 PointerUpAvatars.Add(x);
-                break;
-            case EnemyAvatar x:
-                PointerUpEnemyAvatars.Add(x);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(entity));
@@ -76,9 +65,6 @@ public static class EventSink
             case Avatar x:
                 PointerDownAvatars.Add(x);
                 break;
-            case EnemyAvatar x:
-                PointerDownEnemyAvatars.Add(x);
-                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(entity));
         }
@@ -97,9 +83,6 @@ public static class EventSink
             case Avatar x:
                 PointerEnterAvatars.Add(x);
                 break;
-            case EnemyAvatar x:
-                PointerEnterEnemyAvatars.Add(x);
-                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(entity));
         }
@@ -117,9 +100,6 @@ public static class EventSink
                 break;
             case Avatar x:
                 PointerExitAvatars.Add(x);
-                break;
-            case EnemyAvatar x:
-                PointerExitEnemyAvatars.Add(x);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(entity));
