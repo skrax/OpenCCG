@@ -23,6 +23,9 @@ font_size = 60
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xfup"]
 bg_color = Color(1, 0.266667, 0.607843, 1)
 
+[sub_resource type="Animation" id="Animation_1edrg"]
+length = 0.001
+
 [sub_resource type="Animation" id="Animation_ow2en"]
 resource_local_to_scene = true
 resource_name = "shake"
@@ -40,9 +43,6 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector2(2.08165e-12, 2.08165e-12), Vector2(10, 4), Vector2(2.08165e-12, -3), Vector2(-10, 4), Vector2(-5, -1), Vector2(2.08165e-12, 3), Vector2(5, 4), Vector2(10, 6), Vector2(2.08165e-12, 2.08165e-12), Vector2(-10, -6), Vector2(2.08165e-12, -3), Vector2(10, 6), Vector2(6, 2), Vector2(2.08165e-12, 2.08165e-12)]
 }
-
-[sub_resource type="Animation" id="Animation_1edrg"]
-length = 0.001
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3lums"]
 _data = {

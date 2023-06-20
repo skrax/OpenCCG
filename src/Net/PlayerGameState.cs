@@ -77,18 +77,6 @@ public class PlayerGameState
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
     }
 
-    public LinkedList<CardGameState> GetListByZone(CardZone zone)
-    {
-        return zone switch
-        {
-            CardZone.Deck => Deck,
-            CardZone.Hand => Hand,
-            CardZone.Board => Board,
-            CardZone.Pit => Pit,
-            _ => throw new ArgumentOutOfRangeException(nameof(zone), zone, null)
-        };
-    }
-
     public void Draw(int count = 1)
     {
         for (var i = 0; i < count; ++i)
