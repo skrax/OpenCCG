@@ -41,6 +41,7 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
     {
         _anim.AnimationFinished += _ =>
         {
+            _preview?.QueueFree();
             QueueFree();
             act();
         };
@@ -68,6 +69,7 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
             _dmgPopup.GetChild<Label>(0).Text = diff > 0 ? $"+ {diff}" : $"{diff}";
             _dmgPopup.Visible = true;
             await Task.Delay(TimeSpan.FromSeconds(2));
+            if (_dmgPopup == null) return;
             _dmgPopup.Visible = false;
         }
     }
