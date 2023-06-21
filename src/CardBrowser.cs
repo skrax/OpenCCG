@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,19 @@ public partial class CardBrowser : Control
     [Export] private FileDialog _fileDialog;
     [Export] private Button _menuButton, _createDeckButton, _saveDeckButton, _loadDeckButton;
     [Export] private TextEdit _searchEdit, _deckNameEdit;
+
+    [Export] private DeckCountProgressBar
+        _cardCountBar0,
+        _cardCountBar1,
+        _cardCountBar2,
+        _cardCountBar3,
+        _cardCountBar4,
+        _cardCountBar5,
+        _cardCountBar6,
+        _cardCountBar7,
+        _cardCountBar8;
+
+    [Export] private CounterLabel _creatureCountLabel, _spellCountLabel, _totalCountLabel;
 
     public override void _Ready()
     {
@@ -61,6 +75,8 @@ public partial class CardBrowser : Control
         };
 
         foreach (var cardRecord in Database.Cards.Values.OrderBy(x => x.Cost)) AddCardToView(cardRecord);
+
+        ResetCounters();
     }
 
     private void ClearDeck()
@@ -69,6 +85,24 @@ public partial class CardBrowser : Control
 
         _deck.Clear();
         _deckNameEdit.Clear();
+
+        ResetCounters();
+    }
+
+    private void ResetCounters()
+    {
+        _creatureCountLabel.Value = 0;
+        _spellCountLabel.Value = 0;
+        _totalCountLabel.Value = 0;
+        _cardCountBar0.Count = 0;
+        _cardCountBar1.Count = 0;
+        _cardCountBar2.Count = 0;
+        _cardCountBar3.Count = 0;
+        _cardCountBar4.Count = 0;
+        _cardCountBar5.Count = 0;
+        _cardCountBar6.Count = 0;
+        _cardCountBar7.Count = 0;
+        _cardCountBar8.Count = 0;
     }
 
 
@@ -80,9 +114,16 @@ public partial class CardBrowser : Control
             if (!x.IsActionPressed(InputActions.SpriteClick)) return;
 
             if (_deck.TryGetValue(cardRecord.Id, out var cardDeck))
+            {
                 cardDeck.SetCount(cardDeck.Count + 1);
+                IncreaseCounters(cardDeck.Record);
+            }
             else
+            {
                 AddCardToDeck(card.Record);
+
+                IncreaseCounters(cardRecord);
+            }
         };
     }
 
@@ -105,6 +146,7 @@ public partial class CardBrowser : Control
             if (!inputEvent.IsActionPressed(InputActions.SpriteClick)) return;
 
             cardDeck.SetCount(cardDeck.Count - 1);
+            DecreaseCounters(cardDeck.Record);
             if (cardDeck.Count != 0) return;
 
             _deck.Remove(cardRecord.Id);
@@ -113,6 +155,102 @@ public partial class CardBrowser : Control
         _deck.Add(cardRecord.Id, cardDeck);
 
         return cardDeck;
+    }
+
+    private void IncreaseCounters(CardRecord cardRecord)
+    {
+        switch (cardRecord.Type)
+        {
+            case CardRecordType.Creature:
+                _creatureCountLabel.Value++;
+                break;
+            case CardRecordType.Spell:
+                _spellCountLabel.Value++;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        _totalCountLabel.Value++;
+        switch (cardRecord.Cost)
+        {
+            case 0:
+                _cardCountBar0.Count++;
+                break;
+            case 1:
+                _cardCountBar1.Count++;
+                break;
+            case 2:
+                _cardCountBar2.Count++;
+                break;
+            case 3:
+                _cardCountBar3.Count++;
+                break;
+            case 4:
+                _cardCountBar4.Count++;
+                break;
+            case 5:
+                _cardCountBar5.Count++;
+                break;
+            case 6:
+                _cardCountBar6.Count++;
+                break;
+            case 7:
+                _cardCountBar7.Count++;
+                break;
+            case >= 8:
+                _cardCountBar8.Count++;
+                break;
+            default: throw new ArgumentOutOfRangeException();
+        }
+    }
+    
+    private void DecreaseCounters(CardRecord cardRecord)
+    {
+        switch (cardRecord.Type)
+        {
+            case CardRecordType.Creature:
+                _creatureCountLabel.Value--;
+                break;
+            case CardRecordType.Spell:
+                _spellCountLabel.Value--;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        _totalCountLabel.Value--;
+        switch (cardRecord.Cost)
+        {
+            case 0:
+                _cardCountBar0.Count--;
+                break;
+            case 1:
+                _cardCountBar1.Count--;
+                break;
+            case 2:
+                _cardCountBar2.Count--;
+                break;
+            case 3:
+                _cardCountBar3.Count--;
+                break;
+            case 4:
+                _cardCountBar4.Count--;
+                break;
+            case 5:
+                _cardCountBar5.Count--;
+                break;
+            case 6:
+                _cardCountBar6.Count--;
+                break;
+            case 7:
+                _cardCountBar7.Count--;
+                break;
+            case >= 8:
+                _cardCountBar8.Count--;
+                break;
+            default: throw new ArgumentOutOfRangeException();
+        }
     }
 
     private void SaveDeck()
@@ -142,6 +280,7 @@ public partial class CardBrowser : Control
         {
             var cardRecord = Database.Cards[jsonRecord.Id];
             AddCardToDeck(cardRecord).SetCount(jsonRecord.Count);
+            for (var i = 0; i < jsonRecord.Count; ++i) IncreaseCounters(cardRecord);
         }
     }
 }
