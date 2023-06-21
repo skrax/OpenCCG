@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://datdpp7ssksne"]
+[gd_scene load_steps=8 format=3 uid="uid://datdpp7ssksne"]
 
 [ext_resource type="Script" path="res://src/CardBrowser.cs" id="1_7casj"]
+[ext_resource type="Script" path="res://src/DeckCountProgressBar.cs" id="2_rge2r"]
+[ext_resource type="Script" path="res://src/CounterLabel.cs" id="3_hch07"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mulv"]
 bg_color = Color(0.705882, 0.584314, 0.262745, 1)
@@ -8,7 +10,13 @@ bg_color = Color(0.705882, 0.584314, 0.262745, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fchwj"]
 bg_color = Color(0, 0.709804, 0.486275, 1)
 
-[node name="card-browser" type="Control" node_paths=PackedStringArray("_bottomPanelContainer", "_cardViewFlowContainer", "_cardViewScrollContainer", "_deckScrollContainer", "_clearTextButton", "_deckContainer", "_fileDialog", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton", "_searchEdit", "_deckNameEdit")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rn6sc"]
+bg_color = Color(0, 0, 0, 0.262745)
+
+[sub_resource type="LabelSettings" id="LabelSettings_q1lue"]
+font_size = 15
+
+[node name="card-browser" type="Control" node_paths=PackedStringArray("_bottomPanelContainer", "_cardViewFlowContainer", "_cardViewScrollContainer", "_deckScrollContainer", "_clearTextButton", "_deckContainer", "_fileDialog", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton", "_searchEdit", "_deckNameEdit", "_cardCountBar0", "_cardCountBar1", "_cardCountBar2", "_cardCountBar3", "_cardCountBar4", "_cardCountBar5", "_cardCountBar6", "_cardCountBar7", "_cardCountBar8", "_creatureCountLabel", "_spellCountLabel", "_totalCountLabel")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_7casj")
@@ -25,6 +33,18 @@ _saveDeckButton = NodePath("SaveDeckButton")
 _loadDeckButton = NodePath("LoadDeckButton")
 _searchEdit = NodePath("FilterBar/TextEdit")
 _deckNameEdit = NodePath("DeckName")
+_cardCountBar0 = NodePath("DeckDetails/ProgressBar")
+_cardCountBar1 = NodePath("DeckDetails/ProgressBar2")
+_cardCountBar2 = NodePath("DeckDetails/ProgressBar3")
+_cardCountBar3 = NodePath("DeckDetails/ProgressBar4")
+_cardCountBar4 = NodePath("DeckDetails/ProgressBar5")
+_cardCountBar5 = NodePath("DeckDetails/ProgressBar6")
+_cardCountBar6 = NodePath("DeckDetails/ProgressBar7")
+_cardCountBar7 = NodePath("DeckDetails/ProgressBar8")
+_cardCountBar8 = NodePath("DeckDetails/ProgressBar9")
+_creatureCountLabel = NodePath("DeckDetails/CreatureCount/Count")
+_spellCountLabel = NodePath("DeckDetails/SpellCount/Count")
+_totalCountLabel = NodePath("DeckDetails/TotalCount/Count")
 
 [node name="CardBrowser" type="ScrollContainer" parent="."]
 layout_mode = 0
@@ -110,12 +130,409 @@ layout_mode = 0
 offset_left = 1539.0
 offset_top = 100.0
 offset_right = 1900.0
-offset_bottom = 1066.0
+offset_bottom = 867.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_fchwj")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="DeckBrowser"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="DeckDetails" type="Panel" parent="."]
+layout_mode = 2
+offset_left = 1539.0
+offset_top = 875.0
+offset_right = 1900.0
+offset_bottom = 1068.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_rn6sc")
+
+[node name="ProgressBar" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 5.0
+offset_top = 7.0
+offset_right = 28.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "0
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar2" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 34.0
+offset_top = 7.0
+offset_right = 57.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar2"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "1
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar2"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar3" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 63.0
+offset_top = 7.0
+offset_right = 86.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar3"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "2
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar3"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar4" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 92.0
+offset_top = 7.0
+offset_right = 115.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar4"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "3
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar4"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar5" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 120.0
+offset_top = 7.0
+offset_right = 143.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar5"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "4
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar5"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar6" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 149.0
+offset_top = 7.0
+offset_right = 172.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar6"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "5
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar6"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar7" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 177.0
+offset_top = 7.0
+offset_right = 200.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar7"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "6
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar7"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar8" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 205.0
+offset_top = 7.0
+offset_right = 228.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar8"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "7
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar8"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar9" type="ProgressBar" parent="DeckDetails" node_paths=PackedStringArray("_countLabel")]
+layout_mode = 2
+offset_left = 234.0
+offset_top = 7.0
+offset_right = 257.0
+offset_bottom = 140.0
+max_value = 9.0
+step = 1.0
+value = 1.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_rge2r")
+_countLabel = NodePath("Count")
+
+[node name="Label" type="Label" parent="DeckDetails/ProgressBar9"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 135.0
+offset_right = 23.0
+offset_bottom = 185.0
+text = "8+
+⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Count" type="Label" parent="DeckDetails/ProgressBar9"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 99.0
+offset_right = 23.0
+offset_bottom = 149.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CreatureCount" type="Control" parent="DeckDetails"]
+anchors_preset = 0
+offset_left = 260.0
+offset_right = 300.0
+offset_bottom = 40.0
+
+[node name="Count" type="Label" parent="DeckDetails/CreatureCount"]
+layout_mode = 0
+offset_top = 9.0
+offset_right = 21.0
+offset_bottom = 35.0
+text = "100"
+label_settings = SubResource("LabelSettings_q1lue")
+script = ExtResource("3_hch07")
+
+[node name="Type" type="Label" parent="DeckDetails/CreatureCount"]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 9.0
+offset_right = 105.0
+offset_bottom = 35.0
+text = "Creatures"
+label_settings = SubResource("LabelSettings_q1lue")
+
+[node name="SpellCount" type="Control" parent="DeckDetails"]
+anchors_preset = 0
+offset_left = 260.0
+offset_top = 20.0
+offset_right = 300.0
+offset_bottom = 60.0
+
+[node name="Count" type="Label" parent="DeckDetails/SpellCount"]
+layout_mode = 0
+offset_top = 9.0
+offset_right = 21.0
+offset_bottom = 35.0
+text = "100"
+label_settings = SubResource("LabelSettings_q1lue")
+script = ExtResource("3_hch07")
+
+[node name="Type" type="Label" parent="DeckDetails/SpellCount"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 9.0
+offset_right = 106.0
+offset_bottom = 35.0
+text = "Spells"
+label_settings = SubResource("LabelSettings_q1lue")
+
+[node name="TotalCount" type="Control" parent="DeckDetails"]
+anchors_preset = 0
+offset_left = 286.0
+offset_top = 153.0
+offset_right = 326.0
+offset_bottom = 193.0
+
+[node name="Count" type="Label" parent="DeckDetails/TotalCount"]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 9.0
+offset_right = 72.0
+offset_bottom = 35.0
+text = "10"
+label_settings = SubResource("LabelSettings_q1lue")
+script = ExtResource("3_hch07")
+
+[node name="Type" type="Label" parent="DeckDetails/TotalCount"]
+layout_mode = 0
+offset_top = 9.0
+offset_right = 76.0
+offset_bottom = 35.0
+text = "Total:"
+label_settings = SubResource("LabelSettings_q1lue")
 
 [node name="FileDialog" type="FileDialog" parent="."]
 initial_position = 1
