@@ -73,9 +73,9 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         }
     }
 
-    private void PlayCard(long senderPeerId, Guid cardId)
+    private async Task PlayCard(long senderPeerId, Guid cardId)
     {
-        _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
+        await _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
     }
 
     private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
@@ -88,12 +88,12 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         await _gameState.PlayerGameStates[senderPeerId].CombatPlayerAsync(cardId);
     }
 
-    private void EndTurn(long senderPeerId)
+    private async Task EndTurn(long senderPeerId)
     {
-        _gameState.PlayerGameStates[senderPeerId].EndTurnAsync();
+        await _gameState.PlayerGameStates[senderPeerId].EndTurnAsync();
     }
 
-    private void QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
+    private async Task QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
     {
         var deckList = new List<CardRecord>(30);
         foreach (var card in queuePlayerDto.Deck)
@@ -140,7 +140,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
             p1.Start();
             p2.Start();
-            p1.StartTurnAsync();
+            await p1.StartTurnAsync();
         }
         else
         {
@@ -163,10 +163,9 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.PlayCard => Executor.Make<Guid>(PlayCard),
-            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(
-                CombatPlayerCard),
+            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard),
             MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer),
-            MessageType.EndTurn => Executor.Make(EndTurn),
+            MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
             MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer),
             _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };

@@ -66,9 +66,13 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         if (diff != 0)
         {
+            if (_dmgPopup.IsQueuedForDeletion()) return;
+            if (_dmgPopup == null) return;
             _dmgPopup.GetChild<Label>(0).Text = diff > 0 ? $"+ {diff}" : $"{diff}";
+            if (_dmgPopup == null) return;
             _dmgPopup.Visible = true;
             await Task.Delay(TimeSpan.FromSeconds(2));
+            if (_dmgPopup.IsQueuedForDeletion()) return;
             if (_dmgPopup == null) return;
             _dmgPopup.Visible = false;
         }

@@ -61,7 +61,6 @@ public partial class Client : Node
     private void OnPeerConnected(long id)
     {
         Logger.Info<Client>($"Peer connected {id}");
-        GetParent().SetMultiplayerAuthority(Multiplayer.GetUniqueId(), false);
     }
 
     private void OnPeerDisconnected(long id)
