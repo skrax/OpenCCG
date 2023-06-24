@@ -9,7 +9,7 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
-public partial class HandArea : Area2D, IMessageReceiver<MessageType>
+public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardScene = GD.Load<PackedScene>("res://scenes/card.tscn");
     private readonly List<Card> _cards = new();
@@ -50,7 +50,6 @@ public partial class HandArea : Area2D, IMessageReceiver<MessageType>
     private void DrawCard(CardGameStateDto card)
     {
         var entity = CardScene.Make<Card, CardGameStateDto>(card, this);
-        entity.OnDragFailed += SetCardPositions;
 
         _cards.Add(entity);
         SetCardPositions();
@@ -58,6 +57,6 @@ public partial class HandArea : Area2D, IMessageReceiver<MessageType>
 
     private void SetCardPositions()
     {
-        SpriteHelpers.OrderHorizontally(_cards.Cast<Sprite2D>().ToArray());
+//        SpriteHelpers.OrderHorizontally(_cards.Cast<Sprite2D>().ToArray());
     }
 }

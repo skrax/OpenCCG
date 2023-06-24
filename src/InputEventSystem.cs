@@ -10,13 +10,11 @@ public partial class InputEventSystem : Node2D
     public enum InputState
     {
         Idle,
-        DraggingCard,
         DraggingLine,
         ChoosingTargets,
     }
 
     [Export] private CardTempArea _cardTempArea;
-    private Card? _cardToDrag;
 
     private ulong? _dragLineStartInstanceId;
     private Vector2 _dragOffset;
@@ -25,7 +23,6 @@ public partial class InputEventSystem : Node2D
 
     private InputState _state = InputState.Idle;
 
-    public Action OnInputStateChanged;
 
     public override void _UnhandledInput(InputEvent inputEvent)
     {
@@ -64,11 +61,6 @@ public partial class InputEventSystem : Node2D
                 OnDragLineEnd();
                 break;
             }
-            case InputState.DraggingCard:
-            {
-                OnDragCardEnd();
-                break;
-            }
             case InputState.ChoosingTargets:
             {
                 OnTargetDetect();
@@ -95,11 +87,7 @@ public partial class InputEventSystem : Node2D
         {
             if (cardBoard.GetParentOrNull<BoardArea>() != null)
                 OnDragLineStart(cardBoard, mousePosition);
-            return;
         }
-
-        var card = EventSink.PointerDownCards.MinBy(x => x.ZIndex);
-        if (card != null) OnDragCardStart(card, mousePosition);
     }
 
     private void OnMouseMotion(InputEventMouseMotion mouseMotion)
@@ -109,11 +97,6 @@ public partial class InputEventSystem : Node2D
             case InputState.DraggingLine:
             {
                 OnDragLineUpdate(mouseMotion);
-                break;
-            }
-            case InputState.DraggingCard:
-            {
-                OnDragCardUpdate(mouseMotion);
                 break;
             }
             case InputState.ChoosingTargets:
@@ -150,11 +133,6 @@ public partial class InputEventSystem : Node2D
         }
     }
 
-    private void OnDragCardUpdate(InputEventMouseMotion mouseMotion)
-    {
-        _cardToDrag!.Position = mouseMotion.Position - _dragOffset;
-    }
-
     private void OnDragLineUpdate(InputEventMouseMotion mouseMotion)
     {
         var mousePosition = mouseMotion.Position;
@@ -184,7 +162,6 @@ public partial class InputEventSystem : Node2D
 
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
             {
-                //attacker.Attack(cardBoard);
                 GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, cardBoard.CardGameState.Id);
             }
         }
@@ -194,7 +171,6 @@ public partial class InputEventSystem : Node2D
             Logger.Info<InputEventSystem>($"DragLine End {avatar.GetInstanceId()}");
             if (InstanceFromId(_dragLineStartInstanceId.Value) is CardBoard attacker)
             {
-                //attacker.Attack(avatar);
                 GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
             }
         }
@@ -226,23 +202,5 @@ public partial class InputEventSystem : Node2D
 
         _state = InputState.Idle;
         _line.Points = Array.Empty<Vector2>();
-    }
-
-    private void OnDragCardStart(Card card, Vector2 mousePosition)
-    {
-        card.DisablePreview();
-        _state = InputState.DraggingCard;
-        _dragOffset = mousePosition - card.Position;
-        _cardToDrag = card;
-        card.ZIndex = 1;
-    }
-
-    private void OnDragCardEnd()
-    {
-        _cardToDrag!.ZIndex = 0;
-        _cardToDrag.PlayOrInvokeDragFailure();
-        _cardToDrag = null;
-        _dragOffset = Vector2.Zero;
-        _state = InputState.Idle;
     }
 }
