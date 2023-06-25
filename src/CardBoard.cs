@@ -16,7 +16,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     public CardGameStateDto CardGameState;
     public bool IsEnemy { get; private set; }
 
-    private bool _hovering, _canHover = true;
+    private bool _targetingDisabled;
     [Export] private PackedScene _cardPreviewScene;
     private CardPreview? _preview;
 
@@ -54,6 +54,8 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
     public async Task UpdateAsync(CardGameStateDto cardGameState)
     {
+        _targetingDisabled = true; 
+        
         _atkPanel.Value = cardGameState.Atk;
         var diff = cardGameState.Def - _defPanel.Value;
         _defPanel.Value = cardGameState.Def;
@@ -72,9 +74,11 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         {
             _dmgPopup.GetChild<Label>(0).Text = diff > 0 ? $"+ {diff}" : $"{diff}";
             _dmgPopup.Visible = true;
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Task.Delay(TimeSpan.FromSeconds(1.5));
             _dmgPopup.Visible = false;
         }
+
+        _targetingDisabled = false;
     }
 
     public void ForceDrag()

@@ -10,19 +10,21 @@ public partial class TargetLine : Line2D
     public void Target(Control src, Control dst)
     {
         _dst = dst;
-        Visible = true;
-        SetProcess(true);
         SetPointPosition(0, src.GetGlobalRect().GetCenter());
         var dstPos = dst.GetGlobalRect().GetCenter();
         SetPointPosition(1, dstPos);
         _arrow.Position = dstPos;
+        SetProcess(true);
+        Visible = true;
     }
 
     public void Reset()
     {
+        SetProcess(false);
         _dst = null;
         Visible = false;
-        SetProcess(false);
+        SetPointPosition(0, Vector2.Zero);
+        SetPointPosition(1, Vector2.Zero);
     }
 
     public override void _Process(double delta)

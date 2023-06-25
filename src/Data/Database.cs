@@ -146,7 +146,7 @@ public static class Database
                 new CardAbilities()
                 ,
                 CardRecordType.Creature,
-                3, 3, 2, "res://img/cards/mornehold_assassin.png"
+                2, 2, 2, "res://img/cards/mornehold_assassin.png"
             ),
 
             new("TEST-017", "Beren Morne",

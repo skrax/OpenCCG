@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -306,6 +307,11 @@ public class PlayerGameState
         foreach (var cardGameState in Board)
         {
             await cardGameState.OnEndTurnAsync(this);
+            cardGameState.AttacksAvailable = 0;
+            var dto = cardGameState.AsDto();
+            await Task.WhenAll(
+                Nodes.Board.UpdateCardAsync(PeerId, dto),
+                Nodes.EnemyBoard.UpdateCardAsync(EnemyPeerId, dto));
         }
 
         IsTurn = false;

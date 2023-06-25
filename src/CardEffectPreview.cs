@@ -45,11 +45,26 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         return await _tsc.Task;
     }
 
+    public override void _Process(double delta)
+    {
+        SetProcess(false);
+        if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
+            _tsc.Task.IsFaulted)
+            return;
+
+        ForceDrag();
+    }
+
     private void ForceDrag()
     {
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
-        preview.TreeExiting += () => { line.Reset(); };
+        preview.GlobalPosition = GetGlobalMousePosition();
+        preview.TreeExited += () =>
+        {
+            line.Reset();
+            SetProcess(true);
+        };
         line.Target(this, preview);
 
         ForceDrag(GetInstanceId(), preview);
