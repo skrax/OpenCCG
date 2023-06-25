@@ -12,7 +12,6 @@ namespace OpenCCG;
 
 public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
 {
-    [Export] private InputEventSystem _inputEventSystem;
     [Export] private CardStatPanel _costPanel;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
 
@@ -40,7 +39,7 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
         Show(input.Card);
         _tsc = new TaskCompletionSource<RequireTargetOutputDto>();
         _currentInputDto = input;
-        _inputEventSystem.OnRequireTarget();
+        //_inputEventSystem.OnRequireTarget();
 
         return await _tsc.Task;
     }

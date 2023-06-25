@@ -63,9 +63,12 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
             _canPreview = true;
             MouseEntered += ShowPreview;
             MouseExited += DisablePreview;
+            EventSink.OnDragCardStop?.Invoke();
         };
         Visible = false;
         _canPreview = false;
+
+        EventSink.OnDragCardStart?.Invoke();
 
         return GetInstanceId();
     }
@@ -87,7 +90,7 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
     public void DisablePreview()
     {
         Modulate = Colors.White;
-        
+
         if (_preview == null) return;
         _preview.Visible = false;
     }

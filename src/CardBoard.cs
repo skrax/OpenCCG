@@ -86,7 +86,10 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
     public override bool _CanDropData(Vector2 atPosition, Variant data)
     {
-        return InstanceFromId(data.As<ulong>()) is CardBoard;
+        var instanceId = data.As<ulong>();
+        return instanceId != GetInstanceId() &&
+               IsEnemy &&
+               InstanceFromId(data.As<ulong>()) is CardBoard;
     }
 
     public override void _DropData(Vector2 atPosition, Variant data)

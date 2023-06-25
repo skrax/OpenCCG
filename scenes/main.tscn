@@ -93,6 +93,7 @@ script = ExtResource("3_8aogm")
 offset_top = 572.0
 offset_right = 1920.0
 offset_bottom = 827.0
+mouse_filter = 2
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
@@ -102,6 +103,7 @@ EnemyBoardArea = NodePath("../EnemyBoard")
 offset_top = 253.0
 offset_right = 1920.0
 offset_bottom = 508.0
+mouse_filter = 2
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
@@ -122,7 +124,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 1920.0
 offset_bottom = 827.0
-mouse_filter = 1
+mouse_filter = 2
 script = ExtResource("3_x8tt0")
 
 [node name="Client" parent="." node_paths=PackedStringArray("_main") instance=ExtResource("3_uxwq6")]
