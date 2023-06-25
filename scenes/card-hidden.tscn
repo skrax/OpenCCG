@@ -2,6 +2,10 @@
 
 [ext_resource type="Texture2D" uid="uid://digjedd0khmgw" path="res://img/card-backs/cardback-2.png" id="1_pcjix"]
 
-[node name="card-hidden" type="Sprite2D"]
-scale = Vector2(0.3, 0.3)
+[node name="card-hidden" type="TextureRect"]
+custom_minimum_size = Vector2(153.6, 230.4)
+offset_right = 153.6
+offset_bottom = 230.4
+size_flags_vertical = 4
 texture = ExtResource("1_pcjix")
+expand_mode = 1

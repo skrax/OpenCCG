@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=25 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -46,18 +46,6 @@ gradient = SubResource("Gradient_66qks")
 width = 1920
 height = 255
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_50heu"]
-size = Vector2(1920, 255)
-
-[sub_resource type="Gradient" id="Gradient_vvbrd"]
-offsets = PackedFloat32Array(1)
-colors = PackedColorArray(0.435294, 0.478431, 0.278431, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_d05ec"]
-gradient = SubResource("Gradient_vvbrd")
-width = 1920
-height = 255
-
 [sub_resource type="Gradient" id="Gradient_48kgg"]
 colors = PackedColorArray(1, 0, 0, 1, 0, 1, 0, 1)
 
@@ -80,6 +68,13 @@ offset_bottom = 1208.0
 mouse_filter = 2
 texture = SubResource("GradientTexture2D_xrtuc")
 
+[node name="Background2" type="TextureRect" parent="."]
+offset_top = -127.0
+offset_right = 1920.0
+offset_bottom = 128.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_xrtuc")
+
 [node name="Hand" type="HBoxContainer" parent="."]
 offset_top = 953.0
 offset_right = 1920.0
@@ -87,6 +82,14 @@ offset_bottom = 1208.0
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("1_kp75l")
+
+[node name="EnemyHand" type="HBoxContainer" parent="."]
+offset_top = -127.0
+offset_right = 1920.0
+offset_bottom = 128.0
+theme_override_constants/separation = 40
+alignment = 1
+script = ExtResource("3_8aogm")
 
 [node name="Dropzone" type="Control" parent="."]
 layout_mode = 3
@@ -131,20 +134,6 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 [node name="Background" type="Sprite2D" parent="EnemyBoard"]
 position = Vector2(1, -2)
 texture = SubResource("GradientTexture2D_n57q8")
-
-[node name="EnemyHand" type="Area2D" parent="."]
-position = Vector2(960, 2.08165e-12)
-monitoring = false
-monitorable = false
-script = ExtResource("3_8aogm")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyHand"]
-shape = SubResource("RectangleShape2D_50heu")
-debug_color = Color(0, 0.6, 0.701961, 0.419608)
-
-[node name="Background" type="Sprite2D" parent="EnemyHand"]
-position = Vector2(1, -2)
-texture = SubResource("GradientTexture2D_d05ec")
 
 [node name="EnemyPlayerPanel" parent="." instance=ExtResource("3_n6g3w")]
 position = Vector2(960, 190)

@@ -39,12 +39,10 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
 
         _cards.Remove(cardEntity);
         cardEntity.QueueFree();
-        SetCardPositions();
     }
 
     private void FailPlayCard()
     {
-        SetCardPositions();
     }
 
     private void DrawCard(CardGameStateDto card)
@@ -52,11 +50,5 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
         var entity = CardScene.Make<Card, CardGameStateDto>(card, this);
 
         _cards.Add(entity);
-        SetCardPositions();
-    }
-
-    private void SetCardPositions()
-    {
-//        SpriteHelpers.OrderHorizontally(_cards.Cast<Sprite2D>().ToArray());
     }
 }
