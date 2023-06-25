@@ -15,7 +15,7 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
     [Export] private Label _energyLabel;
     [Export] private Label _healthLabel;
     [Export] private Panel _dmgPopup;
-    [Export] private Avatar _avatar;
+    [Export] public Avatar _avatar;
     [Export] private bool _isEnemy;
 
     public Dictionary<string, IObserver>? Observers => null;

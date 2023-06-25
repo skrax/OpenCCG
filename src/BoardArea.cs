@@ -15,6 +15,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 {
     [Export] public bool IsEnemy;
     [Export] public BoardArea EnemyBoardArea;
+    [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
@@ -42,7 +43,6 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 
     private async Task PlayCombatAnimAsync(PlayCombatDto dto)
     {
-#if false
         var card = _cards.FirstOrDefault(x => x.CardGameState.Id == dto.From);
 
         if (card == null)
@@ -53,7 +53,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 
         if (dto.IsAvatar)
         {
-            await card.AttackAsync(EnemyAvatar);
+            await card.AttackAsync(_EnemyStatusPanel._avatar);
         }
         else
         {
@@ -66,7 +66,6 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 
             await card.AttackAsync(other);
         }
-#endif
     }
 
     private void PlaceCard(CardGameStateDto cardGameStateDto)

@@ -110,7 +110,7 @@ theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("3_8aogm")
 
-[node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("EnemyBoardArea")]
+[node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("EnemyBoardArea", "_StatusPanel", "_EnemyStatusPanel")]
 offset_top = 572.0
 offset_right = 1920.0
 offset_bottom = 827.0
@@ -119,8 +119,10 @@ theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
 EnemyBoardArea = NodePath("../EnemyBoard")
+_StatusPanel = NodePath("../StatusPanel")
+_EnemyStatusPanel = NodePath("../EnemyStatusPanel")
 
-[node name="EnemyBoard" type="HBoxContainer" parent="." node_paths=PackedStringArray("EnemyBoardArea")]
+[node name="EnemyBoard" type="HBoxContainer" parent="." node_paths=PackedStringArray("EnemyBoardArea", "_StatusPanel", "_EnemyStatusPanel")]
 offset_top = 253.0
 offset_right = 1920.0
 offset_bottom = 508.0
@@ -130,6 +132,8 @@ alignment = 1
 script = ExtResource("4_4t5gh")
 IsEnemy = true
 EnemyBoardArea = NodePath("../Board")
+_StatusPanel = NodePath("../EnemyStatusPanel")
+_EnemyStatusPanel = NodePath("../StatusPanel")
 
 [node name="StatusPanel" parent="." instance=ExtResource("3_n6g3w")]
 offset_top = 828.0
