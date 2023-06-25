@@ -81,6 +81,12 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
     public override Variant _GetDragData(Vector2 atPosition)
     {
+        var line = GetNode<TargetLine>("/root/Main/TargetLine");
+        var preview = new Control();
+        preview.TreeExiting += () => { line.Reset(); };
+        line.Target(this, preview);
+
+        SetDragPreview(preview);
         return GetInstanceId();
     }
 

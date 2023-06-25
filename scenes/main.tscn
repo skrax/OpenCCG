@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=21 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -7,8 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
 [ext_resource type="Script" path="res://src/Dropzone.cs" id="3_x8tt0"]
 [ext_resource type="Script" path="res://src/BoardArea.cs" id="4_4t5gh"]
-[ext_resource type="Script" path="res://src/InputEventSystem.cs" id="7_di0s5"]
+[ext_resource type="Script" path="res://src/TargetLine.cs" id="9_cltvt"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
+[ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="9_xpu3a"]
+[ext_resource type="Texture2D" uid="uid://cc6ljig5aldur" path="res://img/line_arrow.png" id="10_a36md"]
 [ext_resource type="PackedScene" uid="uid://rp3que8k4xmy" path="res://scenes/card-tmp.tscn" id="13_hy35u"]
 [ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="13_xdsvr"]
 
@@ -29,9 +31,6 @@ colors = PackedColorArray(0.219608, 0.517647, 0.427451, 1)
 gradient = SubResource("Gradient_s3x3g")
 width = 1920
 height = 255
-
-[sub_resource type="Gradient" id="Gradient_48kgg"]
-colors = PackedColorArray(1, 0, 0, 1, 0, 1, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8ghqf"]
 bg_color = Color(0.94902, 0.419608, 0, 1)
@@ -131,15 +130,23 @@ script = ExtResource("3_x8tt0")
 _main = NodePath("..")
 _serverAddress = "localhost"
 
-[node name="InputEventSystem" type="Node2D" parent="." node_paths=PackedStringArray("_cardTempArea", "_line")]
-script = ExtResource("7_di0s5")
-_cardTempArea = NodePath("../CardTempArea")
-_line = NodePath("Line2D")
+[node name="TargetLine" type="Line2D" parent="." node_paths=PackedStringArray("_arrow")]
+visible = false
+z_index = 3
+texture_repeat = 2
+position = Vector2(2.08165e-12, 2.08165e-12)
+points = PackedVector2Array(331, 130, 332, -44)
+texture = ExtResource("9_xpu3a")
+texture_mode = 1
+begin_cap_mode = 1
+end_cap_mode = 2
+antialiased = true
+script = ExtResource("9_cltvt")
+_arrow = NodePath("Arrow")
 
-[node name="Line2D" type="Line2D" parent="InputEventSystem"]
-top_level = true
-width = 12.0
-gradient = SubResource("Gradient_48kgg")
+[node name="Arrow" type="Sprite2D" parent="TargetLine"]
+position = Vector2(332, -44)
+texture = ExtResource("10_a36md")
 
 [node name="MidPanel" type="Panel" parent="." node_paths=PackedStringArray("_endTurnButton", "_exitButton", "_statusLabel")]
 offset_top = 509.0
@@ -197,11 +204,9 @@ text = "STATUS MESSAGE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
+[node name="CardTempArea" parent="." instance=ExtResource("13_hy35u")]
 visible = false
-_inputEventSystem = NodePath("../InputEventSystem")
 
-[node name="EnemyCardTempArea" parent="." node_paths=PackedStringArray("_inputEventSystem") instance=ExtResource("13_hy35u")]
+[node name="EnemyCardTempArea" parent="." instance=ExtResource("13_hy35u")]
 visible = false
 position = Vector2(1401, 186)
-_inputEventSystem = NodePath("../InputEventSystem")
