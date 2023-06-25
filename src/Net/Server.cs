@@ -49,8 +49,8 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             EnemyHand = GetNode<EnemyHand>("EnemyHand"),
             Board = GetNode<Board>("Board"),
             EnemyBoard = GetNode<Board>("EnemyBoard"),
-            StatusPanel = GetNode<ServerNodes.StatusPanel>("PlayerPanel/StatusPanel"),
-            EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyPlayerPanel/StatusPanel"),
+            StatusPanel = GetNode<ServerNodes.StatusPanel>("StatusPanel"),
+            EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyStatusPanel"),
             MidPanel = GetNode<ServerNodes.MidPanel>("MidPanel"),
             CardTempArea = GetNode<ServerNodes.CardTempArea>("CardTempArea"),
             EnemyCardTempArea = GetNode<ServerNodes.CardTempArea>("EnemyCardTempArea")

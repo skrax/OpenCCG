@@ -6,8 +6,9 @@ using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
-public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
+public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 {
+    [Export] private TextureRect _textureRect;
     [Export] private CardStatPanel _atkPanel, _defPanel;
     [Export] private Panel _dmgPopup;
     [Export] private AnimationPlayer _anim;
@@ -26,9 +27,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         _atkPanel.Value = CardGameState.Atk;
         _defPanel.Value = record.Def;
 
-        Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
+        _textureRect.Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
 
-        var shader = Material as ShaderMaterial;
+        var shader = _textureRect.Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", record.ISummoningProtectionOn);
         if (!IsEnemy)
         {
@@ -56,7 +57,7 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
         CardGameState = cardGameState;
 
-        var shader = Material as ShaderMaterial;
+        var shader = _textureRect.Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
         if (!IsEnemy)
         {
@@ -78,6 +79,24 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         }
     }
 
+    public override Variant _GetDragData(Vector2 atPosition)
+    {
+        return GetInstanceId();
+    }
+
+    public override bool _CanDropData(Vector2 atPosition, Variant data)
+    {
+        return InstanceFromId(data.As<ulong>()) is CardBoard;
+    }
+
+    public override void _DropData(Vector2 atPosition, Variant data)
+    {
+        var attacker = InstanceFromId(data.As<ulong>()) as CardBoard;
+
+        Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked {CardGameState.Id}");
+    }
+
+#if false
     public override void _Input(InputEvent inputEvent)
     {
         var rect = GetRect();
@@ -117,8 +136,9 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
             }
         }
     }
+#endif
 
-    public async Task AttackAsync(Sprite2D sprite2D)
+    public async Task AttackAsync(Control sprite2D)
     {
         var f = 0f;
         var targetPosition = sprite2D.GlobalPosition;
