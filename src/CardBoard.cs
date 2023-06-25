@@ -36,6 +36,9 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
             var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
+        
+        MouseEntered += ShowPreview;
+        MouseExited += DisablePreview;
     }
 
     public void Destroy(Action act)
@@ -67,20 +70,29 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
         if (diff != 0)
         {
-            if (_dmgPopup.IsQueuedForDeletion()) return;
-            if (_dmgPopup == null) return;
             _dmgPopup.GetChild<Label>(0).Text = diff > 0 ? $"+ {diff}" : $"{diff}";
-            if (_dmgPopup == null) return;
             _dmgPopup.Visible = true;
             await Task.Delay(TimeSpan.FromSeconds(2));
-            if (_dmgPopup.IsQueuedForDeletion()) return;
-            if (_dmgPopup == null) return;
             _dmgPopup.Visible = false;
         }
     }
 
+    public void ForceDrag()
+    {
+        var line = GetNode<TargetLine>("/root/Main/TargetLine");
+        var preview = new Control();
+        preview.TreeExiting += () => { line.Reset(); };
+        line.Target(this, preview);
+
+        ForceDrag(GetInstanceId(), preview);
+    }
+
     public override Variant _GetDragData(Vector2 atPosition)
     {
+        if (CardGameState.AttacksAvailable <= 0) return default;
+        if (CardGameState.IsSummoningSicknessOn) return default;
+        if (IsEnemy) return default;
+        
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
         preview.TreeExiting += () => { line.Reset(); };
@@ -95,6 +107,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         var instanceId = data.As<ulong>();
         return instanceId != GetInstanceId() &&
                IsEnemy &&
+               !CardGameState.ISummoningProtectionOn &&
                InstanceFromId(data.As<ulong>()) is CardBoard;
     }
 
@@ -103,49 +116,8 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         var attacker = InstanceFromId(data.As<ulong>()) as CardBoard;
 
         Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked {CardGameState.Id}");
+        GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, CardGameState.Id);
     }
-
-#if false
-    public override void _Input(InputEvent inputEvent)
-    {
-        var rect = GetRect();
-        if (inputEvent.IsActionPressed(InputActions.SpriteClick))
-        {
-            var inputEventMouseButton = (InputEventMouseButton)inputEvent;
-
-            if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
-
-            EventSink.ReportPointerDown(this);
-        }
-
-        if (inputEvent.IsActionReleased(InputActions.SpriteClick))
-        {
-            var inputEventMouseButton = (InputEventMouseButton)inputEvent;
-
-            if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
-
-            EventSink.ReportPointerUp(this);
-        }
-
-        if (inputEvent is InputEventMouseMotion mouseMotion)
-        {
-            switch (_hovering)
-            {
-                case false when rect.HasPoint(ToLocal(mouseMotion.Position)):
-                    if (!_canHover) return;
-
-                    _hovering = true;
-                    EventSink.ReportPointerEnter(this);
-                    break;
-                case true when !rect.HasPoint(ToLocal(mouseMotion.Position)):
-                    _hovering = false;
-
-                    EventSink.ReportPointerExit(this);
-                    break;
-            }
-        }
-    }
-#endif
 
     public async Task AttackAsync(Control sprite2D)
     {
@@ -175,17 +147,18 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         ZIndex = 0;
     }
 
-    public void ShowPreview()
+    private void ShowPreview()
     {
-        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent());
+        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent().GetParent());
         _preview.Init(CardGameState);
-        var pos = Position;
-        pos.X += 256;
-        _preview.Position = pos;
+        var pos = GlobalPosition;
+        pos.X += Size.X + 40;
+        pos.Y -= _preview.Size.Y / 2 - Size.Y / 2;
+        _preview.GlobalPosition = pos;
         _preview.Visible = true;
     }
 
-    public void DisablePreview()
+    private void DisablePreview()
     {
         if (IsQueuedForDeletion() || _preview == null) return;
         _preview.Visible = false;

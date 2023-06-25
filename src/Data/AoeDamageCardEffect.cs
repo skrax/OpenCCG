@@ -81,7 +81,7 @@ public class AoeDamageCardEffect : ICardEffect
                 var board = playerGameState.Board.ToArray();
                 foreach (var cardGameState in board)
                 {
-                    playerGameState.ResolveDamage(cardGameState, Damage, PlayerGameState.ControllingEntity.Self);
+                    playerGameState.ResolveDamageAsync(cardGameState, Damage, PlayerGameState.ControllingEntity.Self);
                     if (cardGameState.Zone == CardZone.Pit)
                         killedSelfCreatures.Add(cardGameState);
                 }
@@ -92,7 +92,7 @@ public class AoeDamageCardEffect : ICardEffect
                 var board = playerGameState.Enemy.Board.ToArray();
                 foreach (var cardGameState in board)
                 {
-                    playerGameState.ResolveDamage(cardGameState, Damage, PlayerGameState.ControllingEntity.Enemy);
+                    playerGameState.ResolveDamageAsync(cardGameState, Damage, PlayerGameState.ControllingEntity.Enemy);
                     if (cardGameState.Zone == CardZone.Pit)
                         killedEnemyCreatures.Add(cardGameState);
                 }

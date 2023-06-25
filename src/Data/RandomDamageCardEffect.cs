@@ -198,7 +198,7 @@ public class RandomDamageCardEffect : ICardEffect
     {
         var idx = Random.Shared.Next(0, board.Length - 1);
         var targetCard = board[idx];
-        playerGameState.ResolveDamage(targetCard, Damage, controllingEntity);
+        playerGameState.ResolveDamageAsync(targetCard, Damage, controllingEntity);
     }
 
     public static CardEffectRecord MakeRecord(int damage, RequireTargetSide side, RequireTargetType type, int count)

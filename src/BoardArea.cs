@@ -32,7 +32,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
-            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync),
+            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync, Executor.ResponseMode.Respond),
             MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
             MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
                 Executor.ResponseMode.Respond),

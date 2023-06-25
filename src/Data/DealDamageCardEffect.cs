@@ -96,14 +96,14 @@ public class DealDamageCardEffect : ICardEffect
             if (TargetSide == RequireTargetSide.Friendly)
             {
                 var targetCard = playerGameState.Board.Single(x => x.Id == output.cardId);
-                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
+                playerGameState.ResolveDamageAsync(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
                 if (targetCard.Zone == CardZone.Pit)
                     await targetCard.OnExitAsync(playerGameState);
             }
             else if (TargetSide == RequireTargetSide.Enemy)
             {
                 var targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+                playerGameState.ResolveDamageAsync(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
 
                 if (targetCard.Zone == CardZone.Pit)
                     await targetCard.OnExitAsync(playerGameState.Enemy);
@@ -113,13 +113,13 @@ public class DealDamageCardEffect : ICardEffect
                 var targetCard = playerGameState.Board.SingleOrDefault(x => x.Id == output.cardId);
                 if (targetCard != null)
                 {
-                    playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
+                    playerGameState.ResolveDamageAsync(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
                     if (targetCard.Zone == CardZone.Pit)
                         await targetCard.OnExitAsync(playerGameState);
                 }
 
                 targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+                playerGameState.ResolveDamageAsync(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
 
                 if (targetCard.Zone == CardZone.Pit)
                     await targetCard.OnExitAsync(playerGameState.Enemy);

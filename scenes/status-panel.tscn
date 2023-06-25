@@ -39,6 +39,7 @@ script = ExtResource("2_1l014")
 
 [node name="DamagePanel" type="Panel" parent="Avatar"]
 visible = false
+layout_mode = 0
 offset_left = 32.0
 offset_top = 49.0
 offset_right = 91.0

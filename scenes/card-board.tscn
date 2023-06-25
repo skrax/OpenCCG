@@ -69,6 +69,7 @@ _cardPreviewScene = ExtResource("4_sw4rk")
 [node name="CardBoard" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_4a4ib")
 custom_minimum_size = Vector2(128, 192)
+layout_mode = 0
 offset_right = 128.0
 offset_bottom = 192.0
 size_flags_vertical = 4
@@ -130,6 +131,7 @@ vertical_alignment = 1
 
 [node name="DamagePanel" type="Panel" parent="CardBoard"]
 visible = false
+layout_mode = 0
 offset_left = 32.0
 offset_top = 77.0
 offset_right = 91.0
