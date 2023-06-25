@@ -7,7 +7,7 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
 
-public partial class CardTempArea : Node, IMessageReceiver<MessageType>
+public partial class CardEffectPreview : Node, IMessageReceiver<MessageType>
 {
     public Dictionary<string, IObserver>? Observers { get; } = new();
 

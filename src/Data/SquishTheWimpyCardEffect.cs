@@ -36,7 +36,7 @@ public class SquishTheWimpyCardEffect : ICardEffect
             await DestroyLowestAllCreaturesAsync(playerGameState);
         }
 
-        playerGameState.Enemy.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
+        playerGameState.Enemy.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
     }
 
     private static async Task DestroyLowestAllCreaturesAsync(PlayerGameState playerGameState)

@@ -71,7 +71,7 @@ public class RandomDamageCardEffect : ICardEffect
     public Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
         var board = playerGameState.Board.ToArray();
         var enemyBoard = playerGameState.Enemy.Board.ToArray();
 

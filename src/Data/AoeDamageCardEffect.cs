@@ -69,7 +69,7 @@ public class AoeDamageCardEffect : ICardEffect
     public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         var killedSelfCreatures = new List<CardGameState>();
         var killedEnemyCreatures = new List<CardGameState>();

@@ -10,7 +10,7 @@ using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
-public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
+public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageType>
 {
     [Export] private CardStatPanel _costPanel;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
@@ -39,9 +39,20 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
         Show(input.Card);
         _tsc = new TaskCompletionSource<RequireTargetOutputDto>();
         _currentInputDto = input;
-        //_inputEventSystem.OnRequireTarget();
+
+        ForceDrag();
 
         return await _tsc.Task;
+    }
+
+    private void ForceDrag()
+    {
+        var line = GetNode<TargetLine>("/root/Main/TargetLine");
+        var preview = new Control();
+        preview.TreeExiting += () => { line.Reset(); };
+        line.Target(this, preview);
+
+        ForceDrag(GetInstanceId(), preview);
     }
 
     private async Task TmpShowTarget(CardGameStateDto cardGameStateDto)
@@ -51,13 +62,14 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
         Reset();
     }
 
-    public bool TryUpstreamTarget<T>(T target)
+    public void TryUpstreamTarget<T>(T target)
     {
         if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
             _tsc.Task.IsFaulted)
         {
-            Logger.Error<CardTempArea>($"No request id set to use {nameof(TryUpstreamTarget)}");
-            return false;
+            Logger.Error<CardEffectPreview>($"No request id set to use {nameof(TryUpstreamTarget)}");
+            ForceDrag();
+            return;
         }
 
         if (target is CardBoard cardBoard && _currentInputDto!.Type != RequireTargetType.Avatar)
@@ -66,11 +78,16 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             if ((isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Friendly) ||
                 (!isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Enemy))
             {
-                return false;
+                ForceDrag();
+                return;
             }
 
             Reset();
-            return _tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id, null));
+            if (!_tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id, null)))
+            {
+                ForceDrag();
+                return;
+            }
         }
 
         if (target is Avatar { IsEnemy: false } &&
@@ -78,7 +95,11 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             _currentInputDto!.Side != RequireTargetSide.Enemy)
         {
             Reset();
-            return _tsc.TrySetResult(new RequireTargetOutputDto(null, false));
+            if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, false)))
+            {
+                ForceDrag();
+                return;
+            }
         }
 
         if (target is Avatar { IsEnemy: true } &&
@@ -86,10 +107,14 @@ public partial class CardTempArea : Sprite2D, IMessageReceiver<MessageType>
             _currentInputDto.Side != RequireTargetSide.Friendly)
         {
             Reset();
-            return _tsc.TrySetResult(new RequireTargetOutputDto(null, true));
+            if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, true)))
+            {
+                ForceDrag();
+                return;
+            }
         }
 
-        return false;
+        ForceDrag();
     }
 
     public Dictionary<string, IObserver>? Observers => null;

@@ -36,7 +36,7 @@ public class FellTheMightyCardEffect : ICardEffect
             await DestroyHighestAllCreaturesAsync(playerGameState);
         }
         
-        playerGameState.Enemy.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
+        playerGameState.Enemy.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
     }
 
     private static async Task DestroyHighestAllCreaturesAsync(PlayerGameState playerGameState)

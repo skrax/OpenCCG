@@ -36,7 +36,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
             var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
-        
+
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;
     }
@@ -92,7 +92,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         if (CardGameState.AttacksAvailable <= 0) return default;
         if (CardGameState.IsSummoningSicknessOn) return default;
         if (IsEnemy) return default;
-        
+
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
         preview.TreeExiting += () => { line.Reset(); };
@@ -105,18 +105,35 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     public override bool _CanDropData(Vector2 atPosition, Variant data)
     {
         var instanceId = data.As<ulong>();
-        return instanceId != GetInstanceId() &&
-               IsEnemy &&
-               !CardGameState.ISummoningProtectionOn &&
-               InstanceFromId(data.As<ulong>()) is CardBoard;
+        if (instanceId == GetInstanceId()) return false;
+        var obj = InstanceFromId(data.As<ulong>());
+
+        return obj switch
+        {
+            CardBoard => IsEnemy && !CardGameState.ISummoningProtectionOn,
+            CardEffectPreview => true,
+            _ => false
+        };
     }
 
     public override void _DropData(Vector2 atPosition, Variant data)
     {
-        var attacker = InstanceFromId(data.As<ulong>()) as CardBoard;
+        var obj = InstanceFromId(data.As<ulong>());
 
-        Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked {CardGameState.Id}");
-        GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, CardGameState.Id);
+        switch (obj)
+        {
+            case CardBoard attacker:
+            {
+                Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked {CardGameState.Id}");
+                GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, CardGameState.Id);
+                break;
+            }
+            case CardEffectPreview effect:
+            {
+                effect.TryUpstreamTarget(this);
+                break;
+            }
+        }
     }
 
     public async Task AttackAsync(Control sprite2D)

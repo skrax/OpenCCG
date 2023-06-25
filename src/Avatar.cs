@@ -9,15 +9,34 @@ public partial class Avatar : TextureRect
 
     public override bool _CanDropData(Vector2 atPosition, Variant data)
     {
-        return IsEnemy;
+        var obj = InstanceFromId(data.As<ulong>());
+
+        return obj switch
+        {
+            CardBoard => IsEnemy,
+            CardEffectPreview => true,
+            _ => false
+        };
     }
 
     public override void _DropData(Vector2 atPosition, Variant data)
     {
-        var attacker = InstanceFromId(data.As<ulong>()) as CardBoard;
+        var obj = InstanceFromId(data.As<ulong>());
 
-        Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked avatar");
+        switch (obj)
+        {
+            case CardBoard attacker:
+            {
+                Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked avatar");
 
-        GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
+                GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
+                break;
+            }
+            case CardEffectPreview effect:
+            {
+                effect.TryUpstreamTarget(this);
+                break;
+            }
+        }
     }
 }

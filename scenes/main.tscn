@@ -11,7 +11,7 @@
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
 [ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="9_xpu3a"]
 [ext_resource type="Texture2D" uid="uid://cc6ljig5aldur" path="res://img/line_arrow.png" id="10_a36md"]
-[ext_resource type="PackedScene" uid="uid://rp3que8k4xmy" path="res://scenes/card-tmp.tscn" id="13_hy35u"]
+[ext_resource type="PackedScene" uid="uid://bi081wvfogtvn" path="res://scenes/card-effect-preview.tscn" id="13_hy35u"]
 [ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="13_xdsvr"]
 
 [sub_resource type="Gradient" id="Gradient_aglup"]
@@ -45,6 +45,7 @@ bg_color = Color(0.70261, 0.0548099, 0.36398, 1)
 script = ExtResource("1_pq47c")
 
 [node name="Background" type="TextureRect" parent="."]
+z_index = -1
 offset_top = 953.0
 offset_right = 1920.0
 offset_bottom = 1208.0
@@ -52,6 +53,7 @@ mouse_filter = 2
 texture = SubResource("GradientTexture2D_xrtuc")
 
 [node name="Background2" type="TextureRect" parent="."]
+z_index = -1
 offset_top = -127.0
 offset_right = 1920.0
 offset_bottom = 128.0
@@ -59,6 +61,7 @@ mouse_filter = 2
 texture = SubResource("GradientTexture2D_xrtuc")
 
 [node name="Background3" type="TextureRect" parent="."]
+z_index = -1
 offset_top = 572.0
 offset_right = 1920.0
 offset_bottom = 827.0
@@ -66,11 +69,30 @@ mouse_filter = 2
 texture = SubResource("GradientTexture2D_gjihd")
 
 [node name="Background4" type="TextureRect" parent="."]
+z_index = -1
 offset_top = 253.0
 offset_right = 1920.0
 offset_bottom = 508.0
 mouse_filter = 2
 texture = SubResource("GradientTexture2D_gjihd")
+
+[node name="TargetLine" type="Line2D" parent="." node_paths=PackedStringArray("_arrow")]
+visible = false
+z_index = 3
+texture_repeat = 2
+position = Vector2(2.08165e-12, 2.08165e-12)
+points = PackedVector2Array(331, 130, 332, -44)
+texture = ExtResource("9_xpu3a")
+texture_mode = 1
+begin_cap_mode = 1
+end_cap_mode = 2
+antialiased = true
+script = ExtResource("9_cltvt")
+_arrow = NodePath("Arrow")
+
+[node name="Arrow" type="Sprite2D" parent="TargetLine"]
+position = Vector2(332, -44)
+texture = ExtResource("10_a36md")
 
 [node name="Hand" type="HBoxContainer" parent="."]
 offset_top = 953.0
@@ -130,24 +152,6 @@ script = ExtResource("3_x8tt0")
 _main = NodePath("..")
 _serverAddress = "localhost"
 
-[node name="TargetLine" type="Line2D" parent="." node_paths=PackedStringArray("_arrow")]
-visible = false
-z_index = 3
-texture_repeat = 2
-position = Vector2(2.08165e-12, 2.08165e-12)
-points = PackedVector2Array(331, 130, 332, -44)
-texture = ExtResource("9_xpu3a")
-texture_mode = 1
-begin_cap_mode = 1
-end_cap_mode = 2
-antialiased = true
-script = ExtResource("9_cltvt")
-_arrow = NodePath("Arrow")
-
-[node name="Arrow" type="Sprite2D" parent="TargetLine"]
-position = Vector2(332, -44)
-texture = ExtResource("10_a36md")
-
 [node name="MidPanel" type="Panel" parent="." node_paths=PackedStringArray("_endTurnButton", "_exitButton", "_statusLabel")]
 offset_top = 509.0
 offset_right = 1921.0
@@ -204,9 +208,20 @@ text = "STATUS MESSAGE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CardTempArea" parent="." instance=ExtResource("13_hy35u")]
+[node name="CardEffectPreview" parent="." instance=ExtResource("13_hy35u")]
 visible = false
+z_index = 2
+offset_left = 681.0
+offset_top = 788.0
+offset_right = 834.6
+offset_bottom = 1018.4
+mouse_filter = 2
 
-[node name="EnemyCardTempArea" parent="." instance=ExtResource("13_hy35u")]
+[node name="EnemyCardEffectPreview" parent="." instance=ExtResource("13_hy35u")]
 visible = false
-position = Vector2(1401, 186)
+z_index = 2
+offset_left = 1190.0
+offset_top = 66.0
+offset_right = 1343.6
+offset_bottom = 296.4
+mouse_filter = 2

@@ -52,8 +52,8 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             StatusPanel = GetNode<ServerNodes.StatusPanel>("StatusPanel"),
             EnemyStatusPanel = GetNode<ServerNodes.StatusPanel>("EnemyStatusPanel"),
             MidPanel = GetNode<ServerNodes.MidPanel>("MidPanel"),
-            CardTempArea = GetNode<ServerNodes.CardTempArea>("CardTempArea"),
-            EnemyCardTempArea = GetNode<ServerNodes.CardTempArea>("EnemyCardTempArea")
+            CardEffectPreview = GetNode<ServerNodes.CardEffectPreview>("CardEffectPreview"),
+            EnemyCardEffectPreview = GetNode<ServerNodes.CardEffectPreview>("EnemyCardEffectPreview")
         };
     }
 

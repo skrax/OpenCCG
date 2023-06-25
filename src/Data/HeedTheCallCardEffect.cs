@@ -41,6 +41,6 @@ public class HeedTheCallCardEffect : ICardEffect
             playerGameState.Nodes.EnemyHand.RemoveCard(playerGameState.EnemyPeerId);
         }
 
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, _.AsDto());
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, _.AsDto());
     }
 }
