@@ -76,6 +76,58 @@ public class PlayerGameState
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
     }
 
+    public void Start()
+    {
+        Draw(Rules.InitialCardsDrawn);
+        UpdateEnergyRpc();
+
+        Nodes.StatusPanel.SetHealth(PeerId, Health);
+        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
+    }
+
+    public async Task StartTurnAsync()
+    {
+        IsTurn = true;
+        Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
+        UpdateEnergyRpc();
+        Draw();
+
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnUpkeepAsync();
+        }
+
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
+
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnStartTurnAsync(this);
+        }
+    }
+
+    public async Task EndTurnAsync()
+    {
+        if (!IsTurn) return;
+
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, "End Step"));
+        
+        foreach (var cardGameState in Board)
+        {
+            cardGameState.AttacksAvailable = 0;
+            await cardGameState.UpdateCreatureAsync();
+        }
+
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnEndTurnAsync(this);
+        }
+
+        IsTurn = false;
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
+
+        await Enemy.StartTurnAsync();
+    }
+
     public void Draw(int count = 1)
     {
         for (var i = 0; i < count; ++i)
@@ -258,58 +310,6 @@ public class PlayerGameState
         }
     }
 
-    public void Start()
-    {
-        Draw(Rules.InitialCardsDrawn);
-        UpdateEnergyRpc();
-
-        Nodes.StatusPanel.SetHealth(PeerId, Health);
-        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
-    }
-
-    public async Task EndTurnAsync()
-    {
-        if (!IsTurn) return;
-
-        foreach (var cardGameState in Board)
-        {
-            await cardGameState.OnEndTurnAsync(this);
-            cardGameState.AttacksAvailable = 0;
-            var dto = cardGameState.AsDto();
-            await Task.WhenAll(
-                Nodes.Board.UpdateCardAsync(PeerId, dto),
-                Nodes.EnemyBoard.UpdateCardAsync(EnemyPeerId, dto));
-        }
-
-        IsTurn = false;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
-
-        await Enemy.StartTurnAsync();
-    }
-
-    public async Task StartTurnAsync()
-    {
-        IsTurn = true;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
-
-        foreach (var cardGameState in Board)
-        {
-            cardGameState.IsSummoningProtectionOn = false;
-            cardGameState.IsSummoningSicknessOn = false;
-            cardGameState.AttacksAvailable = cardGameState.MaxAttacksPerTurn;
-
-            var dto = cardGameState.AsDto();
-            await Task.WhenAll(
-                Nodes.Board.UpdateCardAsync(PeerId, dto),
-                Nodes.EnemyBoard.UpdateCardAsync(EnemyPeerId, dto));
-
-            await cardGameState.OnStartTurnAsync(this);
-        }
-
-        Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
-        UpdateEnergyRpc();
-        Draw();
-    }
 
     public void Disconnect()
     {

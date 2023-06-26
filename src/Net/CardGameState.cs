@@ -44,6 +44,10 @@ public class CardGameState
         Cost = Record.Cost;
     }
 
+    public void Prepare()
+    {
+    }
+
     public CardGameStateDto AsDto()
     {
         var recordMod = new CardRecordMod(
@@ -80,6 +84,15 @@ public class CardGameState
         var t2 = PlayerGameState.Nodes.EnemyBoard.UpdateCardAsync(PlayerGameState.EnemyPeerId, dto);
 
         await Task.WhenAll(t1, t2);
+    }
+
+    public async Task OnUpkeepAsync()
+    {
+        IsSummoningProtectionOn = false;
+        IsSummoningSicknessOn = false;
+        AttacksAvailable = MaxAttacksPerTurn;
+
+        await UpdateCreatureAsync();
     }
 
     public async Task OnSpellAsync(PlayerGameState playerGameState) =>
