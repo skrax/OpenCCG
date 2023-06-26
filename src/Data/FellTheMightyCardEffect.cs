@@ -51,12 +51,12 @@ public class FellTheMightyCardEffect : ICardEffect
 
         foreach (var cardGameState in toDestroySelf)
         {
-            playerGameState.DestroySelfCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
 
         foreach (var cardGameState in toDestroyEnemy)
         {
-            playerGameState.DestroyEnemyCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
         
         foreach (var cardGameState in toDestroySelf)
@@ -79,7 +79,7 @@ public class FellTheMightyCardEffect : ICardEffect
         var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfHighest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
-            playerGameState.DestroySelfCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
         
         foreach (var cardGameState in toDestroy)
@@ -96,7 +96,7 @@ public class FellTheMightyCardEffect : ICardEffect
         var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyHighest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
-            playerGameState.DestroyEnemyCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
         
         foreach (var cardGameState in toDestroy)

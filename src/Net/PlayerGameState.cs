@@ -60,11 +60,9 @@ public class PlayerGameState
         var shuffledDeckList = DeckList
                                .Select(x =>
                                {
-                                   var card = new CardGameState
+                                   var card = new CardGameState(x, this)
                                    {
-                                       Record = x,
                                        Zone = CardZone.Deck,
-                                       AttacksAvailable = 1,
                                        MaxAttacksPerTurn = 1
                                    };
 
@@ -179,7 +177,7 @@ public class PlayerGameState
 
         --attacker.AttacksAvailable;
         attacker.IsSummoningProtectionOn = false;
-        await UpdateSelfCreatureAsync(attacker);
+        await attacker.UpdateCreatureAsync();
         var atk = Math.Max(0, attacker.Atk);
         Enemy.Health -= atk;
 
@@ -194,44 +192,15 @@ public class PlayerGameState
         }
     }
 
-    public async Task ResolveDamageAsync(CardGameState card, int damage, ControllingEntity controllingEntity)
+    public async Task ResolveDamageAsync(CardGameState card, int damage)
     {
         card.Def -= damage;
 
-        if (controllingEntity is ControllingEntity.Self)
+        await card.UpdateCreatureAsync();
+        if (card.Def <= 0)
         {
-            await UpdateSelfCreatureAsync(card);
-            if (card.Def <= 0)
-            {
-                DestroySelfCreature(card);
-            }
+            card.DestroyCreature();
         }
-        else
-        {
-            await UpdateEnemyCreatureAsync(card);
-            if (card.Def <= 0)
-            {
-                DestroyEnemyCreature(card);
-            }
-        }
-    }
-
-    private async Task UpdateEnemyCreatureAsync(CardGameState card)
-    {
-        var dto = card.AsDto();
-        var t1 = Nodes.EnemyBoard.UpdateCardAsync(PeerId, dto);
-        var t2 = Nodes.Board.UpdateCardAsync(EnemyPeerId, dto);
-
-        await Task.WhenAll(t1, t2);
-    }
-
-    private async Task UpdateSelfCreatureAsync(CardGameState card)
-    {
-        var dto = card.AsDto();
-        var t1 = Nodes.Board.UpdateCardAsync(PeerId, dto);
-        var t2 = Nodes.EnemyBoard.UpdateCardAsync(EnemyPeerId, dto);
-
-        await Task.WhenAll(t1, t2);
     }
 
     public async Task CombatAsync(Guid attackerId, Guid targetId)
@@ -257,10 +226,8 @@ public class PlayerGameState
 
         --attacker.AttacksAvailable;
         attacker.IsSummoningProtectionOn = false;
-        await UpdateSelfCreatureAsync(attacker);
-        await Task.WhenAll(
-            ResolveDamageAsync(attacker, target.Atk, ControllingEntity.Self),
-            ResolveDamageAsync(target, attacker.Atk, ControllingEntity.Enemy));
+        await attacker.UpdateCreatureAsync();
+        await Task.WhenAll(ResolveDamageAsync(attacker, target.Atk), ResolveDamageAsync(target, attacker.Atk));
 
         if (attacker.Record.Abilities.Drain)
         {
@@ -352,25 +319,5 @@ public class PlayerGameState
     private void NotifyDisconnected()
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "Opponent disconnected");
-    }
-
-    public void DestroyEnemyCreature(CardGameState cardGameState)
-    {
-        Enemy.Board.Remove(cardGameState);
-        Enemy.Pit.AddLast(cardGameState);
-        cardGameState.Zone = CardZone.Pit;
-
-        Nodes.EnemyBoard.RemoveCard(PeerId, cardGameState.Id);
-        Nodes.Board.RemoveCard(EnemyPeerId, cardGameState.Id);
-    }
-
-    public void DestroySelfCreature(CardGameState cardGameState)
-    {
-        Board.Remove(cardGameState);
-        Pit.AddLast(cardGameState);
-        cardGameState.Zone = CardZone.Pit;
-
-        Nodes.Board.RemoveCard(PeerId, cardGameState.Id);
-        Nodes.EnemyBoard.RemoveCard(EnemyPeerId, cardGameState.Id);
     }
 }
