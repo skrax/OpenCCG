@@ -14,6 +14,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 {
     [Export] private CardStatPanel _costPanel;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
+    [Export] private SkipSelectionField _skipSelectionField;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
     private RequireTargetInputDto? _currentInputDto;
@@ -41,6 +42,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         _currentInputDto = input;
 
         ForceDrag();
+        _skipSelectionField.Enable();
 
         return await _tsc.Task;
     }
@@ -75,6 +77,24 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         Show(cardGameStateDto);
         await Task.Delay(TimeSpan.FromSeconds(3));
         Reset();
+    }
+
+    public void SkipTarget()
+    {
+        if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
+            _tsc.Task.IsFaulted)
+        {
+            Logger.Error<CardEffectPreview>($"No request id set to use {nameof(TryUpstreamTarget)}");
+            ForceDrag();
+            return;
+        }
+
+        Reset();
+
+        if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, null)))
+        {
+            ForceDrag();
+        }
     }
 
     public void TryUpstreamTarget<T>(T target)

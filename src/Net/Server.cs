@@ -73,9 +73,9 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         }
     }
 
-    private async Task PlayCard(long senderPeerId, Guid cardId)
+    private async Task<bool> PlayCard(long senderPeerId, Guid cardId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
+        return await _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
     }
 
     private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
@@ -162,7 +162,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.PlayCard => Executor.Make<Guid>(PlayCard),
+            MessageType.PlayCard => Executor.Make<Guid, bool>(PlayCard),
             MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard),
             MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer),
             MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),

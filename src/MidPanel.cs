@@ -5,7 +5,7 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
-public partial class MidPanel : Node, IMessageReceiver<MessageType>
+public partial class MidPanel : Control, IMessageReceiver<MessageType>
 {
     [Export] private Button _endTurnButton, _exitButton;
     [Export] private Label _statusLabel;

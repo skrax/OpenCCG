@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -11,12 +10,6 @@ namespace OpenCCG.Net;
 
 public class PlayerGameState
 {
-    public enum ControllingEntity
-    {
-        Self,
-        Enemy
-    }
-
     public long PeerId { get; init; }
 
     public long EnemyPeerId { get; set; }
@@ -158,21 +151,19 @@ public class PlayerGameState
         Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy, MaxEnergy);
     }
 
-    public async Task PlayCardAsync(Guid id)
+    public async Task<bool> PlayCardAsync(Guid id)
     {
         if (!IsTurn)
         {
-            Nodes.Hand.FailPlayCard(PeerId);
-            return;
+            return false;
         }
 
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
-        if (card == null) throw new ApplicationException();
+        if (card == null) return false;
         if (Energy - card.Cost < 0)
         {
-            Nodes.Hand.FailPlayCard(PeerId);
-            return;
+            return false;
         }
 
         Energy -= card.Cost;
@@ -210,6 +201,8 @@ public class PlayerGameState
         }
 
         UpdateCardCountRpc();
+
+        return true;
     }
 
     public async Task CombatPlayerAsync(Guid attackerId)

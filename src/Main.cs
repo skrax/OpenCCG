@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
@@ -13,7 +14,7 @@ namespace OpenCCG;
 
 public partial class Main : Node, IMessageReceiver<MessageType>
 {
-    public Dictionary<string, IObserver>? Observers => null;
+    public Dictionary<string, IObserver> Observers { get; } = new();
 
     [Rpc]
     public async void HandleMessageAsync(string messageJson)
@@ -29,9 +30,9 @@ public partial class Main : Node, IMessageReceiver<MessageType>
         };
     }
 
-    public void PlayCard(Guid id)
+    public async Task<bool> TryPlayCardAsync(Guid id)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.PlayCard, id);
+        return await IMessageReceiver<MessageType>.GetAsync<Guid, bool>(this, 1, MessageType.PlayCard, id);
     }
 
     public void CombatPlayerCard(Guid attackerId, Guid targetId)

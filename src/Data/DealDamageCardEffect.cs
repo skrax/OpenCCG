@@ -74,20 +74,29 @@ public class DealDamageCardEffect : ICardEffect
             new EndTurnButtonSetActiveDto(playerGameState.IsTurn, null));
         playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
+        // check if targeting was skipped
+        if (output.cardId == null && output.isEnemyAvatar == null)
+        {
+            return;
+        }
+
         if (output.cardId == null)
         {
             if (output.isEnemyAvatar!.Value)
             {
                 playerGameState.Enemy.Health -= Damage;
 
-                playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Enemy.Health);
-                playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Enemy.Health);
+                playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.PeerId,
+                    playerGameState.Enemy.Health);
+                playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.EnemyPeerId,
+                    playerGameState.Enemy.Health);
             }
             else if (!output.isEnemyAvatar.Value)
             {
                 playerGameState.Health -= Damage;
 
-                playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.EnemyPeerId, playerGameState.Health);
+                playerGameState.Nodes.EnemyStatusPanel.SetHealth(playerGameState.EnemyPeerId,
+                    playerGameState.Health);
                 playerGameState.Nodes.StatusPanel.SetHealth(playerGameState.PeerId, playerGameState.Health);
             }
         }
