@@ -1,0 +1,10 @@
+[gd_scene load_steps=4 format=3 uid="uid://ca3qjc0fh4fma"]
+
+[ext_resource type="Script" path="res://src/Startup.cs" id="1_yhyhv"]
+[ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="2_cyw5e"]
+[ext_resource type="PackedScene" uid="uid://dobmo3im8em5o" path="res://scenes/server.tscn" id="3_taenk"]
+
+[node name="startup" type="Node"]
+script = ExtResource("1_yhyhv")
+_menuScene = ExtResource("2_cyw5e")
+_serverScene = ExtResource("3_taenk")
