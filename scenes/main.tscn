@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=22 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="9_xpu3a"]
 [ext_resource type="Texture2D" uid="uid://cc6ljig5aldur" path="res://img/line_arrow.png" id="10_a36md"]
 [ext_resource type="PackedScene" uid="uid://bi081wvfogtvn" path="res://scenes/card-effect-preview.tscn" id="13_hy35u"]
+[ext_resource type="Script" path="res://src/SkipSelectionField.cs" id="13_pb0qo"]
 [ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="13_xdsvr"]
 
 [sub_resource type="Gradient" id="Gradient_aglup"]
@@ -212,7 +213,17 @@ text = "STATUS MESSAGE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CardEffectPreview" parent="." instance=ExtResource("13_hy35u")]
+[node name="SkipTargetField" type="Button" parent="MidPanel"]
+visible = false
+layout_mode = 0
+offset_left = 1357.0
+offset_right = 1648.0
+offset_bottom = 61.0
+theme_override_font_sizes/font_size = 35
+text = "Skip Selection"
+script = ExtResource("13_pb0qo")
+
+[node name="CardEffectPreview" parent="." node_paths=PackedStringArray("_skipSelectionField") instance=ExtResource("13_hy35u")]
 visible = false
 z_index = 2
 offset_left = 681.0
@@ -220,6 +231,7 @@ offset_top = 788.0
 offset_right = 834.6
 offset_bottom = 1018.4
 mouse_filter = 2
+_skipSelectionField = NodePath("../MidPanel/SkipTargetField")
 
 [node name="EnemyCardEffectPreview" parent="." instance=ExtResource("13_hy35u")]
 visible = false
