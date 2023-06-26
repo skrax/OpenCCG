@@ -16,9 +16,9 @@ public partial class Dropzone : Control
         return obj is Card;
     }
 
-    public override void _DropData(Vector2 atPosition, Variant data)
+    public override async void _DropData(Vector2 atPosition, Variant data)
     {
         var card = InstanceFromId(data.As<ulong>()) as Card;
-        card!.Play();
+        await card!.PlayAsync();
     }
 }

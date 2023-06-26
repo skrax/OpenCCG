@@ -27,7 +27,6 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.RemoveCard => Executor.Make<Guid>(RemoveCard),
-            MessageType.FailPlayCard => Executor.Make(FailPlayCard),
             MessageType.DrawCard => Executor.Make<CardGameStateDto>(DrawCard)
         };
     }
@@ -39,10 +38,6 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
 
         _cards.Remove(cardEntity);
         cardEntity.QueueFree();
-    }
-
-    private void FailPlayCard()
-    {
     }
 
     private void DrawCard(CardGameStateDto card)

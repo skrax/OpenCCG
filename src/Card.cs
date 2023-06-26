@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -95,10 +96,11 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
         _preview.Visible = false;
     }
 
-    public void Play()
+    public async Task PlayAsync()
     {
         Visible = false;
-        GetNode<Main>("/root/Main").PlayCard(Id);
+        var success = await GetNode<Main>("/root/Main").TryPlayCardAsync(Id);
+        if (!success) Visible = true;
     }
 
     public void DrawOutline(bool enabled)

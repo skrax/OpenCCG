@@ -30,9 +30,4 @@ public partial class Hand : Node, IMessageReceiver<MessageType>
     {
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard, id);
     }
-
-    public void FailPlayCard(long peerId)
-    {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.FailPlayCard);
-    }
 }

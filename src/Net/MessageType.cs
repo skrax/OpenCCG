@@ -13,7 +13,6 @@ public enum MessageType
     SetEnergy,
     SetCardCount,
     SetHealth,
-    FailPlayCard,
     DrawCard,
     RequireTarget,
     TmpShowCard,
