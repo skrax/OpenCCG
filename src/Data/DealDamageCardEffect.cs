@@ -69,10 +69,10 @@ public class DealDamageCardEffect : ICardEffect
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
             new EndTurnButtonSetActiveDto(false, "Select a Target"));
         var input = new RequireTargetInputDto(cardDto, RequireTargetType.All, RequireTargetSide.Enemy);
-        var output = await playerGameState.Nodes.CardTempArea.RequireTargetsAsync(playerGameState.PeerId, input);
+        var output = await playerGameState.Nodes.CardEffectPreview.RequireTargetsAsync(playerGameState.PeerId, input);
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
             new EndTurnButtonSetActiveDto(playerGameState.IsTurn, null));
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         if (output.cardId == null)
         {
@@ -96,14 +96,14 @@ public class DealDamageCardEffect : ICardEffect
             if (TargetSide == RequireTargetSide.Friendly)
             {
                 var targetCard = playerGameState.Board.Single(x => x.Id == output.cardId);
-                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
+                await playerGameState.ResolveDamageAsync(targetCard, Damage);
                 if (targetCard.Zone == CardZone.Pit)
                     await targetCard.OnExitAsync(playerGameState);
             }
             else if (TargetSide == RequireTargetSide.Enemy)
             {
                 var targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+                await playerGameState.ResolveDamageAsync(targetCard, Damage);
 
                 if (targetCard.Zone == CardZone.Pit)
                     await targetCard.OnExitAsync(playerGameState.Enemy);
@@ -113,13 +113,13 @@ public class DealDamageCardEffect : ICardEffect
                 var targetCard = playerGameState.Board.SingleOrDefault(x => x.Id == output.cardId);
                 if (targetCard != null)
                 {
-                    playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Self);
+                    await playerGameState.ResolveDamageAsync(targetCard, Damage);
                     if (targetCard.Zone == CardZone.Pit)
                         await targetCard.OnExitAsync(playerGameState);
                 }
 
                 targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-                playerGameState.ResolveDamage(targetCard, Damage, PlayerGameState.ControllingEntity.Enemy);
+                await playerGameState.ResolveDamageAsync(targetCard, Damage);
 
                 if (targetCard.Zone == CardZone.Pit)
                     await targetCard.OnExitAsync(playerGameState.Enemy);

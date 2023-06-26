@@ -5,7 +5,7 @@ using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
-public partial class CardPreview : Sprite2D, INodeInit<CardGameStateDto>
+public partial class CardPreview : TextureRect, INodeInit<CardGameStateDto>
 {
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     [Export] private CardInfoPanel _infoPanel, _namePanel;

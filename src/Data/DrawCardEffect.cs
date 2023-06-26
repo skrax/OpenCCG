@@ -22,7 +22,7 @@ public class DrawCardEffect : ICardEffect
     public Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         playerGameState.Draw(Count);
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
 
         return Task.CompletedTask;
     }

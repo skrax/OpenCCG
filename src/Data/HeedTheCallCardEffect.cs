@@ -15,14 +15,7 @@ public class HeedTheCallCardEffect : ICardEffect
 
         for (var i = 0; i < 2; ++i)
         {
-            var spectre = new CardGameState
-            {
-                Record = record,
-                AttacksAvailable = 1,
-                MaxAttacksPerTurn = 1
-            };
-            
-            spectre.ResetStats();
+            var spectre = new CardGameState(record, playerGameState);
 
             spectre.IsSummoningProtectionOn = spectre.Record.Abilities is { Exposed: false, Defender: false };
             spectre.IsSummoningSicknessOn = !spectre.Record.Abilities.Haste;
@@ -41,6 +34,6 @@ public class HeedTheCallCardEffect : ICardEffect
             playerGameState.Nodes.EnemyHand.RemoveCard(playerGameState.EnemyPeerId);
         }
 
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, _.AsDto());
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, _.AsDto());
     }
 }

@@ -6,8 +6,9 @@ using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
-public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
+public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 {
+    [Export] private TextureRect _textureRect;
     [Export] private CardStatPanel _atkPanel, _defPanel;
     [Export] private Panel _dmgPopup;
     [Export] private AnimationPlayer _anim;
@@ -15,7 +16,7 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
     public CardGameStateDto CardGameState;
     public bool IsEnemy { get; private set; }
 
-    private bool _hovering, _canHover = true;
+    private bool _targetingDisabled;
     [Export] private PackedScene _cardPreviewScene;
     private CardPreview? _preview;
 
@@ -26,15 +27,18 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         _atkPanel.Value = CardGameState.Atk;
         _defPanel.Value = record.Def;
 
-        Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
+        _textureRect.Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
 
-        var shader = Material as ShaderMaterial;
+        var shader = _textureRect.Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", record.ISummoningProtectionOn);
         if (!IsEnemy)
         {
             var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
+
+        MouseEntered += ShowPreview;
+        MouseExited += DisablePreview;
     }
 
     public void Destroy(Action act)
@@ -50,13 +54,15 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
 
     public async Task UpdateAsync(CardGameStateDto cardGameState)
     {
+        _targetingDisabled = true; 
+        
         _atkPanel.Value = cardGameState.Atk;
         var diff = cardGameState.Def - _defPanel.Value;
         _defPanel.Value = cardGameState.Def;
 
         CardGameState = cardGameState;
 
-        var shader = Material as ShaderMaterial;
+        var shader = _textureRect.Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
         if (!IsEnemy)
         {
@@ -68,53 +74,73 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         {
             _dmgPopup.GetChild<Label>(0).Text = diff > 0 ? $"+ {diff}" : $"{diff}";
             _dmgPopup.Visible = true;
-            await Task.Delay(TimeSpan.FromSeconds(2));
-            if (_dmgPopup == null) return;
+            await Task.Delay(TimeSpan.FromSeconds(1.5));
             _dmgPopup.Visible = false;
         }
+
+        _targetingDisabled = false;
     }
 
-    public override void _Input(InputEvent inputEvent)
+    public void ForceDrag()
     {
-        var rect = GetRect();
-        if (inputEvent.IsActionPressed(InputActions.SpriteClick))
+        var line = GetNode<TargetLine>("/root/Main/TargetLine");
+        var preview = new Control();
+        preview.TreeExiting += () => { line.Reset(); };
+        line.Target(this, preview);
+
+        ForceDrag(GetInstanceId(), preview);
+    }
+
+    public override Variant _GetDragData(Vector2 atPosition)
+    {
+        if (CardGameState.AttacksAvailable <= 0) return default;
+        if (CardGameState.IsSummoningSicknessOn) return default;
+        if (IsEnemy) return default;
+
+        var line = GetNode<TargetLine>("/root/Main/TargetLine");
+        var preview = new Control();
+        preview.TreeExiting += () => { line.Reset(); };
+        line.Target(this, preview);
+
+        SetDragPreview(preview);
+        return GetInstanceId();
+    }
+
+    public override bool _CanDropData(Vector2 atPosition, Variant data)
+    {
+        var instanceId = data.As<ulong>();
+        if (instanceId == GetInstanceId()) return false;
+        var obj = InstanceFromId(data.As<ulong>());
+
+        return obj switch
         {
-            var inputEventMouseButton = (InputEventMouseButton)inputEvent;
+            CardBoard => IsEnemy && !CardGameState.ISummoningProtectionOn,
+            CardEffectPreview => true,
+            _ => false
+        };
+    }
 
-            if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
+    public override void _DropData(Vector2 atPosition, Variant data)
+    {
+        var obj = InstanceFromId(data.As<ulong>());
 
-            EventSink.ReportPointerDown(this);
-        }
-
-        if (inputEvent.IsActionReleased(InputActions.SpriteClick))
+        switch (obj)
         {
-            var inputEventMouseButton = (InputEventMouseButton)inputEvent;
-
-            if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
-
-            EventSink.ReportPointerUp(this);
-        }
-
-        if (inputEvent is InputEventMouseMotion mouseMotion)
-        {
-            switch (_hovering)
+            case CardBoard attacker:
             {
-                case false when rect.HasPoint(ToLocal(mouseMotion.Position)):
-                    if (!_canHover) return;
-
-                    _hovering = true;
-                    EventSink.ReportPointerEnter(this);
-                    break;
-                case true when !rect.HasPoint(ToLocal(mouseMotion.Position)):
-                    _hovering = false;
-
-                    EventSink.ReportPointerExit(this);
-                    break;
+                Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked {CardGameState.Id}");
+                GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, CardGameState.Id);
+                break;
+            }
+            case CardEffectPreview effect:
+            {
+                effect.TryUpstreamTarget(this);
+                break;
             }
         }
     }
 
-    public async Task AttackAsync(Sprite2D sprite2D)
+    public async Task AttackAsync(Control sprite2D)
     {
         var f = 0f;
         var targetPosition = sprite2D.GlobalPosition;
@@ -142,17 +168,18 @@ public partial class CardBoard : Sprite2D, INodeInit<CardGameStateDto>
         ZIndex = 0;
     }
 
-    public void ShowPreview()
+    private void ShowPreview()
     {
-        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent());
+        _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent().GetParent());
         _preview.Init(CardGameState);
-        var pos = Position;
-        pos.X += 256;
-        _preview.Position = pos;
+        var pos = GlobalPosition;
+        pos.X += Size.X + 40;
+        pos.Y -= _preview.Size.Y / 2 - Size.Y / 2;
+        _preview.GlobalPosition = pos;
         _preview.Visible = true;
     }
 
-    public void DisablePreview()
+    private void DisablePreview()
     {
         if (IsQueuedForDeletion() || _preview == null) return;
         _preview.Visible = false;

@@ -69,7 +69,7 @@ public class AoeDamageCardEffect : ICardEffect
     public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         var killedSelfCreatures = new List<CardGameState>();
         var killedEnemyCreatures = new List<CardGameState>();
@@ -79,23 +79,25 @@ public class AoeDamageCardEffect : ICardEffect
             if (TargetSide is RequireTargetSide.All or RequireTargetSide.Friendly)
             {
                 var board = playerGameState.Board.ToArray();
-                foreach (var cardGameState in board)
+
+                await Task.WhenAll(board.Select(async x =>
                 {
-                    playerGameState.ResolveDamage(cardGameState, Damage, PlayerGameState.ControllingEntity.Self);
-                    if (cardGameState.Zone == CardZone.Pit)
-                        killedSelfCreatures.Add(cardGameState);
-                }
+                    await playerGameState.ResolveDamageAsync(x, Damage);
+                    if (x.Zone == CardZone.Pit)
+                        killedSelfCreatures.Add(x);
+                }));
             }
 
             if (TargetSide is RequireTargetSide.All or RequireTargetSide.Enemy)
             {
                 var board = playerGameState.Enemy.Board.ToArray();
-                foreach (var cardGameState in board)
+
+                await Task.WhenAll(board.Select(async x =>
                 {
-                    playerGameState.ResolveDamage(cardGameState, Damage, PlayerGameState.ControllingEntity.Enemy);
-                    if (cardGameState.Zone == CardZone.Pit)
-                        killedEnemyCreatures.Add(cardGameState);
-                }
+                    await playerGameState.ResolveDamageAsync(x, Damage);
+                    if (x.Zone == CardZone.Pit)
+                        killedEnemyCreatures.Add(x);
+                }));
             }
         }
 

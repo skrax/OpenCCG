@@ -11,11 +11,11 @@ using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
-public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
+public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 {
     [Export] public bool IsEnemy;
     [Export] public BoardArea EnemyBoardArea;
-    [Export] public Avatar Avatar, EnemyAvatar;
+    [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
@@ -33,7 +33,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
-            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync),
+            MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync, Executor.ResponseMode.Respond),
             MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
             MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
                 Executor.ResponseMode.Respond),
@@ -53,7 +53,7 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
 
         if (dto.IsAvatar)
         {
-            await card.AttackAsync(EnemyAvatar);
+            await card.AttackAsync(_EnemyStatusPanel._avatar);
         }
         else
         {
@@ -68,19 +68,12 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         }
     }
 
-    private void SetCardPositions()
-    {
-        SpriteHelpers.OrderHorizontally(_cards.Cast<Sprite2D>().ToArray());
-    }
-
     private void PlaceCard(CardGameStateDto cardGameStateDto)
     {
         var card = CardBoardScene.Make<CardBoard, CardGameStateDto>(cardGameStateDto, this);
         Logger.Info<BoardArea>($"IsEnemy: {IsEnemy} placed: ${cardGameStateDto.Id} ${cardGameStateDto.Record.Name}");
 
         _cards.Add(card);
-
-        SetCardPositions();
     }
 
     private async Task UpdateCardAsync(CardGameStateDto cardGameStateDto)
@@ -112,6 +105,6 @@ public partial class BoardArea : Area2D, IMessageReceiver<MessageType>
         }
 
         _cards.Remove(card);
-        card.Destroy(SetCardPositions);
+        card.Destroy(() => { });
     }
 }

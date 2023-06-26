@@ -68,10 +68,10 @@ public class RandomDamageCardEffect : ICardEffect
         return sb.ToString();
     }
 
-    public Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
+    public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         var cardDto = card.AsDto();
-        playerGameState.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
+        playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
         var board = playerGameState.Board.ToArray();
         var enemyBoard = playerGameState.Enemy.Board.ToArray();
 
@@ -80,10 +80,10 @@ public class RandomDamageCardEffect : ICardEffect
             switch (TargetType)
             {
                 case RequireTargetType.All:
-                    DealDamageToRandomAvatarOrCreature(playerGameState, board, enemyBoard);
+                    await DealDamageToRandomAvatarOrCreatureAsync(playerGameState, board, enemyBoard);
                     break;
                 case RequireTargetType.Creature:
-                    DealDamageToRandomCreature(playerGameState, board, enemyBoard);
+                    await DealDamageToRandomCreatureAsync(playerGameState, board, enemyBoard);
                     break;
                 case RequireTargetType.Avatar:
                     DealDamageToRandomAvatar(playerGameState);
@@ -92,11 +92,9 @@ public class RandomDamageCardEffect : ICardEffect
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        return Task.CompletedTask;
     }
 
-    private void DealDamageToRandomAvatarOrCreature(PlayerGameState playerGameState,
+    private async Task DealDamageToRandomAvatarOrCreatureAsync(PlayerGameState playerGameState,
         CardGameState[] board,
         CardGameState[] enemyBoard)
     {
@@ -108,7 +106,7 @@ public class RandomDamageCardEffect : ICardEffect
         }
         else
         {
-            DealDamageToRandomCreature(playerGameState, board, enemyBoard);
+            await DealDamageToRandomCreatureAsync(playerGameState, board, enemyBoard);
         }
     }
 
@@ -125,7 +123,6 @@ public class RandomDamageCardEffect : ICardEffect
                 {
                     DealDamageToSelf(playerGameState);
                 }
-
                 break;
             case RequireTargetSide.Friendly:
                 DealDamageToSelf(playerGameState);
@@ -155,27 +152,27 @@ public class RandomDamageCardEffect : ICardEffect
             playerGameState.Enemy.Health);
     }
 
-    private void DealDamageToRandomCreature(PlayerGameState playerGameState,
+    private async Task DealDamageToRandomCreatureAsync(PlayerGameState playerGameState,
         CardGameState[] board,
         CardGameState[] enemyBoard)
     {
         switch (TargetSide)
         {
             case RequireTargetSide.All:
-                DealDamageToRandomEnemyOrFriendlyCreature(playerGameState, board, enemyBoard);
+                await DealDamageToRandomEnemyOrFriendlyCreatureAsync(playerGameState, board, enemyBoard);
                 break;
             case RequireTargetSide.Friendly:
-                DealDamageToARandomCreature(playerGameState, board, PlayerGameState.ControllingEntity.Self);
+                await DealDamageToARandomCreatureAsync(playerGameState, board);
                 break;
             case RequireTargetSide.Enemy:
-                DealDamageToARandomCreature(playerGameState, enemyBoard, PlayerGameState.ControllingEntity.Enemy);
+                await DealDamageToARandomCreatureAsync(playerGameState, enemyBoard);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
-    private void DealDamageToRandomEnemyOrFriendlyCreature(PlayerGameState playerGameState,
+    private async Task DealDamageToRandomEnemyOrFriendlyCreatureAsync(PlayerGameState playerGameState,
         CardGameState[] board,
         CardGameState[] enemyBoard)
     {
@@ -185,20 +182,19 @@ public class RandomDamageCardEffect : ICardEffect
 
         if (isTargetSelf)
         {
-            DealDamageToARandomCreature(playerGameState, board, PlayerGameState.ControllingEntity.Self);
+            await DealDamageToARandomCreatureAsync(playerGameState, board);
         }
         else
         {
-            DealDamageToARandomCreature(playerGameState, enemyBoard, PlayerGameState.ControllingEntity.Enemy);
+            await DealDamageToARandomCreatureAsync(playerGameState, enemyBoard);
         }
     }
 
-    private void DealDamageToARandomCreature(PlayerGameState playerGameState, CardGameState[] board,
-        PlayerGameState.ControllingEntity controllingEntity)
+    private async Task DealDamageToARandomCreatureAsync(PlayerGameState playerGameState, CardGameState[] board)
     {
         var idx = Random.Shared.Next(0, board.Length - 1);
         var targetCard = board[idx];
-        playerGameState.ResolveDamage(targetCard, Damage, controllingEntity);
+        await playerGameState.ResolveDamageAsync(targetCard, Damage);
     }
 
     public static CardEffectRecord MakeRecord(int damage, RequireTargetSide side, RequireTargetType type, int count)

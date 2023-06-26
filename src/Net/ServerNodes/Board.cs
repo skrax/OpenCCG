@@ -31,9 +31,9 @@ public partial class Board : Node, IMessageReceiver<MessageType>
         IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.PlaceCard, cardGameStateDtoJson);
     }
 
-    public void UpdateCard(long peerId, CardGameStateDto cardGameStateDtoJson)
+    public async Task UpdateCardAsync(long peerId, CardGameStateDto cardGameStateDtoJson)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.UpdateCard, cardGameStateDtoJson);
+        await IMessageReceiver<MessageType>.GetAsync(this, peerId, MessageType.UpdateCard, cardGameStateDtoJson);
     }
 
     public async Task PlayCombatAnimAsync(long peerId, Guid from, Guid to)

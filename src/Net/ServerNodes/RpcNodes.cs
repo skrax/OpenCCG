@@ -18,7 +18,7 @@ public class RpcNodes
 
     public MidPanel MidPanel { get; init; }
 
-    public CardTempArea CardTempArea { get; init; }
+    public CardEffectPreview CardEffectPreview { get; init; }
 
-    public CardTempArea EnemyCardTempArea { get; init; }
+    public CardEffectPreview EnemyCardEffectPreview { get; init; }
 }

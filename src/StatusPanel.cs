@@ -11,12 +11,19 @@ public record SetEnergyDto(int Current, int Max);
 
 public partial class StatusPanel : Node, IMessageReceiver<MessageType>
 {
-    private Label _cardCountLabel;
-    private Label _energyLabel;
-    private Label _healthLabel;
+    [Export] private Label _cardCountLabel;
+    [Export] private Label _energyLabel;
+    [Export] private Label _healthLabel;
     [Export] private Panel _dmgPopup;
+    [Export] public Avatar _avatar;
+    [Export] private bool _isEnemy;
 
     public Dictionary<string, IObserver>? Observers => null;
+
+    public override void _Ready()
+    {
+        _avatar.IsEnemy = _isEnemy;
+    }
 
     [Rpc]
     public async void HandleMessageAsync(string messageJson)
@@ -32,13 +39,6 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
             MessageType.SetCardCount => Executor.Make<int>(SetCardCount),
             MessageType.SetHealth => Executor.Make<int>(SetHealth)
         };
-    }
-
-    public override void _Ready()
-    {
-        _healthLabel = GetChild<Label>(0);
-        _cardCountLabel = GetChild<Label>(2);
-        _energyLabel = GetChild<Label>(4);
     }
 
     private void SetEnergy(SetEnergyDto dto)

@@ -36,7 +36,7 @@ public class SquishTheWimpyCardEffect : ICardEffect
             await DestroyLowestAllCreaturesAsync(playerGameState);
         }
 
-        playerGameState.Enemy.Nodes.EnemyCardTempArea.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
+        playerGameState.Enemy.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
     }
 
     private static async Task DestroyLowestAllCreaturesAsync(PlayerGameState playerGameState)
@@ -50,16 +50,16 @@ public class SquishTheWimpyCardEffect : ICardEffect
 
         foreach (var cardGameState in selfToDestroy)
         {
-            playerGameState.DestroySelfCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
 
         var enemyToDestroy = enemyByAtk.TakeWhile(x => x.Atk == lowest).ToArray();
 
         foreach (var cardGameState in enemyToDestroy)
         {
-            playerGameState.DestroyEnemyCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
-        
+
         foreach (var cardGameState in selfToDestroy)
         {
             await cardGameState.OnExitAsync(playerGameState);
@@ -67,7 +67,7 @@ public class SquishTheWimpyCardEffect : ICardEffect
 
         foreach (var cardGameState in enemyToDestroy)
         {
-           await cardGameState.OnExitAsync(playerGameState.Enemy);
+            await cardGameState.OnExitAsync(playerGameState.Enemy);
         }
     }
 
@@ -80,9 +80,9 @@ public class SquishTheWimpyCardEffect : ICardEffect
         var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfLowest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
-            playerGameState.DestroySelfCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
-        
+
         foreach (var cardGameState in toDestroy)
         {
             await cardGameState.OnExitAsync(playerGameState);
@@ -97,9 +97,9 @@ public class SquishTheWimpyCardEffect : ICardEffect
         var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyLowest).ToArray();
         foreach (var cardGameState in toDestroy)
         {
-            playerGameState.DestroyEnemyCreature(cardGameState);
+            cardGameState.DestroyCreature();
         }
-        
+
         foreach (var cardGameState in toDestroy)
         {
            await cardGameState.OnExitAsync(playerGameState.Enemy); 

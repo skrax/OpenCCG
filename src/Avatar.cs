@@ -1,31 +1,42 @@
 using Godot;
+using OpenCCG.Core;
 
 namespace OpenCCG;
 
-public partial class Avatar : Sprite2D
+public partial class Avatar : TextureRect
 {
     [Export] public bool IsEnemy;
 
-    public override void _Input(InputEvent inputEvent)
+    public override bool _CanDropData(Vector2 atPosition, Variant data)
     {
-        if (inputEvent.IsActionPressed(InputActions.SpriteClick))
+        var obj = InstanceFromId(data.As<ulong>());
+
+        return obj switch
         {
-            var rect = GetRect();
-            var inputEventMouseButton = (InputEventMouseButton)inputEvent;
+            CardBoard => IsEnemy,
+            CardEffectPreview => true,
+            _ => false
+        };
+    }
 
-            if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
+    public override void _DropData(Vector2 atPosition, Variant data)
+    {
+        var obj = InstanceFromId(data.As<ulong>());
 
-            EventSink.ReportPointerDown(this);
-        }
-
-        if (inputEvent.IsActionReleased(InputActions.SpriteClick))
+        switch (obj)
         {
-            var rect = GetRect();
-            var inputEventMouseButton = (InputEventMouseButton)inputEvent;
+            case CardBoard attacker:
+            {
+                Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked avatar");
 
-            if (!rect.HasPoint(ToLocal(inputEventMouseButton.Position))) return;
-
-            EventSink.ReportPointerUp(this);
+                GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
+                break;
+            }
+            case CardEffectPreview effect:
+            {
+                effect.TryUpstreamTarget(this);
+                break;
+            }
         }
     }
 }

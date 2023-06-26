@@ -7,10 +7,10 @@ using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
-public partial class EnemyHandArea : Area2D, IMessageReceiver<MessageType>
+public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardHiddenScene = GD.Load<PackedScene>("res://scenes/card-hidden.tscn");
-    private readonly List<Sprite2D> _cards = new();
+    private readonly List<TextureRect> _cards = new();
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -36,18 +36,11 @@ public partial class EnemyHandArea : Area2D, IMessageReceiver<MessageType>
 
         _cards.Remove(cardEntity);
         cardEntity.QueueFree();
-        SetCardPositions();
     }
 
     private void DrawCard()
     {
-        var entity = CardHiddenScene.Make<Sprite2D>(this);
+        var entity = CardHiddenScene.Make<TextureRect>(this);
         _cards.Add(entity);
-        SetCardPositions();
-    }
-
-    private void SetCardPositions()
-    {
-        SpriteHelpers.OrderHorizontally(_cards.ToArray());
     }
 }

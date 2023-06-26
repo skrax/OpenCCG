@@ -9,7 +9,19 @@ namespace OpenCCG.Net;
 public class CardGameState
 {
     public readonly Guid Id = Guid.NewGuid();
-    public CardRecord Record { get; init; }
+
+    public CardGameState(CardRecord record, PlayerGameState playerGameState)
+    {
+        Record = record;
+        PlayerGameState = playerGameState;
+        Atk = Record.Atk;
+        Def = Record.Def;
+        Cost = Record.Cost;
+        MaxAttacksPerTurn = 1;
+    }
+
+    public CardRecord Record { get; }
+    public PlayerGameState PlayerGameState { get; }
 
     public CardZone Zone { get; set; }
 
@@ -32,6 +44,10 @@ public class CardGameState
         Cost = Record.Cost;
     }
 
+    public void Prepare()
+    {
+    }
+
     public CardGameStateDto AsDto()
     {
         var recordMod = new CardRecordMod(
@@ -51,6 +67,33 @@ public class CardGameState
         );
     }
 
+    public void DestroyCreature()
+    {
+        PlayerGameState.Board.Remove(this);
+        PlayerGameState.Pit.AddLast(this);
+        Zone = CardZone.Pit;
+
+        PlayerGameState.Nodes.Board.RemoveCard(PlayerGameState.PeerId, Id);
+        PlayerGameState.Nodes.EnemyBoard.RemoveCard(PlayerGameState.EnemyPeerId, Id);
+    }
+
+    public async Task UpdateCreatureAsync()
+    {
+        var dto = AsDto();
+        var t1 = PlayerGameState.Nodes.Board.UpdateCardAsync(PlayerGameState.PeerId, dto);
+        var t2 = PlayerGameState.Nodes.EnemyBoard.UpdateCardAsync(PlayerGameState.EnemyPeerId, dto);
+
+        await Task.WhenAll(t1, t2);
+    }
+
+    public async Task OnUpkeepAsync()
+    {
+        IsSummoningProtectionOn = false;
+        IsSummoningSicknessOn = false;
+        AttacksAvailable = MaxAttacksPerTurn;
+
+        await UpdateCreatureAsync();
+    }
 
     public async Task OnSpellAsync(PlayerGameState playerGameState) =>
         await ExecuteEffectAsync(Record.CardEffects.Spell, playerGameState);

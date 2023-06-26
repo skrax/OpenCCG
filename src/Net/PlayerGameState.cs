@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
@@ -59,11 +60,9 @@ public class PlayerGameState
         var shuffledDeckList = DeckList
                                .Select(x =>
                                {
-                                   var card = new CardGameState
+                                   var card = new CardGameState(x, this)
                                    {
-                                       Record = x,
                                        Zone = CardZone.Deck,
-                                       AttacksAvailable = 1,
                                        MaxAttacksPerTurn = 1
                                    };
 
@@ -75,6 +74,58 @@ public class PlayerGameState
 
         Deck = new LinkedList<CardGameState>(shuffledDeckList);
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
+    }
+
+    public void Start()
+    {
+        Draw(Rules.InitialCardsDrawn);
+        UpdateEnergyRpc();
+
+        Nodes.StatusPanel.SetHealth(PeerId, Health);
+        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
+    }
+
+    public async Task StartTurnAsync()
+    {
+        IsTurn = true;
+        Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
+        UpdateEnergyRpc();
+        Draw();
+
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnUpkeepAsync();
+        }
+
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
+
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnStartTurnAsync(this);
+        }
+    }
+
+    public async Task EndTurnAsync()
+    {
+        if (!IsTurn) return;
+
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, "End Step"));
+        
+        foreach (var cardGameState in Board)
+        {
+            cardGameState.AttacksAvailable = 0;
+            await cardGameState.UpdateCreatureAsync();
+        }
+
+        foreach (var cardGameState in Board)
+        {
+            await cardGameState.OnEndTurnAsync(this);
+        }
+
+        IsTurn = false;
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
+
+        await Enemy.StartTurnAsync();
     }
 
     public void Draw(int count = 1)
@@ -178,7 +229,7 @@ public class PlayerGameState
 
         --attacker.AttacksAvailable;
         attacker.IsSummoningProtectionOn = false;
-        UpdateSelfCreature(attacker);
+        await attacker.UpdateCreatureAsync();
         var atk = Math.Max(0, attacker.Atk);
         Enemy.Health -= atk;
 
@@ -193,40 +244,15 @@ public class PlayerGameState
         }
     }
 
-    public void ResolveDamage(CardGameState card, int damage, ControllingEntity controllingEntity)
+    public async Task ResolveDamageAsync(CardGameState card, int damage)
     {
         card.Def -= damage;
 
-        if (controllingEntity is ControllingEntity.Self)
+        await card.UpdateCreatureAsync();
+        if (card.Def <= 0)
         {
-            UpdateSelfCreature(card);
-            if (card.Def <= 0)
-            {
-                DestroySelfCreature(card);
-            }
+            card.DestroyCreature();
         }
-        else
-        {
-            UpdateEnemyCreature(card);
-            if (card.Def <= 0)
-            {
-                DestroyEnemyCreature(card);
-            }
-        }
-    }
-
-    private void UpdateEnemyCreature(CardGameState card)
-    {
-        var dto = card.AsDto();
-        Nodes.EnemyBoard.UpdateCard(PeerId, dto);
-        Nodes.Board.UpdateCard(EnemyPeerId, dto);
-    }
-
-    private void UpdateSelfCreature(CardGameState card)
-    {
-        var dto = card.AsDto();
-        Nodes.Board.UpdateCard(PeerId, dto);
-        Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
     }
 
     public async Task CombatAsync(Guid attackerId, Guid targetId)
@@ -252,9 +278,8 @@ public class PlayerGameState
 
         --attacker.AttacksAvailable;
         attacker.IsSummoningProtectionOn = false;
-        UpdateSelfCreature(attacker);
-        ResolveDamage(attacker, target.Atk, ControllingEntity.Self);
-        ResolveDamage(target, attacker.Atk, ControllingEntity.Enemy);
+        await attacker.UpdateCreatureAsync();
+        await Task.WhenAll(ResolveDamageAsync(attacker, target.Atk), ResolveDamageAsync(target, attacker.Atk));
 
         if (attacker.Record.Abilities.Drain)
         {
@@ -285,52 +310,6 @@ public class PlayerGameState
         }
     }
 
-    public void Start()
-    {
-        Draw(Rules.InitialCardsDrawn);
-        UpdateEnergyRpc();
-
-        Nodes.StatusPanel.SetHealth(PeerId, Health);
-        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
-    }
-
-    public async Task EndTurnAsync()
-    {
-        if (!IsTurn) return;
-
-        foreach (var cardGameState in Board)
-        {
-            await cardGameState.OnEndTurnAsync(this);
-        }
-
-        IsTurn = false;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
-
-        await Enemy.StartTurnAsync();
-    }
-
-    public async Task StartTurnAsync()
-    {
-        IsTurn = true;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
-
-        foreach (var cardGameState in Board)
-        {
-            cardGameState.IsSummoningProtectionOn = false;
-            cardGameState.IsSummoningSicknessOn = false;
-            cardGameState.AttacksAvailable = cardGameState.MaxAttacksPerTurn;
-
-            var dto = cardGameState.AsDto();
-            Nodes.Board.UpdateCard(PeerId, dto);
-            Nodes.EnemyBoard.UpdateCard(EnemyPeerId, dto);
-
-            await cardGameState.OnStartTurnAsync(this);
-        }
-
-        Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
-        UpdateEnergyRpc();
-        Draw();
-    }
 
     public void Disconnect()
     {
@@ -340,25 +319,5 @@ public class PlayerGameState
     private void NotifyDisconnected()
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "Opponent disconnected");
-    }
-
-    public void DestroyEnemyCreature(CardGameState cardGameState)
-    {
-        Enemy.Board.Remove(cardGameState);
-        Enemy.Pit.AddLast(cardGameState);
-        cardGameState.Zone = CardZone.Pit;
-
-        Nodes.EnemyBoard.RemoveCard(PeerId, cardGameState.Id);
-        Nodes.Board.RemoveCard(EnemyPeerId, cardGameState.Id);
-    }
-
-    public void DestroySelfCreature(CardGameState cardGameState)
-    {
-        Board.Remove(cardGameState);
-        Pit.AddLast(cardGameState);
-        cardGameState.Zone = CardZone.Pit;
-
-        Nodes.Board.RemoveCard(PeerId, cardGameState.Id);
-        Nodes.EnemyBoard.RemoveCard(EnemyPeerId, cardGameState.Id);
     }
 }

@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="2_wipga"]
 [ext_resource type="Script" path="res://src/CardBoard.cs" id="3_7q1kr"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_0j6jh"]
-[ext_resource type="PackedScene" uid="uid://crilm4jimvs04" path="res://scenes/card-preview.tscn" id="4_sw4rk"]
+[ext_resource type="PackedScene" uid="uid://dysns3hnic57" path="res://scenes/card-preview.tscn" id="4_sw4rk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4a4ib"]
 resource_local_to_scene = true
@@ -15,10 +15,10 @@ shader_parameter/mixColor = Color(0, 0, 0, 1)
 shader_parameter/outlineColor = Color(0, 1, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_5ex16"]
-font_size = 60
+font_size = 15
 
 [sub_resource type="LabelSettings" id="LabelSettings_6jk6c"]
-font_size = 60
+font_size = 15
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xfup"]
 bg_color = Color(1, 0.266667, 0.607843, 1)
@@ -34,7 +34,7 @@ step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath(".:offset")
+tracks/0/path = NodePath(".:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = false
 tracks/0/keys = {
@@ -50,33 +50,47 @@ _data = {
 "shake": SubResource("Animation_ow2en")
 }
 
-[node name="CardBoard" type="Sprite2D" node_paths=PackedStringArray("_atkPanel", "_defPanel", "_dmgPopup", "_anim")]
-material = SubResource("ShaderMaterial_4a4ib")
-position = Vector2(2.08165e-12, 2.08165e-12)
-scale = Vector2(0.25, 0.25)
-texture = ExtResource("2_wipga")
-offset = Vector2(2.08165e-12, 2.08165e-12)
+[node name="CardBoard" type="Control" node_paths=PackedStringArray("_textureRect", "_atkPanel", "_defPanel", "_dmgPopup", "_anim")]
+custom_minimum_size = Vector2(128, 192)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 128.0
+offset_bottom = 192.0
+size_flags_vertical = 4
+mouse_filter = 1
 script = ExtResource("3_7q1kr")
-_atkPanel = NodePath("AttackPanel")
-_defPanel = NodePath("DefPanel")
-_dmgPopup = NodePath("DamagePanel")
-_anim = NodePath("AnimationPlayer")
+_textureRect = NodePath("CardBoard")
+_atkPanel = NodePath("CardBoard/AttackPanel")
+_defPanel = NodePath("CardBoard/DefPanel")
+_dmgPopup = NodePath("CardBoard/DamagePanel")
+_anim = NodePath("CardBoard/AnimationPlayer")
 _cardPreviewScene = ExtResource("4_sw4rk")
 
-[node name="AttackPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
+[node name="CardBoard" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_4a4ib")
+custom_minimum_size = Vector2(128, 192)
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 192.0
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_wipga")
+expand_mode = 1
+
+[node name="AttackPanel" type="Panel" parent="CardBoard" node_paths=PackedStringArray("_statLabel")]
+layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = -256.0
-offset_top = -504.0
-offset_right = -166.0
-offset_bottom = -384.0
+offset_top = -30.0
+offset_right = 22.0
 grow_vertical = 0
 pivot_offset = Vector2(2.08165e-12, 2.08165e-12)
+mouse_filter = 2
 script = ExtResource("4_0j6jh")
 _statLabel = NodePath("Label")
 
-[node name="Label" type="Label" parent="AttackPanel"]
+[node name="Label" type="Label" parent="CardBoard/AttackPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -88,22 +102,22 @@ label_settings = SubResource("LabelSettings_5ex16")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DefPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
+[node name="DefPanel" type="Panel" parent="CardBoard" node_paths=PackedStringArray("_statLabel")]
+layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -346.0
-offset_top = -504.0
-offset_right = -256.0
-offset_bottom = -384.0
+offset_left = -22.0
+offset_top = -30.0
 grow_horizontal = 0
 grow_vertical = 0
+mouse_filter = 2
 script = ExtResource("4_0j6jh")
 _statLabel = NodePath("Label")
 
-[node name="Label" type="Label" parent="DefPanel"]
+[node name="Label" type="Label" parent="CardBoard/DefPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -115,29 +129,30 @@ label_settings = SubResource("LabelSettings_6jk6c")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DamagePanel" type="Panel" parent="."]
+[node name="DamagePanel" type="Panel" parent="CardBoard"]
 visible = false
-offset_left = -116.0
-offset_top = -60.0
-offset_right = 120.0
-offset_bottom = 60.0
+layout_mode = 0
+offset_left = 32.0
+offset_top = 77.0
+offset_right = 91.0
+offset_bottom = 107.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_8xfup")
 
-[node name="Label" type="Label" parent="DamagePanel"]
-layout_mode = 2
-offset_right = 236.0
-offset_bottom = 120.0
+[node name="Label" type="Label" parent="CardBoard/DamagePanel"]
+layout_mode = 1
+offset_right = 59.0
+offset_bottom = 30.0
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 72
+theme_override_font_sizes/font_size = 18
 text = "- 10"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CardBoard"]
 libraries = {
 "": SubResource("AnimationLibrary_3lums")
 }
