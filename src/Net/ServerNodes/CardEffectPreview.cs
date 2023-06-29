@@ -12,8 +12,10 @@ public partial class CardEffectPreview : Node, IMessageReceiver<MessageType>
     public Dictionary<string, IObserver>? Observers { get; } = new();
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public async void HandleMessageAsync(string messageJson) =>
+    public async void HandleMessageAsync(string messageJson)
+    {
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
 
     public Executor GetExecutor(MessageType messageType)
     {

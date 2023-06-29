@@ -8,17 +8,17 @@ namespace OpenCCG;
 
 public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 {
-    [Export] private TextureRect _textureRect;
-    [Export] private CardStatPanel _atkPanel, _defPanel;
-    [Export] private Panel _dmgPopup;
     [Export] private AnimationPlayer _anim;
+    [Export] private CardStatPanel _atkPanel, _defPanel;
+    [Export] private PackedScene _cardPreviewScene;
+    [Export] private Panel _dmgPopup;
     private bool _isDragging, _canStopDrag;
-    public CardGameStateDto CardGameState;
-    public bool IsEnemy { get; private set; }
+    private CardPreview? _preview;
 
     private bool _targetingDisabled;
-    [Export] private PackedScene _cardPreviewScene;
-    private CardPreview? _preview;
+    [Export] private TextureRect _textureRect;
+    public CardGameStateDto CardGameState;
+    public bool IsEnemy { get; private set; }
 
     public void Init(CardGameStateDto record)
     {
@@ -54,8 +54,8 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
     public async Task UpdateAsync(CardGameStateDto cardGameState)
     {
-        _targetingDisabled = true; 
-        
+        _targetingDisabled = true;
+
         _atkPanel.Value = cardGameState.Atk;
         var diff = cardGameState.Def - _defPanel.Value;
         _defPanel.Value = cardGameState.Def;
@@ -146,13 +146,9 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         var targetPosition = sprite2D.GlobalPosition;
         var off = sprite2D.GetRect().Size.Y * sprite2D.Scale.Y * 0.9f;
         if (sprite2D is Avatar { IsEnemy: true } or CardBoard { IsEnemy: true })
-        {
             targetPosition.Y += off;
-        }
         else
-        {
             targetPosition.Y -= off;
-        }
 
         var oldPosition = GlobalPosition;
         ZIndex = 1;

@@ -121,15 +121,10 @@ public class AoeDamageCardEffect : ICardEffect
             }
         }
 
-        foreach (var cardGameState in killedSelfCreatures)
-        {
-            await cardGameState.OnExitAsync(playerGameState);
-        }
+        foreach (var cardGameState in killedSelfCreatures) await cardGameState.OnExitAsync(playerGameState);
 
         foreach (var killedEnemyCreature in killedEnemyCreatures)
-        {
             await killedEnemyCreature.OnExitAsync(playerGameState.Enemy);
-        }
     }
 
     public static CardEffectRecord MakeRecord(int damage, RequireTargetSide side, RequireTargetType type)

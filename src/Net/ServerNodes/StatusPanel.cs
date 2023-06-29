@@ -22,7 +22,8 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
 
     public void SetEnergy(long peerId, int current, int max)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetEnergy, new SetEnergyDto(current, max));
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.SetEnergy,
+            new SetEnergyDto(current, max));
     }
 
     public void SetCardCount(long peerId, int value)

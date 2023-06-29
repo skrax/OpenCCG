@@ -13,11 +13,28 @@ namespace OpenCCG;
 public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageType>
 {
     [Export] private CardStatPanel _costPanel;
+    private RequireTargetInputDto? _currentInputDto;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
     [Export] private SkipSelectionField _skipSelectionField;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
-    private RequireTargetInputDto? _currentInputDto;
+
+    public Dictionary<string, IObserver>? Observers => null;
+
+    [Rpc]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
+            MessageType.TmpShowCard => Executor.Make<CardGameStateDto>(TmpShowTarget, Executor.ResponseMode.NoResponse)
+        };
+    }
 
     private void Show(CardGameStateDto cardGameStateDto)
     {
@@ -91,10 +108,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
         Reset();
 
-        if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, null)))
-        {
-            ForceDrag();
-        }
+        if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, null))) ForceDrag();
     }
 
     public void TryUpstreamTarget<T>(T target)
@@ -151,18 +165,4 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
         ForceDrag();
     }
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    [Rpc]
-    public async void HandleMessageAsync(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType) => messageType switch
-    {
-        MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
-        MessageType.TmpShowCard => Executor.Make<CardGameStateDto>(TmpShowTarget)
-    };
 }

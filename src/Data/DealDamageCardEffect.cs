@@ -75,10 +75,7 @@ public class DealDamageCardEffect : ICardEffect
         playerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, cardDto);
 
         // check if targeting was skipped
-        if (output.cardId == null && output.isEnemyAvatar == null)
-        {
-            return;
-        }
+        if (output.cardId == null && output.isEnemyAvatar == null) return;
 
         if (output.cardId == null)
         {

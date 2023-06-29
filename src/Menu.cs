@@ -8,12 +8,12 @@ public partial class Menu : Node
 {
     private static readonly PackedScene CardBrowserScene = GD.Load<PackedScene>("res://scenes/card-browser.tscn");
     private static readonly PackedScene MainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
-    [Export] private Button _playButton, _cardsButton, _loadDeckButton;
     [Export] private Label _deckNameLabel;
     [Export] private FileDialog _fileDialog;
-    [Export] private CheckButton _usePasswordCheckButton;
     [Export] private LineEdit _password;
+    [Export] private Button _playButton, _cardsButton, _loadDeckButton;
     private RuntimeData _runtimeData;
+    [Export] private CheckButton _usePasswordCheckButton;
 
     public override void _Ready()
     {

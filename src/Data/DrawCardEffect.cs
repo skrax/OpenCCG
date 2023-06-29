@@ -7,8 +7,6 @@ namespace OpenCCG.Data;
 public class DrawCardEffect : ICardEffect
 {
     public const string Id = "TEST-E-006";
-    
-    public int Count { get; }
 
     public DrawCardEffect(string initJson)
     {
@@ -17,8 +15,13 @@ public class DrawCardEffect : ICardEffect
         Count = init.Count;
     }
 
-    public string GetText() => $"Draw {Count} cards";
-    
+    public int Count { get; }
+
+    public string GetText()
+    {
+        return $"Draw {Count} cards";
+    }
+
     public Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
         playerGameState.Draw(Count);
@@ -27,8 +30,10 @@ public class DrawCardEffect : ICardEffect
         return Task.CompletedTask;
     }
 
-    private record Init(int Count);
+    public static CardEffectRecord MakeRecord(int count)
+    {
+        return new CardEffectRecord(Id, JsonSerializer.Serialize(new Init(count)));
+    }
 
-    public static CardEffectRecord MakeRecord(int count) => new(Id, JsonSerializer.Serialize(new Init(count)));
-    
+    private record Init(int Count);
 }

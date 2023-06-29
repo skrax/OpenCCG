@@ -18,8 +18,30 @@ public record QueuedPlayer(long peerId, List<CardRecord> deckList);
 public partial class Server : Node, IMessageReceiver<MessageType>
 {
     private readonly GameState _gameState = new();
-    private RpcNodes _rpcNodes;
     private readonly Dictionary<string, QueuedPlayer> _queuesByPassword = new();
+    private RpcNodes _rpcNodes;
+
+    public Dictionary<string, IObserver>? Observers { get; } = new();
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.PlayCard => Executor.Make<Guid, bool>(PlayCard),
+            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard,
+                Executor.ResponseMode.NoResponse),
+            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer, Executor.ResponseMode.NoResponse),
+            MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
+            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer, Executor.ResponseMode.NoResponse),
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+        };
+    }
 
     public override void _Ready()
     {
@@ -62,35 +84,46 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         Logger.Info<Server>($"Peer connected {id}");
     }
 
-    private void OnPeerDisconnected(long id)
+    private async void OnPeerDisconnected(long id)
     {
         Logger.Info<Server>($"Peer disconnected {id}");
-        if (_gameState.PlayerGameStates.TryGetValue(id, out var playerGameState))
+        if (_gameState.PlayerGameStateCommandQueues.TryGetValue(id, out var commandQueue))
         {
-            playerGameState.Disconnect();
-            _gameState.PlayerGameStates.Remove(id);
-            _gameState.PlayerGameStates.Remove(playerGameState.EnemyPeerId);
+            await commandQueue.EnqueueAsync(x => x.Disconnect);
+
+            if (_gameState.PlayerGameStateCommandQueues.TryGetValue(commandQueue.PlayerGameState.EnemyPeerId,
+                    out var enemyCommandQueue))
+            {
+                _gameState.PlayerGameStateCommandQueues.Remove(enemyCommandQueue.PlayerGameState.PeerId);
+                enemyCommandQueue.Stop();
+            }
+
+            _gameState.PlayerGameStateCommandQueues.Remove(id);
+            commandQueue.Stop();
         }
     }
 
     private async Task<bool> PlayCard(long senderPeerId, Guid cardId)
     {
-        return await _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
+        var tsc = await _gameState.PlayerGameStateCommandQueues[senderPeerId]
+                                  .EnqueueWithCompletionAsync<Guid, bool>(x => x.PlayCardAsync, cardId);
+        return await tsc.Task;
     }
 
     private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
     {
-        await _gameState.PlayerGameStates[senderPeerId].CombatAsync(t.AttackerId, t.TargetId);
+        await _gameState.PlayerGameStateCommandQueues[senderPeerId]
+                        .EnqueueAsync(x => x.CombatAsync, t);
     }
 
     private async Task CombatPlayer(long senderPeerId, Guid cardId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].CombatPlayerAsync(cardId);
+        await _gameState.PlayerGameStateCommandQueues[senderPeerId].EnqueueAsync(x => x.CombatPlayerAsync, cardId);
     }
 
     private async Task EndTurn(long senderPeerId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].EndTurnAsync();
+        await _gameState.PlayerGameStateCommandQueues[senderPeerId].EnqueueAsync(x => x.EndTurnAsync);
     }
 
     private async Task QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
@@ -135,12 +168,14 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             p1.Enemy = p2;
             p2.Enemy = p1;
 
-            _gameState.PlayerGameStates.Add(p1.PeerId, p1);
-            _gameState.PlayerGameStates.Add(p2.PeerId, p2);
+            var p1Q = new PlayerGameStateCommandQueue(p1);
+            var p2Q = new PlayerGameStateCommandQueue(p2);
+            _gameState.PlayerGameStateCommandQueues.Add(p1.PeerId, p1Q);
+            _gameState.PlayerGameStateCommandQueues.Add(p2.PeerId, p2Q);
 
-            p1.Start();
-            p2.Start();
-            await p1.StartTurnAsync();
+            p1Q.Start();
+            p2Q.Start();
+            await p1Q.EnqueueAsync(x => x.StartTurnAsync);
         }
         else
         {
@@ -148,26 +183,5 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             _rpcNodes.MidPanel.SetStatusMessage(senderPeerId, "Looking for opponent");
             _rpcNodes.MidPanel.EndTurnButtonSetActive(senderPeerId, new EndTurnButtonSetActiveDto(false, ""));
         }
-    }
-
-    public Dictionary<string, IObserver>? Observers { get; } = new();
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public async void HandleMessageAsync(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType)
-    {
-        return messageType switch
-        {
-            MessageType.PlayCard => Executor.Make<Guid, bool>(PlayCard),
-            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard),
-            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer),
-            MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
-            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer),
-            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
-        };
     }
 }

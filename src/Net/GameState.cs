@@ -4,5 +4,5 @@ namespace OpenCCG.Net;
 
 public class GameState
 {
-    public readonly Dictionary<long, PlayerGameState> PlayerGameStates = new();
+    public readonly Dictionary<long, PlayerGameStateCommandQueue> PlayerGameStateCommandQueues = new();
 }

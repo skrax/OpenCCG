@@ -9,7 +9,10 @@ public class FellTheMightyCardEffect : ICardEffect
 {
     public const string Id = "TEST-E-002";
 
-    public string GetText() => "Destroy the highest attack creature(s)";
+    public string GetText()
+    {
+        return "Destroy the highest attack creature(s)";
+    }
 
     public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
@@ -18,7 +21,7 @@ public class FellTheMightyCardEffect : ICardEffect
 
         if (!selfHasCreatures && !enemyHasCreatures)
         {
-           // pass 
+            // pass 
         }
 
         else if (!selfHasCreatures)
@@ -35,7 +38,7 @@ public class FellTheMightyCardEffect : ICardEffect
         {
             await DestroyHighestAllCreaturesAsync(playerGameState);
         }
-        
+
         playerGameState.Enemy.Nodes.EnemyCardEffectPreview.TmpShowCard(playerGameState.EnemyPeerId, card.AsDto());
     }
 
@@ -49,25 +52,13 @@ public class FellTheMightyCardEffect : ICardEffect
         var toDestroySelf = selfByAtk.TakeWhile(x => x.Atk == highest).ToArray();
         var toDestroyEnemy = enemyByAtk.TakeWhile(x => x.Atk == highest).ToArray();
 
-        foreach (var cardGameState in toDestroySelf)
-        {
-            cardGameState.DestroyCreature();
-        }
+        foreach (var cardGameState in toDestroySelf) cardGameState.DestroyCreature();
 
-        foreach (var cardGameState in toDestroyEnemy)
-        {
-            cardGameState.DestroyCreature();
-        }
-        
-        foreach (var cardGameState in toDestroySelf)
-        {
-            await cardGameState.OnExitAsync(playerGameState);
-        }
+        foreach (var cardGameState in toDestroyEnemy) cardGameState.DestroyCreature();
 
-        foreach (var cardGameState in toDestroyEnemy)
-        {
-            await cardGameState.OnExitAsync(playerGameState.Enemy);
-        }
+        foreach (var cardGameState in toDestroySelf) await cardGameState.OnExitAsync(playerGameState);
+
+        foreach (var cardGameState in toDestroyEnemy) await cardGameState.OnExitAsync(playerGameState.Enemy);
     }
 
 
@@ -77,15 +68,9 @@ public class FellTheMightyCardEffect : ICardEffect
         var selfHighest = selfByAtk.First().Atk;
 
         var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfHighest).ToArray();
-        foreach (var cardGameState in toDestroy)
-        {
-            cardGameState.DestroyCreature();
-        }
-        
-        foreach (var cardGameState in toDestroy)
-        {
-           await cardGameState.OnExitAsync(playerGameState); 
-        }
+        foreach (var cardGameState in toDestroy) cardGameState.DestroyCreature();
+
+        foreach (var cardGameState in toDestroy) await cardGameState.OnExitAsync(playerGameState);
     }
 
     private static async Task DestroyHighestEnemyCreaturesAsync(PlayerGameState playerGameState)
@@ -94,14 +79,8 @@ public class FellTheMightyCardEffect : ICardEffect
         var enemyHighest = enemyByAtk.First().Atk;
 
         var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyHighest).ToArray();
-        foreach (var cardGameState in toDestroy)
-        {
-            cardGameState.DestroyCreature();
-        }
-        
-        foreach (var cardGameState in toDestroy)
-        {
-           await cardGameState.OnExitAsync(playerGameState.Enemy); 
-        }
+        foreach (var cardGameState in toDestroy) cardGameState.DestroyCreature();
+
+        foreach (var cardGameState in toDestroy) await cardGameState.OnExitAsync(playerGameState.Enemy);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
+using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -38,7 +39,6 @@ public class PlayerGameState
 
     public bool IsTurn { get; set; }
 
-
     public void Init(List<CardRecord> deckList)
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "");
@@ -66,8 +66,9 @@ public class PlayerGameState
                                .Shuffle();
 
         Deck = new LinkedList<CardGameState>(shuffledDeckList);
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, null));
     }
+
 
     public void Start()
     {
@@ -85,38 +86,29 @@ public class PlayerGameState
         UpdateEnergyRpc();
         Draw();
 
-        foreach (var cardGameState in Board)
-        {
-            await cardGameState.OnUpkeepAsync();
-        }
+        foreach (var cardGameState in Board) await cardGameState.OnUpkeepAsync();
 
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(true, null));
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(true, null));
 
-        foreach (var cardGameState in Board)
-        {
-            await cardGameState.OnStartTurnAsync(this);
-        }
+        foreach (var cardGameState in Board) await cardGameState.OnStartTurnAsync(this);
     }
 
     public async Task EndTurnAsync()
     {
         if (!IsTurn) return;
 
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, "End Step"));
-        
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, "End Step"));
+
         foreach (var cardGameState in Board)
         {
             cardGameState.AttacksAvailable = 0;
             await cardGameState.UpdateCreatureAsync();
         }
 
-        foreach (var cardGameState in Board)
-        {
-            await cardGameState.OnEndTurnAsync(this);
-        }
+        foreach (var cardGameState in Board) await cardGameState.OnEndTurnAsync(this);
 
         IsTurn = false;
-        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
+        Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, null));
 
         await Enemy.StartTurnAsync();
     }
@@ -153,18 +145,12 @@ public class PlayerGameState
 
     public async Task<bool> PlayCardAsync(Guid id)
     {
-        if (!IsTurn)
-        {
-            return false;
-        }
+        if (!IsTurn) return false;
 
         var card = Hand.FirstOrDefault(x => x.Id == id);
 
         if (card == null) return false;
-        if (Energy - card.Cost < 0)
-        {
-            return false;
-        }
+        if (Energy - card.Cost < 0) return false;
 
         Energy -= card.Cost;
         UpdateEnergyRpc();
@@ -242,16 +228,16 @@ public class PlayerGameState
         card.Def -= damage;
 
         await card.UpdateCreatureAsync();
-        if (card.Def <= 0)
-        {
-            card.DestroyCreature();
-        }
+        if (card.Def <= 0) card.DestroyCreature();
     }
 
-    public async Task CombatAsync(Guid attackerId, Guid targetId)
+    public async Task CombatAsync(CombatPlayerCardDto combatPlayerCardDto)
     {
         // TODO feedback
         if (!IsTurn) return;
+
+        var attackerId = combatPlayerCardDto.AttackerId;
+        var targetId = combatPlayerCardDto.TargetId;
 
         var attacker = Board.First(x => x.Id == attackerId);
         var target = Enemy.Board.First(x => x.Id == targetId);
@@ -289,18 +275,11 @@ public class PlayerGameState
         }
 
         if (attacker.Zone == CardZone.Board)
-        {
             await attacker.OnEndCombatAsync(this);
-        }
         else
-        {
             await attacker.OnExitAsync(this);
-        }
 
-        if (target.Zone != CardZone.Board)
-        {
-            await target.OnExitAsync(Enemy);
-        }
+        if (target.Zone != CardZone.Board) await target.OnExitAsync(Enemy);
     }
 
 

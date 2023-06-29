@@ -8,8 +8,8 @@ namespace OpenCCG;
 public partial class MidPanel : Control, IMessageReceiver<MessageType>
 {
     [Export] private Button _endTurnButton, _exitButton;
-    [Export] private Label _statusLabel;
     [Export] private PackedScene _menuScene;
+    [Export] private Label _statusLabel;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -23,8 +23,9 @@ public partial class MidPanel : Control, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive),
-            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage)
+            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive,
+                Executor.ResponseMode.NoResponse),
+            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage, Executor.ResponseMode.NoResponse)
         };
     }
 
@@ -48,12 +49,8 @@ public partial class MidPanel : Control, IMessageReceiver<MessageType>
     {
         _endTurnButton.Disabled = !dto.isActive;
         if (dto.reason != null)
-        {
             _endTurnButton.Text = dto.reason;
-        }
         else
-        {
             _endTurnButton.Text = dto.isActive ? "End Turn" : "Enemy Turn";
-        }
     }
 }

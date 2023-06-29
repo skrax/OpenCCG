@@ -13,12 +13,12 @@ namespace OpenCCG;
 
 public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 {
-    [Export] public bool IsEnemy;
-    [Export] public BoardArea EnemyBoardArea;
-    [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
+    [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
+    [Export] public BoardArea EnemyBoardArea;
+    [Export] public bool IsEnemy;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -32,9 +32,9 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
+            MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard, Executor.ResponseMode.NoResponse),
             MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync, Executor.ResponseMode.Respond),
-            MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
+            MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard, Executor.ResponseMode.NoResponse),
             MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
                 Executor.ResponseMode.Respond),
             _ => throw new NotImplementedException()

@@ -18,14 +18,6 @@ public partial class CardBrowser : Control
 
     private readonly Dictionary<string, CardUIDeck> _deck = new();
     [Export] private HBoxContainer _bottomPanelContainer;
-    [Export] private FlowContainer _cardViewFlowContainer;
-
-    [Export] private ScrollContainer _cardViewScrollContainer, _deckScrollContainer;
-    [Export] private Button _clearTextButton;
-    [Export] private VBoxContainer _deckContainer;
-    [Export] private FileDialog _fileDialog;
-    [Export] private Button _menuButton, _createDeckButton, _saveDeckButton, _loadDeckButton;
-    [Export] private TextEdit _searchEdit, _deckNameEdit;
 
     [Export] private DeckCountProgressBar
         _cardCountBar0,
@@ -38,7 +30,16 @@ public partial class CardBrowser : Control
         _cardCountBar7,
         _cardCountBar8;
 
+    [Export] private FlowContainer _cardViewFlowContainer;
+
+    [Export] private ScrollContainer _cardViewScrollContainer, _deckScrollContainer;
+    [Export] private Button _clearTextButton;
+
     [Export] private CounterLabel _creatureCountLabel, _spellCountLabel, _totalCountLabel;
+    [Export] private VBoxContainer _deckContainer;
+    [Export] private FileDialog _fileDialog;
+    [Export] private Button _menuButton, _createDeckButton, _saveDeckButton, _loadDeckButton;
+    [Export] private TextEdit _searchEdit, _deckNameEdit;
 
     public override void _Ready()
     {
@@ -204,7 +205,7 @@ public partial class CardBrowser : Control
             default: throw new ArgumentOutOfRangeException();
         }
     }
-    
+
     private void DecreaseCounters(CardRecord cardRecord)
     {
         switch (cardRecord.Type)

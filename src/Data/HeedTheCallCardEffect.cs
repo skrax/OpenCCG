@@ -7,7 +7,10 @@ public class HeedTheCallCardEffect : ICardEffect
 {
     public const string Id = "TEST-E-007";
 
-    public string GetText() => "Summon 2 Mornehold Spectres";
+    public string GetText()
+    {
+        return "Summon 2 Mornehold Spectres";
+    }
 
     public async Task ExecuteAsync(CardGameState _, PlayerGameState playerGameState)
     {

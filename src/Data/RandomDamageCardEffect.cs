@@ -76,7 +76,6 @@ public class RandomDamageCardEffect : ICardEffect
         var enemyBoard = playerGameState.Enemy.Board.ToArray();
 
         for (var i = 0; i < Count; i++)
-        {
             switch (TargetType)
             {
                 case RequireTargetType.All:
@@ -91,7 +90,6 @@ public class RandomDamageCardEffect : ICardEffect
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
     }
 
     private async Task DealDamageToRandomAvatarOrCreatureAsync(PlayerGameState playerGameState,
@@ -101,13 +99,9 @@ public class RandomDamageCardEffect : ICardEffect
         var isTargetAvatar = board.Any() && enemyBoard.Any() && Random.Shared.Next(0, 1) == 0;
 
         if (isTargetAvatar)
-        {
             DealDamageToRandomAvatar(playerGameState);
-        }
         else
-        {
             await DealDamageToRandomCreatureAsync(playerGameState, board, enemyBoard);
-        }
     }
 
     private void DealDamageToRandomAvatar(PlayerGameState playerGameState)
@@ -116,13 +110,9 @@ public class RandomDamageCardEffect : ICardEffect
         {
             case RequireTargetSide.All:
                 if (Random.Shared.Next(0, 1) == 0)
-                {
                     DealDamageToEnemy(playerGameState);
-                }
                 else
-                {
                     DealDamageToSelf(playerGameState);
-                }
                 break;
             case RequireTargetSide.Friendly:
                 DealDamageToSelf(playerGameState);
@@ -181,13 +171,9 @@ public class RandomDamageCardEffect : ICardEffect
             : board.Any();
 
         if (isTargetSelf)
-        {
             await DealDamageToARandomCreatureAsync(playerGameState, board);
-        }
         else
-        {
             await DealDamageToARandomCreatureAsync(playerGameState, enemyBoard);
-        }
     }
 
     private async Task DealDamageToARandomCreatureAsync(PlayerGameState playerGameState, CardGameState[] board)
