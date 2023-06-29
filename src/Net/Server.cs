@@ -62,35 +62,46 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         Logger.Info<Server>($"Peer connected {id}");
     }
 
-    private void OnPeerDisconnected(long id)
+    private async void OnPeerDisconnected(long id)
     {
         Logger.Info<Server>($"Peer disconnected {id}");
-        if (_gameState.PlayerGameStates.TryGetValue(id, out var playerGameState))
+        if (_gameState.PlayerGameStateCommandQueues.TryGetValue(id, out var commandQueue))
         {
-            playerGameState.Disconnect();
-            _gameState.PlayerGameStates.Remove(id);
-            _gameState.PlayerGameStates.Remove(playerGameState.EnemyPeerId);
+            await commandQueue.EnqueueAsync(x => x.Disconnect);
+
+            if (_gameState.PlayerGameStateCommandQueues.TryGetValue(commandQueue.PlayerGameState.EnemyPeerId,
+                    out var enemyCommandQueue))
+            {
+                _gameState.PlayerGameStateCommandQueues.Remove(enemyCommandQueue.PlayerGameState.PeerId);
+                enemyCommandQueue.Stop();
+            }
+
+            _gameState.PlayerGameStateCommandQueues.Remove(id);
+            commandQueue.Stop();
         }
     }
 
     private async Task<bool> PlayCard(long senderPeerId, Guid cardId)
     {
-        return await _gameState.PlayerGameStates[senderPeerId].PlayCardAsync(cardId);
+        var tsc = await _gameState.PlayerGameStateCommandQueues[senderPeerId]
+                                  .EnqueueWithCompletionAsync<Guid, bool>(x => x.PlayCardAsync, cardId);
+        return await tsc.Task;
     }
 
     private async Task CombatPlayerCard(long senderPeerId, CombatPlayerCardDto t)
     {
-        await _gameState.PlayerGameStates[senderPeerId].CombatAsync(t.AttackerId, t.TargetId);
+        await _gameState.PlayerGameStateCommandQueues[senderPeerId]
+                        .EnqueueAsync(x => x.CombatAsync, t);
     }
 
     private async Task CombatPlayer(long senderPeerId, Guid cardId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].CombatPlayerAsync(cardId);
+        await _gameState.PlayerGameStateCommandQueues[senderPeerId].EnqueueAsync(x => x.CombatPlayerAsync, cardId);
     }
 
     private async Task EndTurn(long senderPeerId)
     {
-        await _gameState.PlayerGameStates[senderPeerId].EndTurnAsync();
+        await _gameState.PlayerGameStateCommandQueues[senderPeerId].EnqueueAsync(x => x.EndTurnAsync);
     }
 
     private async Task QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
@@ -135,12 +146,14 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             p1.Enemy = p2;
             p2.Enemy = p1;
 
-            _gameState.PlayerGameStates.Add(p1.PeerId, p1);
-            _gameState.PlayerGameStates.Add(p2.PeerId, p2);
+            var p1Q = new PlayerGameStateCommandQueue(p1);
+            var p2Q = new PlayerGameStateCommandQueue(p2);
+            _gameState.PlayerGameStateCommandQueues.Add(p1.PeerId, p1Q);
+            _gameState.PlayerGameStateCommandQueues.Add(p2.PeerId, p2Q);
 
-            p1.Start();
-            p2.Start();
-            await p1.StartTurnAsync();
+            p1Q.Start();
+            p2Q.Start();
+            await p1Q.EnqueueAsync(x => x.StartTurnAsync);
         }
         else
         {

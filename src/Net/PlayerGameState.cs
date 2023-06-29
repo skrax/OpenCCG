@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Core;
 using OpenCCG.Data;
+using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
@@ -38,7 +39,6 @@ public class PlayerGameState
 
     public bool IsTurn { get; set; }
 
-
     public void Init(List<CardRecord> deckList)
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "");
@@ -68,6 +68,7 @@ public class PlayerGameState
         Deck = new LinkedList<CardGameState>(shuffledDeckList);
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, null));
     }
+
 
     public void Start()
     {
@@ -103,7 +104,7 @@ public class PlayerGameState
         if (!IsTurn) return;
 
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new(false, "End Step"));
-        
+
         foreach (var cardGameState in Board)
         {
             cardGameState.AttacksAvailable = 0;
@@ -248,10 +249,13 @@ public class PlayerGameState
         }
     }
 
-    public async Task CombatAsync(Guid attackerId, Guid targetId)
+    public async Task CombatAsync(CombatPlayerCardDto combatPlayerCardDto)
     {
         // TODO feedback
         if (!IsTurn) return;
+
+        var attackerId = combatPlayerCardDto.AttackerId;
+        var targetId = combatPlayerCardDto.TargetId;
 
         var attacker = Board.First(x => x.Id == attackerId);
         var target = Enemy.Board.First(x => x.Id == targetId);
