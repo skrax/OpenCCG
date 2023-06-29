@@ -9,7 +9,10 @@ public class SquishTheWimpyCardEffect : ICardEffect
 {
     public const string Id = "TEST-E-003";
 
-    public string GetText() => "Destroy the lowest attack creature(s)";
+    public string GetText()
+    {
+        return "Destroy the lowest attack creature(s)";
+    }
 
     public async Task ExecuteAsync(CardGameState card, PlayerGameState playerGameState)
     {
@@ -48,27 +51,15 @@ public class SquishTheWimpyCardEffect : ICardEffect
 
         var selfToDestroy = selfByAtk.TakeWhile(x => x.Atk == lowest).ToArray();
 
-        foreach (var cardGameState in selfToDestroy)
-        {
-            cardGameState.DestroyCreature();
-        }
+        foreach (var cardGameState in selfToDestroy) cardGameState.DestroyCreature();
 
         var enemyToDestroy = enemyByAtk.TakeWhile(x => x.Atk == lowest).ToArray();
 
-        foreach (var cardGameState in enemyToDestroy)
-        {
-            cardGameState.DestroyCreature();
-        }
+        foreach (var cardGameState in enemyToDestroy) cardGameState.DestroyCreature();
 
-        foreach (var cardGameState in selfToDestroy)
-        {
-            await cardGameState.OnExitAsync(playerGameState);
-        }
+        foreach (var cardGameState in selfToDestroy) await cardGameState.OnExitAsync(playerGameState);
 
-        foreach (var cardGameState in enemyToDestroy)
-        {
-            await cardGameState.OnExitAsync(playerGameState.Enemy);
-        }
+        foreach (var cardGameState in enemyToDestroy) await cardGameState.OnExitAsync(playerGameState.Enemy);
     }
 
 
@@ -78,15 +69,9 @@ public class SquishTheWimpyCardEffect : ICardEffect
         var selfLowest = selfByAtk.First().Atk;
 
         var toDestroy = selfByAtk.TakeWhile(x => x.Atk == selfLowest).ToArray();
-        foreach (var cardGameState in toDestroy)
-        {
-            cardGameState.DestroyCreature();
-        }
+        foreach (var cardGameState in toDestroy) cardGameState.DestroyCreature();
 
-        foreach (var cardGameState in toDestroy)
-        {
-            await cardGameState.OnExitAsync(playerGameState);
-        }
+        foreach (var cardGameState in toDestroy) await cardGameState.OnExitAsync(playerGameState);
     }
 
     private static async Task DestroyLowestEnemyCreaturesAsync(PlayerGameState playerGameState)
@@ -95,14 +80,8 @@ public class SquishTheWimpyCardEffect : ICardEffect
         var enemyLowest = enemyByAtk.First().Atk;
 
         var toDestroy = enemyByAtk.TakeWhile(x => x.Atk == enemyLowest).ToArray();
-        foreach (var cardGameState in toDestroy)
-        {
-            cardGameState.DestroyCreature();
-        }
+        foreach (var cardGameState in toDestroy) cardGameState.DestroyCreature();
 
-        foreach (var cardGameState in toDestroy)
-        {
-           await cardGameState.OnExitAsync(playerGameState.Enemy); 
-        }
+        foreach (var cardGameState in toDestroy) await cardGameState.OnExitAsync(playerGameState.Enemy);
     }
 }

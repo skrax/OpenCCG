@@ -2,15 +2,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenCCG.Core;
-using OpenCCG.Net.Dto;
 
 namespace OpenCCG.Net;
 
 public class PlayerGameStateCommandQueue
 {
-    public readonly PlayerGameState PlayerGameState;
-    private readonly DefaultBackgroundTaskQueue _taskQueue = new(100);
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly DefaultBackgroundTaskQueue _taskQueue = new(100);
+    public readonly PlayerGameState PlayerGameState;
 
     public PlayerGameStateCommandQueue(PlayerGameState playerGameState)
     {
@@ -20,7 +19,6 @@ public class PlayerGameStateCommandQueue
     private async Task ProcessTaskQueueAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
                 var workItem = await _taskQueue.DequeueAsync(stoppingToken);
@@ -35,7 +33,6 @@ public class PlayerGameStateCommandQueue
             {
                 Logger.Error<PlayerGameState>(ex, "Error occurred executing task work item.");
             }
-        }
     }
 
     public void Start()

@@ -8,8 +8,8 @@ namespace OpenCCG;
 public partial class MidPanel : Control, IMessageReceiver<MessageType>
 {
     [Export] private Button _endTurnButton, _exitButton;
-    [Export] private Label _statusLabel;
     [Export] private PackedScene _menuScene;
+    [Export] private Label _statusLabel;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -49,12 +49,8 @@ public partial class MidPanel : Control, IMessageReceiver<MessageType>
     {
         _endTurnButton.Disabled = !dto.isActive;
         if (dto.reason != null)
-        {
             _endTurnButton.Text = dto.reason;
-        }
         else
-        {
             _endTurnButton.Text = dto.isActive ? "End Turn" : "Enemy Turn";
-        }
     }
 }

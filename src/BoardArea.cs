@@ -13,12 +13,12 @@ namespace OpenCCG;
 
 public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 {
-    [Export] public bool IsEnemy;
-    [Export] public BoardArea EnemyBoardArea;
-    [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     private readonly List<CardBoard> _cards = new();
+    [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
+    [Export] public BoardArea EnemyBoardArea;
+    [Export] public bool IsEnemy;
 
     public Dictionary<string, IObserver>? Observers => null;
 

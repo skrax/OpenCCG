@@ -9,21 +9,15 @@ namespace OpenCCG;
 
 public partial class Card : TextureRect, INodeInit<CardGameStateDto>
 {
-    [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
-    [Export] private CardInfoPanel _infoPanel, _namePanel;
-    [Export] private PackedScene _cardPreviewScene;
-
-    private CardGameStateDto _cardGameState;
-    private CardPreview? _preview;
     private static bool _canPreview = true;
 
-    public Guid Id { get; private set; }
+    private CardGameStateDto _cardGameState;
+    [Export] private PackedScene _cardPreviewScene;
+    [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
+    [Export] private CardInfoPanel _infoPanel, _namePanel;
+    private CardPreview? _preview;
 
-    public override void _Process(double delta)
-    {
-        Visible = true;
-        SetProcess(false);
-    }
+    public Guid Id { get; private set; }
 
     public void Init(CardGameStateDto card)
     {
@@ -46,6 +40,12 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
         Texture = GD.Load<Texture2D>(record.ImgPath);
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;
+    }
+
+    public override void _Process(double delta)
+    {
+        Visible = true;
+        SetProcess(false);
     }
 
     public override Variant _GetDragData(Vector2 atPosition)

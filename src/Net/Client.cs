@@ -7,8 +7,8 @@ namespace OpenCCG.Net;
 public partial class Client : Node
 {
     [Export] private Main _main;
-    [Export] private string _serverAddress;
     private ENetMultiplayerPeer _peer;
+    [Export] private string _serverAddress;
 
     public override void _Ready()
     {

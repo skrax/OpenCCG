@@ -18,8 +18,30 @@ public record QueuedPlayer(long peerId, List<CardRecord> deckList);
 public partial class Server : Node, IMessageReceiver<MessageType>
 {
     private readonly GameState _gameState = new();
-    private RpcNodes _rpcNodes;
     private readonly Dictionary<string, QueuedPlayer> _queuesByPassword = new();
+    private RpcNodes _rpcNodes;
+
+    public Dictionary<string, IObserver>? Observers { get; } = new();
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public async void HandleMessageAsync(string messageJson)
+    {
+        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+    }
+
+    public Executor GetExecutor(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.PlayCard => Executor.Make<Guid, bool>(PlayCard),
+            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard,
+                Executor.ResponseMode.NoResponse),
+            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer, Executor.ResponseMode.NoResponse),
+            MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
+            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer, Executor.ResponseMode.NoResponse),
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+        };
+    }
 
     public override void _Ready()
     {
@@ -161,27 +183,5 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             _rpcNodes.MidPanel.SetStatusMessage(senderPeerId, "Looking for opponent");
             _rpcNodes.MidPanel.EndTurnButtonSetActive(senderPeerId, new EndTurnButtonSetActiveDto(false, ""));
         }
-    }
-
-    public Dictionary<string, IObserver>? Observers { get; } = new();
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public async void HandleMessageAsync(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
-    }
-
-    public Executor GetExecutor(MessageType messageType)
-    {
-        return messageType switch
-        {
-            MessageType.PlayCard => Executor.Make<Guid, bool>(PlayCard),
-            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard,
-                Executor.ResponseMode.NoResponse),
-            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer, Executor.ResponseMode.NoResponse),
-            MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
-            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer, Executor.ResponseMode.NoResponse),
-            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
-        };
     }
 }

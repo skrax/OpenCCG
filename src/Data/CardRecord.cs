@@ -12,17 +12,25 @@ public enum CardRecordType
 
 public record CardEffectRecord(string Id, string? InitJson = null)
 {
-    public string GetText() => Database.CardEffects[Id](InitJson).GetText();
+    public string GetText()
+    {
+        return Database.CardEffects[Id](InitJson).GetText();
+    }
 }
 
 public class CardAbilities
 {
+    private static readonly PropertyInfo[] AllAbilities = typeof(CardAbilities)
+                                                          .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                                          .Where(x => x.PropertyType == typeof(bool))
+                                                          .ToArray();
+
     public bool Exposed { get; init; }
 
     public bool Haste { get; init; }
 
     public bool Drain { get; init; }
-    
+
     public bool Defender { get; init; }
 
     public string GetText()
@@ -33,11 +41,6 @@ public class CardAbilities
 
         return sb.ToString();
     }
-
-    private static readonly PropertyInfo[] AllAbilities = typeof(CardAbilities)
-                                                          .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                                          .Where(x => x.PropertyType == typeof(bool))
-                                                          .ToArray();
 }
 
 public class CardEffects

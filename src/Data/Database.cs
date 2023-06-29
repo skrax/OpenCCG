@@ -52,7 +52,7 @@ public static class Database
             new("TEST-007", "Fell the Mighty",
                 new CardEffects
                 {
-                    Spell = new(FellTheMightyCardEffect.Id),
+                    Spell = new CardEffectRecord(FellTheMightyCardEffect.Id)
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -61,7 +61,7 @@ public static class Database
             new("TEST-008", "Squish the Wimpy",
                 new CardEffects
                 {
-                    Spell = new(SquishTheWimpyCardEffect.Id),
+                    Spell = new CardEffectRecord(SquishTheWimpyCardEffect.Id)
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -79,7 +79,7 @@ public static class Database
 
             new("TEST-010", "Ymir, Winter Soldier",
                 new CardEffects(),
-                new CardAbilities()
+                new CardAbilities
                 {
                     Haste = true
                 },
@@ -90,7 +90,7 @@ public static class Database
             new("TEST-011", "Firebomb",
                 new CardEffects
                 {
-                    Spell = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All),
+                    Spell = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All)
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -108,7 +108,7 @@ public static class Database
 
             new("TEST-013", "Black Leech",
                 new CardEffects(),
-                new CardAbilities()
+                new CardAbilities
                 {
                     Drain = true
                 },
@@ -119,7 +119,7 @@ public static class Database
             new("TEST-014", "Imminent Catastrophe",
                 new CardEffects
                 {
-                    Spell = AoeDamageCardEffect.MakeRecord(7, RequireTargetSide.All, RequireTargetType.Creature),
+                    Spell = AoeDamageCardEffect.MakeRecord(7, RequireTargetSide.All, RequireTargetType.Creature)
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
@@ -152,7 +152,7 @@ public static class Database
             new("TEST-017", "Beren Morne",
                 new CardEffects
                 {
-                    EndTurn = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All),
+                    EndTurn = DealDamageCardEffect.MakeRecord(5, RequireTargetSide.Enemy, RequireTargetType.All)
                 },
                 new CardAbilities(),
                 CardRecordType.Creature,
@@ -174,12 +174,12 @@ public static class Database
             new("TEST-019", "Heed the Call",
                 new CardEffects
                 {
-                    Spell = new(HeedTheCallCardEffect.Id)
+                    Spell = new CardEffectRecord(HeedTheCallCardEffect.Id)
                 },
                 new CardAbilities(),
                 CardRecordType.Spell,
                 0, 0, 5, "res://img/cards/heed_the_call.png"
-            ),
+            )
         }.ToDictionary(x => x.Id);
 
     public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(
@@ -197,6 +197,6 @@ public static class Database
 
             new(DrawCardEffect.Id, s => new DrawCardEffect(s!)),
 
-            new(HeedTheCallCardEffect.Id, s => new HeedTheCallCardEffect()),
+            new(HeedTheCallCardEffect.Id, s => new HeedTheCallCardEffect())
         });
 }

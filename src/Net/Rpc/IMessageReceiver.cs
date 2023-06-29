@@ -87,8 +87,8 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
 
         return await tsc.Task;
     }
-    
-    
+
+
     /// <summary>
     ///     Send a message to a peer and adds a new entry to <see cref="Observers" /> which awaits a response.
     /// </summary>
