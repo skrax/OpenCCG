@@ -16,16 +16,16 @@ font_size = 32
 [sub_resource type="LabelSettings" id="LabelSettings_iyv0j"]
 font_size = 31
 
-[node name="StatusPanel" type="Panel" node_paths=PackedStringArray("_cardCountLabel", "_energyLabel", "_healthLabel", "_dmgPopup", "_avatar")]
+[node name="StatusPanel" type="Panel" node_paths=PackedStringArray("_avatar", "_cardCountLabel", "_dmgPopup", "_energyLabel", "_healthLabel")]
 offset_right = 1920.0
 offset_bottom = 124.0
 mouse_filter = 2
 script = ExtResource("3_13snm")
+_avatar = NodePath("Avatar")
 _cardCountLabel = NodePath("CardCount")
+_dmgPopup = NodePath("Avatar/DamagePanel")
 _energyLabel = NodePath("EnergyCount")
 _healthLabel = NodePath("HealthCount")
-_dmgPopup = NodePath("Avatar/DamagePanel")
-_avatar = NodePath("Avatar")
 
 [node name="Avatar" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(123.904, 123.904)

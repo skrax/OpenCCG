@@ -26,12 +26,12 @@ size_flags_vertical = 4
 texture = ExtResource("1_8stps")
 expand_mode = 1
 script = ExtResource("2_davtw")
+_cardPreviewScene = ExtResource("3_ab0j7")
 _costPanel = NodePath("CostPanel")
 _atkPanel = NodePath("AttackPanel")
 _defPanel = NodePath("DefPanel")
 _infoPanel = NodePath("InfoPanel")
 _namePanel = NodePath("NamePanel")
-_cardPreviewScene = ExtResource("3_ab0j7")
 
 [node name="NamePanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
 layout_mode = 1

@@ -16,23 +16,11 @@ bg_color = Color(0, 0, 0, 0.262745)
 [sub_resource type="LabelSettings" id="LabelSettings_q1lue"]
 font_size = 15
 
-[node name="card-browser" type="Control" node_paths=PackedStringArray("_bottomPanelContainer", "_cardViewFlowContainer", "_cardViewScrollContainer", "_deckScrollContainer", "_clearTextButton", "_deckContainer", "_fileDialog", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton", "_searchEdit", "_deckNameEdit", "_cardCountBar0", "_cardCountBar1", "_cardCountBar2", "_cardCountBar3", "_cardCountBar4", "_cardCountBar5", "_cardCountBar6", "_cardCountBar7", "_cardCountBar8", "_creatureCountLabel", "_spellCountLabel", "_totalCountLabel")]
+[node name="card-browser" type="Control" node_paths=PackedStringArray("_bottomPanelContainer", "_cardCountBar0", "_cardCountBar1", "_cardCountBar2", "_cardCountBar3", "_cardCountBar4", "_cardCountBar5", "_cardCountBar6", "_cardCountBar7", "_cardCountBar8", "_cardViewFlowContainer", "_cardViewScrollContainer", "_deckScrollContainer", "_clearTextButton", "_creatureCountLabel", "_spellCountLabel", "_totalCountLabel", "_deckContainer", "_fileDialog", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton", "_searchEdit", "_deckNameEdit")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_7casj")
 _bottomPanelContainer = NodePath("FilterBar")
-_cardViewFlowContainer = NodePath("CardBrowser/VFlowContainer")
-_cardViewScrollContainer = NodePath("CardBrowser")
-_deckScrollContainer = NodePath("DeckBrowser")
-_clearTextButton = NodePath("FilterBar/Button")
-_deckContainer = NodePath("DeckBrowser/VBoxContainer")
-_fileDialog = NodePath("FileDialog")
-_menuButton = NodePath("MenuButton")
-_createDeckButton = NodePath("CreateDeckButton")
-_saveDeckButton = NodePath("SaveDeckButton")
-_loadDeckButton = NodePath("LoadDeckButton")
-_searchEdit = NodePath("FilterBar/TextEdit")
-_deckNameEdit = NodePath("DeckName")
 _cardCountBar0 = NodePath("DeckDetails/ProgressBar")
 _cardCountBar1 = NodePath("DeckDetails/ProgressBar2")
 _cardCountBar2 = NodePath("DeckDetails/ProgressBar3")
@@ -42,9 +30,21 @@ _cardCountBar5 = NodePath("DeckDetails/ProgressBar6")
 _cardCountBar6 = NodePath("DeckDetails/ProgressBar7")
 _cardCountBar7 = NodePath("DeckDetails/ProgressBar8")
 _cardCountBar8 = NodePath("DeckDetails/ProgressBar9")
+_cardViewFlowContainer = NodePath("CardBrowser/VFlowContainer")
+_cardViewScrollContainer = NodePath("CardBrowser")
+_deckScrollContainer = NodePath("DeckBrowser")
+_clearTextButton = NodePath("FilterBar/Button")
 _creatureCountLabel = NodePath("DeckDetails/CreatureCount/Count")
 _spellCountLabel = NodePath("DeckDetails/SpellCount/Count")
 _totalCountLabel = NodePath("DeckDetails/TotalCount/Count")
+_deckContainer = NodePath("DeckBrowser/VBoxContainer")
+_fileDialog = NodePath("FileDialog")
+_menuButton = NodePath("MenuButton")
+_createDeckButton = NodePath("CreateDeckButton")
+_saveDeckButton = NodePath("SaveDeckButton")
+_loadDeckButton = NodePath("LoadDeckButton")
+_searchEdit = NodePath("FilterBar/TextEdit")
+_deckNameEdit = NodePath("DeckName")
 
 [node name="CardBrowser" type="ScrollContainer" parent="."]
 layout_mode = 0

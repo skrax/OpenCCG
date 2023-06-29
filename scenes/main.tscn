@@ -111,7 +111,7 @@ theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("3_8aogm")
 
-[node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("EnemyBoardArea", "_StatusPanel", "_EnemyStatusPanel")]
+[node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("_StatusPanel", "_EnemyStatusPanel", "EnemyBoardArea")]
 offset_top = 572.0
 offset_right = 1920.0
 offset_bottom = 827.0
@@ -119,11 +119,11 @@ mouse_filter = 2
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
-EnemyBoardArea = NodePath("../EnemyBoard")
 _StatusPanel = NodePath("../StatusPanel")
 _EnemyStatusPanel = NodePath("../EnemyStatusPanel")
+EnemyBoardArea = NodePath("../EnemyBoard")
 
-[node name="EnemyBoard" type="HBoxContainer" parent="." node_paths=PackedStringArray("EnemyBoardArea", "_StatusPanel", "_EnemyStatusPanel")]
+[node name="EnemyBoard" type="HBoxContainer" parent="." node_paths=PackedStringArray("_StatusPanel", "_EnemyStatusPanel", "EnemyBoardArea")]
 offset_top = 253.0
 offset_right = 1920.0
 offset_bottom = 508.0
@@ -131,10 +131,10 @@ mouse_filter = 2
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
-IsEnemy = true
-EnemyBoardArea = NodePath("../Board")
 _StatusPanel = NodePath("../EnemyStatusPanel")
 _EnemyStatusPanel = NodePath("../StatusPanel")
+EnemyBoardArea = NodePath("../Board")
+IsEnemy = true
 
 [node name="StatusPanel" parent="." instance=ExtResource("3_n6g3w")]
 offset_top = 828.0
@@ -164,8 +164,8 @@ offset_bottom = 570.0
 script = ExtResource("9_d8cg4")
 _endTurnButton = NodePath("EndTurnButton")
 _exitButton = NodePath("ExitButton")
-_statusLabel = NodePath("StatusLabel")
 _menuScene = ExtResource("13_xdsvr")
+_statusLabel = NodePath("StatusLabel")
 
 [node name="EndTurnButton" type="Button" parent="MidPanel"]
 layout_mode = 0

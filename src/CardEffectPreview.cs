@@ -59,7 +59,6 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         _currentInputDto = input;
 
         ForceDrag();
-        _skipSelectionField.Enable();
 
         return await _tsc.Task;
     }
@@ -81,10 +80,12 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         preview.GlobalPosition = GetGlobalMousePosition();
         preview.TreeExited += () =>
         {
+            _skipSelectionField.Disable();
             line.Reset();
             SetProcess(true);
         };
         line.Target(this, preview);
+        _skipSelectionField.Enable();
 
         ForceDrag(GetInstanceId(), preview);
     }
@@ -101,12 +102,13 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
             _tsc.Task.IsFaulted)
         {
-            Logger.Error<CardEffectPreview>($"No request id set to use {nameof(TryUpstreamTarget)}");
+            Logger.Error<CardEffectPreview>($"No request id set to use {nameof(SkipTarget)}");
             ForceDrag();
             return;
         }
 
         Reset();
+        _skipSelectionField.Disable();
 
         if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, null))) ForceDrag();
     }
@@ -120,6 +122,9 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
             ForceDrag();
             return;
         }
+
+
+        _skipSelectionField.Disable();
 
         if (target is CardBoard cardBoard && _currentInputDto!.Type != RequireTargetType.Avatar)
         {
