@@ -70,7 +70,6 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         DrawOutline(canAttack);
     }
 
-
     private void OnDragForCombatStart(ulong instanceId)
     {
         if (GetInstanceId() == instanceId) return;
