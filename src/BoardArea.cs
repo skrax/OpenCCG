@@ -32,9 +32,9 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard),
+            MessageType.PlaceCard => Executor.Make<CardGameStateDto>(PlaceCard, Executor.ResponseMode.NoResponse),
             MessageType.UpdateCard => Executor.Make<CardGameStateDto>(UpdateCardAsync, Executor.ResponseMode.Respond),
-            MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard),
+            MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard, Executor.ResponseMode.NoResponse),
             MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
                 Executor.ResponseMode.Respond),
             _ => throw new NotImplementedException()

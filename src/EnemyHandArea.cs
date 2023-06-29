@@ -24,8 +24,8 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
     {
         return messageType switch
         {
-            MessageType.RemoveCard => Executor.Make(RemoveCard),
-            MessageType.DrawCard => Executor.Make(DrawCard)
+            MessageType.RemoveCard => Executor.Make(RemoveCard,Executor.ResponseMode.NoResponse),
+            MessageType.DrawCard => Executor.Make(DrawCard,Executor.ResponseMode.NoResponse)
         };
     }
 

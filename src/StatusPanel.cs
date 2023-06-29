@@ -35,9 +35,9 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.SetEnergy => Executor.Make<SetEnergyDto>(SetEnergy),
-            MessageType.SetCardCount => Executor.Make<int>(SetCardCount),
-            MessageType.SetHealth => Executor.Make<int>(SetHealth)
+            MessageType.SetEnergy => Executor.Make<SetEnergyDto>(SetEnergy, Executor.ResponseMode.NoResponse),
+            MessageType.SetCardCount => Executor.Make<int>(SetCardCount, Executor.ResponseMode.NoResponse),
+            MessageType.SetHealth => Executor.Make<int>(SetHealth, Executor.ResponseMode.NoResponse)
         };
     }
 

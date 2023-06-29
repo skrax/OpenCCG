@@ -23,8 +23,9 @@ public partial class MidPanel : Control, IMessageReceiver<MessageType>
     {
         return messageType switch
         {
-            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive),
-            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage)
+            MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive,
+                Executor.ResponseMode.NoResponse),
+            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage, Executor.ResponseMode.NoResponse)
         };
     }
 

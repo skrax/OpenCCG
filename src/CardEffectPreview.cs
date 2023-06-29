@@ -163,6 +163,6 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
     public Executor GetExecutor(MessageType messageType) => messageType switch
     {
         MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
-        MessageType.TmpShowCard => Executor.Make<CardGameStateDto>(TmpShowTarget)
+        MessageType.TmpShowCard => Executor.Make<CardGameStateDto>(TmpShowTarget, Executor.ResponseMode.NoResponse)
     };
 }

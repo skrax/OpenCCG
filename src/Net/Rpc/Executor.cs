@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace OpenCCG.Net.Rpc;
 
-public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode Response, Func<long, string?, string?>? Op,
+public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode Response,
+    Func<long, string?, string?>? Op,
     Func<long, string?, Task<string?>>? AsyncOp)
 {
     public enum ExecutionMode
@@ -29,7 +30,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         return new Executor(ExecutionMode.Async, isFireAndForget, null, op);
     }
 
-    public static Executor Make(Action act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make(Action act, ResponseMode isFireAndForget)
     {
         return MakeOp((_, _) =>
         {
@@ -38,7 +39,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         }, isFireAndForget);
     }
 
-    public static Executor Make(Action<long> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make(Action<long> act, ResponseMode isFireAndForget)
     {
         return MakeOp((senderPeerId, _) =>
         {
@@ -47,7 +48,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         }, isFireAndForget);
     }
 
-    public static Executor Make<TIn>(Action<TIn> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make<TIn>(Action<TIn> act, ResponseMode isFireAndForget)
     {
         return MakeOp((_, input) =>
         {
@@ -57,7 +58,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
     }
 
 
-    public static Executor Make<TIn>(Action<long, TIn> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make<TIn>(Action<long, TIn> act, ResponseMode isFireAndForget)
     {
         return MakeOp((senderPeerId, input) =>
         {
@@ -102,7 +103,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         }, ResponseMode.Respond);
     }
 
-    public static Executor Make(Func<Task> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make(Func<Task> act, ResponseMode isFireAndForget)
     {
         return MakeAsyncOp(async (_, _) =>
         {
@@ -111,7 +112,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         }, isFireAndForget);
     }
 
-    public static Executor Make(Func<long, Task> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make(Func<long, Task> act, ResponseMode isFireAndForget)
     {
         return MakeAsyncOp(async (senderPeerId, _) =>
         {
@@ -120,7 +121,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         }, isFireAndForget);
     }
 
-    public static Executor Make<TIn>(Func<TIn, Task> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make<TIn>(Func<TIn, Task> act, ResponseMode isFireAndForget)
     {
         return MakeAsyncOp(async (_, input) =>
         {
@@ -129,7 +130,7 @@ public record Executor(Executor.ExecutionMode Execution, Executor.ResponseMode R
         }, isFireAndForget);
     }
 
-    public static Executor Make<TIn>(Func<long, TIn, Task> act, ResponseMode isFireAndForget = ResponseMode.NoResponse)
+    public static Executor Make<TIn>(Func<long, TIn, Task> act, ResponseMode isFireAndForget)
     {
         return MakeAsyncOp(async (senderPeerId, input) =>
         {

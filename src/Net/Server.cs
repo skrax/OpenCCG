@@ -163,10 +163,11 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.PlayCard => Executor.Make<Guid, bool>(PlayCard),
-            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard),
-            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer),
+            MessageType.CombatPlayerCard => Executor.Make<CombatPlayerCardDto>(CombatPlayerCard,
+                Executor.ResponseMode.NoResponse),
+            MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer, Executor.ResponseMode.NoResponse),
             MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
-            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer),
+            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer, Executor.ResponseMode.NoResponse),
             _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }
