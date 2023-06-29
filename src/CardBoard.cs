@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
@@ -39,6 +41,35 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;
+        EventSink.OnDragForCombatStart += OnDragForCombatStart;
+        EventSink.OnDragForCombatStop += OnDragForCombatStop;
+    }
+
+    public override void _ExitTree()
+    {
+        EventSink.OnDragForCombatStart -= OnDragForCombatStart;
+        EventSink.OnDragForCombatStop -= OnDragForCombatStop;
+    }
+
+    private void OnDragForCombatStart(ulong instanceId)
+    {
+        if (GetInstanceId() == instanceId) return;
+        if (!IsEnemy) return;
+        if (CardGameState.ISummoningProtectionOn) return;
+        if (!CardGameState.Record.Abilities.Defender &&
+            GetParent<BoardArea>()._cards.Any(x => x.CardGameState.Record.Abilities.Defender)) return;
+
+        var shader = _textureRect.Material as ShaderMaterial;
+        shader?.SetShaderParameter("drawOutline", true);
+    }
+
+    private void OnDragForCombatStop(ulong instanceId)
+    {
+        if (GetInstanceId() == instanceId) return;
+        if (!IsEnemy) return;
+
+        var shader = _textureRect.Material as ShaderMaterial;
+        shader?.SetShaderParameter("drawOutline", false);
     }
 
     public void Destroy(Action act)
@@ -99,10 +130,15 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
-        preview.TreeExiting += () => { line.Reset(); };
+        preview.TreeExiting += () =>
+        {
+            line.Reset();
+            EventSink.OnDragForCombatStop?.Invoke(GetInstanceId());
+        };
         line.Target(this, preview);
 
         SetDragPreview(preview);
+        EventSink.OnDragForCombatStart?.Invoke(GetInstanceId());
         return GetInstanceId();
     }
 

@@ -15,7 +15,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
-    private readonly List<CardBoard> _cards = new();
+    public readonly List<CardBoard> _cards = new();
     [Export] public StatusPanel _StatusPanel, _EnemyStatusPanel;
     [Export] public BoardArea EnemyBoardArea;
     [Export] public bool IsEnemy;
