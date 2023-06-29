@@ -67,8 +67,8 @@ public class DealDamageCardEffect : ICardEffect
     {
         var cardDto = card.AsDto();
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
-            new EndTurnButtonSetActiveDto(false, "Select a Target"));
-        var input = new RequireTargetInputDto(cardDto, RequireTargetType.All, RequireTargetSide.Enemy);
+            new EndTurnButtonSetActiveDto(false, "Select a target"));
+        var input = new RequireTargetInputDto(cardDto, TargetType, TargetSide);
         var output = await playerGameState.Nodes.CardEffectPreview.RequireTargetsAsync(playerGameState.PeerId, input);
         playerGameState.Nodes.MidPanel.EndTurnButtonSetActive(playerGameState.PeerId,
             new EndTurnButtonSetActiveDto(playerGameState.IsTurn, null));
@@ -123,12 +123,14 @@ public class DealDamageCardEffect : ICardEffect
                     if (targetCard.Zone == CardZone.Pit)
                         await targetCard.OnExitAsync(playerGameState);
                 }
+                else
+                {
+                    targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
+                    await playerGameState.ResolveDamageAsync(targetCard, Damage);
 
-                targetCard = playerGameState.Enemy.Board.Single(x => x.Id == output.cardId);
-                await playerGameState.ResolveDamageAsync(targetCard, Damage);
-
-                if (targetCard.Zone == CardZone.Pit)
-                    await targetCard.OnExitAsync(playerGameState.Enemy);
+                    if (targetCard.Zone == CardZone.Pit)
+                        await targetCard.OnExitAsync(playerGameState.Enemy);
+                }
             }
         }
     }

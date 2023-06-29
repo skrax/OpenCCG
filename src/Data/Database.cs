@@ -179,7 +179,17 @@ public static class Database
                 new CardAbilities(),
                 CardRecordType.Spell,
                 0, 0, 5, "res://img/cards/heed_the_call.png"
-            )
+            ),
+
+            new("TEST-020", "Bounty Hunter",
+                new CardEffects()
+                {
+                    Enter = ExposeCreatureCardEffect.MakeRecord(RequireTargetSide.All)
+                },
+                new CardAbilities(),
+                CardRecordType.Creature,
+                4, 3, 3, "res://img/cards/bounty_hunter.png"
+            ),
         }.ToDictionary(x => x.Id);
 
     public static readonly Dictionary<string, Func<string?, ICardEffect>> CardEffects = new(
@@ -197,6 +207,8 @@ public static class Database
 
             new(DrawCardEffect.Id, s => new DrawCardEffect(s!)),
 
-            new(HeedTheCallCardEffect.Id, s => new HeedTheCallCardEffect())
+            new(HeedTheCallCardEffect.Id, s => new HeedTheCallCardEffect()),
+
+            new(ExposeCreatureCardEffect.Id, s => new ExposeCreatureCardEffect(s!)),
         });
 }

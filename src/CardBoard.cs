@@ -47,12 +47,20 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         EventSink.OnDragSelectTargetStop += OnDragSelectTargetStop;
     }
 
+    public override void _ExitTree()
+    {
+        EventSink.OnDragForCombatStart -= OnDragForCombatStart;
+        EventSink.OnDragForCombatStop -= OnDragForCombatStop;
+        EventSink.OnDragSelectTargetStart -= OnDragSelectTargetStart;
+        EventSink.OnDragSelectTargetStop -= OnDragSelectTargetStop;
+    }
+
     private void OnDragSelectTargetStart(RequireTargetInputDto dto)
     {
         if (dto.Type == RequireTargetType.Avatar) return;
         if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
         if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
-        
+
         DrawOutline(true);
     }
 
@@ -62,13 +70,6 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         DrawOutline(canAttack);
     }
 
-    public override void _ExitTree()
-    {
-        EventSink.OnDragForCombatStart -= OnDragForCombatStart;
-        EventSink.OnDragForCombatStop -= OnDragForCombatStop;
-        EventSink.OnDragSelectTargetStart -= OnDragSelectTargetStart;
-        EventSink.OnDragSelectTargetStop -= OnDragSelectTargetStop;
-    }
 
     private void OnDragForCombatStart(ulong instanceId)
     {

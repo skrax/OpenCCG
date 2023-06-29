@@ -17,12 +17,20 @@ public partial class Avatar : TextureRect
         EventSink.OnDragSelectTargetStop += OnDragSelectTargetStop;
     }
 
+    public override void _ExitTree()
+    {
+        EventSink.OnDragForCombatStart -= OnDragForCombatStart;
+        EventSink.OnDragForCombatStop -= OnDragForCombatStop;
+        EventSink.OnDragSelectTargetStart -= OnDragSelectTargetStart;
+        EventSink.OnDragSelectTargetStop -= OnDragSelectTargetStop;
+    }
+
     private void OnDragSelectTargetStart(RequireTargetInputDto dto)
     {
         if (dto.Type is RequireTargetType.Creature) return;
         if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
         if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
-       
+
         DrawOutline(true);
     }
 
