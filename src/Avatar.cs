@@ -1,6 +1,7 @@
 using System.Linq;
 using Godot;
 using OpenCCG.Core;
+using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
@@ -12,6 +13,22 @@ public partial class Avatar : TextureRect
     {
         EventSink.OnDragForCombatStart += OnDragForCombatStart;
         EventSink.OnDragForCombatStop += OnDragForCombatStop;
+        EventSink.OnDragSelectTargetStart += OnDragSelectTargetStart;
+        EventSink.OnDragSelectTargetStop += OnDragSelectTargetStop;
+    }
+
+    private void OnDragSelectTargetStart(RequireTargetInputDto dto)
+    {
+        if (dto.Type is RequireTargetType.Creature) return;
+        if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
+        if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
+       
+        DrawOutline(true);
+    }
+
+    private void OnDragSelectTargetStop()
+    {
+        DrawOutline(false);
     }
 
     private void OnDragForCombatStart(ulong instanceId)
@@ -20,16 +37,13 @@ public partial class Avatar : TextureRect
         var board = GetNode<BoardArea>("/root/Main/EnemyBoard");
         if (board._cards.Any(x => x.CardGameState.Record.Abilities.Defender)) return;
 
-        var shader = Material as ShaderMaterial;
-        shader?.SetShaderParameter("drawOutline", true);
+        DrawOutline(true);
     }
+
 
     private void OnDragForCombatStop(ulong instanceId)
     {
-        if (!IsEnemy) return;
-
-        var shader = Material as ShaderMaterial;
-        shader?.SetShaderParameter("drawOutline", false);
+        DrawOutline(false);
     }
 
     public override bool _CanDropData(Vector2 atPosition, Variant data)
@@ -63,5 +77,11 @@ public partial class Avatar : TextureRect
                 break;
             }
         }
+    }
+
+    private void DrawOutline(bool enabled)
+    {
+        var shader = Material as ShaderMaterial;
+        shader?.SetShaderParameter("drawOutline", enabled);
     }
 }

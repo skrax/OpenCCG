@@ -75,17 +75,21 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
     private void ForceDrag()
     {
+        if (_currentInputDto == null) return;
+
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
         preview.GlobalPosition = GetGlobalMousePosition();
         preview.TreeExited += () =>
         {
+            EventSink.OnDragSelectTargetStop?.Invoke();
             _skipSelectionField.Disable();
             line.Reset();
             SetProcess(true);
         };
         line.Target(this, preview);
         _skipSelectionField.Enable();
+        EventSink.OnDragSelectTargetStart?.Invoke(_currentInputDto!);
 
         ForceDrag(GetInstanceId(), preview);
     }

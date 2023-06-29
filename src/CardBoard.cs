@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
@@ -43,12 +43,31 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         MouseExited += DisablePreview;
         EventSink.OnDragForCombatStart += OnDragForCombatStart;
         EventSink.OnDragForCombatStop += OnDragForCombatStop;
+        EventSink.OnDragSelectTargetStart += OnDragSelectTargetStart;
+        EventSink.OnDragSelectTargetStop += OnDragSelectTargetStop;
+    }
+
+    private void OnDragSelectTargetStart(RequireTargetInputDto dto)
+    {
+        if (dto.Type == RequireTargetType.Avatar) return;
+        if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
+        if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
+        
+        DrawOutline(true);
+    }
+
+    private void OnDragSelectTargetStop()
+    {
+        var canAttack = !IsEnemy && CardGameState is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+        DrawOutline(canAttack);
     }
 
     public override void _ExitTree()
     {
         EventSink.OnDragForCombatStart -= OnDragForCombatStart;
         EventSink.OnDragForCombatStop -= OnDragForCombatStop;
+        EventSink.OnDragSelectTargetStart -= OnDragSelectTargetStart;
+        EventSink.OnDragSelectTargetStop -= OnDragSelectTargetStop;
     }
 
     private void OnDragForCombatStart(ulong instanceId)
@@ -59,8 +78,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         if (!CardGameState.Record.Abilities.Defender &&
             GetParent<BoardArea>()._cards.Any(x => x.CardGameState.Record.Abilities.Defender)) return;
 
-        var shader = _textureRect.Material as ShaderMaterial;
-        shader?.SetShaderParameter("drawOutline", true);
+        DrawOutline(true);
     }
 
     private void OnDragForCombatStop(ulong instanceId)
@@ -68,8 +86,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         if (GetInstanceId() == instanceId) return;
         if (!IsEnemy) return;
 
-        var shader = _textureRect.Material as ShaderMaterial;
-        shader?.SetShaderParameter("drawOutline", false);
+        DrawOutline(false);
     }
 
     public void Destroy(Action act)
@@ -215,5 +232,11 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     {
         if (IsQueuedForDeletion() || _preview == null) return;
         _preview.Visible = false;
+    }
+
+    private void DrawOutline(bool enabled)
+    {
+        var shader = _textureRect.Material as ShaderMaterial;
+        shader?.SetShaderParameter("drawOutline", enabled);
     }
 }
