@@ -50,7 +50,7 @@ _data = {
 "shake": SubResource("Animation_ow2en")
 }
 
-[node name="CardBoard" type="Control" node_paths=PackedStringArray("_textureRect", "_atkPanel", "_defPanel", "_dmgPopup", "_anim")]
+[node name="CardBoard" type="Control" node_paths=PackedStringArray("_anim", "_atkPanel", "_defPanel", "_dmgPopup", "_textureRect")]
 custom_minimum_size = Vector2(128, 192)
 layout_mode = 3
 anchors_preset = 0
@@ -59,12 +59,12 @@ offset_bottom = 192.0
 size_flags_vertical = 4
 mouse_filter = 1
 script = ExtResource("3_7q1kr")
-_textureRect = NodePath("CardBoard")
+_anim = NodePath("CardBoard/AnimationPlayer")
 _atkPanel = NodePath("CardBoard/AttackPanel")
 _defPanel = NodePath("CardBoard/DefPanel")
-_dmgPopup = NodePath("CardBoard/DamagePanel")
-_anim = NodePath("CardBoard/AnimationPlayer")
 _cardPreviewScene = ExtResource("4_sw4rk")
+_dmgPopup = NodePath("CardBoard/DamagePanel")
+_textureRect = NodePath("CardBoard")
 
 [node name="CardBoard" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_4a4ib")

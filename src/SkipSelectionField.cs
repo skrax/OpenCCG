@@ -22,7 +22,7 @@ public partial class SkipSelectionField : Button
         Visible = true;
     }
 
-    private void Disable()
+    public void Disable()
     {
         Visible = false;
     }
