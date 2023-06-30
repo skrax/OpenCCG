@@ -10,13 +10,13 @@ public partial class CardPreview : TextureRect, INodeInit<CardGameStateDto>
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
 
-    public void Init(CardGameStateDto card)
+    public void Init(CardGameStateDto outline)
     {
-        var record = card.Record;
+        var record = outline.Record;
         _infoPanel.Value = record.Description;
-        _costPanel.Value = card.Cost;
-        _atkPanel.Value = card.Atk;
-        _defPanel.Value = card.Def;
+        _costPanel.Value = outline.Cost;
+        _atkPanel.Value = outline.Atk;
+        _defPanel.Value = outline.Def;
         _namePanel.Value = record.Name;
         if (record.Type is not CardRecordType.Creature)
         {

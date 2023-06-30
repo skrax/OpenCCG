@@ -228,7 +228,10 @@ public class PlayerGameState
         card.Def -= damage;
 
         await card.UpdateCreatureAsync();
-        if (card.Def <= 0) card.DestroyCreature();
+        if (card.Def <= 0)
+        {
+            card.DestroyCreature();
+        }
     }
 
     public async Task CombatAsync(CombatPlayerCardDto combatPlayerCardDto)

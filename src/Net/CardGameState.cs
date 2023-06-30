@@ -43,10 +43,6 @@ public class CardGameState
         Cost = Record.Cost;
     }
 
-    public void Prepare()
-    {
-    }
-
     public CardGameStateDto AsDto()
     {
         var recordMod = new CardRecordMod(

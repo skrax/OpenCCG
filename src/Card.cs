@@ -19,16 +19,16 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
 
     public Guid Id { get; private set; }
 
-    public void Init(CardGameStateDto card)
+    public void Init(CardGameStateDto outline)
     {
         SetProcess(false);
-        _cardGameState = card;
-        var record = card.Record;
-        Id = card.Id;
+        _cardGameState = outline;
+        var record = outline.Record;
+        Id = outline.Id;
         _infoPanel.Value = record.Description;
-        _costPanel.Value = card.Cost;
-        _atkPanel.Value = card.Atk;
-        _defPanel.Value = card.Def;
+        _costPanel.Value = outline.Cost;
+        _atkPanel.Value = outline.Atk;
+        _defPanel.Value = outline.Def;
         _namePanel.Value = record.Name;
         if (record.Type is not CardRecordType.Creature)
         {
@@ -36,7 +36,7 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
             _defPanel.Visible = false;
         }
 
-        Logger.Info<Card>($"Init Card: {card.Atk}/{card.Def}/{card.Cost}");
+        Logger.Info<Card>($"Init Card: {outline.Atk}/{outline.Def}/{outline.Cost}");
         Texture = GD.Load<Texture2D>(record.ImgPath);
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;

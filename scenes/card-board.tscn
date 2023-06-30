@@ -181,7 +181,7 @@ libraries = {
 
 [node name="Ward" type="Sprite2D" parent="."]
 visible = false
-modulate = Color(0, 1, 1, 0.604743)
+modulate = Color(0, 1, 1, 0.668899)
 position = Vector2(67, 67)
 rotation = -1.13446
 scale = Vector2(0.367759, 0.367759)

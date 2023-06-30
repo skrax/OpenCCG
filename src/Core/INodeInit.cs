@@ -2,5 +2,5 @@ namespace OpenCCG.Core;
 
 public interface INodeInit<in TParam>
 {
-    void Init(TParam record);
+    void Init(TParam outline);
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
@@ -21,9 +22,9 @@ public partial class Hand : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public void DrawCard(long peerId, CardGameStateDto cardGameStateJson)
+    public void DrawCard(long peerId, CardImplementationDto dto)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.DrawCard, cardGameStateJson);
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.DrawCard, dto);
     }
 
     public void RemoveCard(long peerId, Guid id)

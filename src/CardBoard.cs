@@ -22,20 +22,20 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     public CardGameStateDto CardGameState;
     public bool IsEnemy { get; private set; }
 
-    public void Init(CardGameStateDto record)
+    public void Init(CardGameStateDto outline)
     {
         IsEnemy = GetParent<BoardArea>().IsEnemy;
-        CardGameState = record;
+        CardGameState = outline;
         _atkPanel.Value = CardGameState.Atk;
-        _defPanel.Value = record.Def;
+        _defPanel.Value = outline.Def;
 
         _textureRect.Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
 
         var shader = _textureRect.Material as ShaderMaterial;
-        shader?.SetShaderParameter("doMix", record.ISummoningProtectionOn);
+        shader?.SetShaderParameter("doMix", outline.ISummoningProtectionOn);
         if (!IsEnemy)
         {
-            var canAttack = record is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+            var canAttack = outline is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
 
