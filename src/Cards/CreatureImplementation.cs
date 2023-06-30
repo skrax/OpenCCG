@@ -6,34 +6,29 @@ namespace OpenCCG.Cards;
 public abstract class CreatureImplementation : CardImplementation
 {
     protected CreatureImplementation(
-        ICreatureOutline outline,
+        CreatureOutline outline,
         CreatureAbilities abilities,
-        PlayerGameState2 playerGameState
+        PlayerGameState playerGameState
     ) :
-        base(outline, playerGameState)
+        base(outline, playerGameState,
+            new CreatureState
+            {
+                Atk = outline.Atk,
+                Def = outline.Def,
+                AttacksAvailable = 0,
+                MaxAttacksPerTurn = 1,
+                IsExposed = abilities.Exposed
+            }
+        )
     {
-        Outline = outline;
         Abilities = abilities;
-        Atk = outline.Atk;
-        Def = outline.Def;
-        AttacksAvailable = 0;
-        MaxAttacksPerTurn = 1;
-        IsExposed = Abilities.Exposed;
     }
 
-    public new ICreatureOutline Outline { get; }
+    public CreatureOutline CreatureOutline => (CreatureOutline)Outline;
+
+    public CreatureState CreatureState => (CreatureState)State;
 
     public CreatureAbilities Abilities { get; }
-
-    public int Atk { get; set; }
-
-    public int Def { get; set; }
-
-    public int AttacksAvailable { get; set; }
-
-    public int MaxAttacksPerTurn { get; set; }
-
-    public bool IsExposed { get; set; }
 
     public virtual Task OnEnterAsync() => Task.CompletedTask;
     public virtual Task OnExitAsync() => Task.CompletedTask;
@@ -44,16 +39,16 @@ public abstract class CreatureImplementation : CardImplementation
 
     public async Task OnUpkeepAsync()
     {
-        IsExposed = true;
-        AttacksAvailable = MaxAttacksPerTurn;
+        CreatureState.IsExposed = true;
+        CreatureState.AttacksAvailable = CreatureState.MaxAttacksPerTurn;
 
         await UpdateAsync();
     }
 
     public async Task OnEnterBoardAsync()
     {
-        IsExposed = Abilities.Exposed || Abilities.Defender;
-        AttacksAvailable = Abilities.Haste ? MaxAttacksPerTurn : 0;
+        CreatureState.IsExposed = Abilities.Exposed || Abilities.Defender;
+        CreatureState.AttacksAvailable = Abilities.Haste ? CreatureState.MaxAttacksPerTurn : 0;
 
         var dto = AsDto();
 
@@ -67,11 +62,11 @@ public abstract class CreatureImplementation : CardImplementation
 
     public async Task OnEndStepAsync()
     {
-        AttacksAvailable = 0;
+        CreatureState.AttacksAvailable = 0;
         await UpdateAsync();
     }
 
-    private async Task UpdateAsync()
+    public async Task UpdateAsync()
     {
         var dto = AsDto();
         var t1 = PlayerGameState.Nodes.Board.UpdateCardAsync(PlayerGameState.PeerId, dto);
@@ -79,4 +74,21 @@ public abstract class CreatureImplementation : CardImplementation
 
         await Task.WhenAll(t1, t2);
     }
+
+    public async Task DestroyAsync()
+    {
+        MoveToZone(CardZone.Pit);
+        await Task.WhenAll(PlayerGameState.Nodes.Board.RemoveCard(PlayerGameState.PeerId, Id),
+            PlayerGameState.Nodes.EnemyBoard.RemoveCard(PlayerGameState.EnemyPeerId, Id));
+    }
+
+    public async Task TakeDamageAsync(int amount)
+    {
+        if (amount <= 0) return;
+        CreatureState.Def -= amount;
+
+        await UpdateAsync();
+    }
+
+    public override CardImplementationDto AsDto() => CardImplementationDto.AsCreature(Id, CreatureOutline, CreatureState, Abilities);
 }

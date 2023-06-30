@@ -49,9 +49,9 @@ public partial class Board : Node, IMessageReceiver<MessageType>
             new PlayCombatDto(from, null, true));
     }
 
-    public void RemoveCard(long peerId, Guid cardId)
+    public async Task RemoveCard(long peerId, Guid cardId)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard,
+        await IMessageReceiver<MessageType>.GetAsync(this, peerId, MessageType.RemoveCard,
             new RemoveCardDto(cardId));
     }
 }

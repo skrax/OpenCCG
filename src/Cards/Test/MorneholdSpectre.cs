@@ -7,7 +7,7 @@ namespace OpenCCG.Cards.Test;
 
 public class MorneholdSpectre : CreatureImplementation
 {
-    public MorneholdSpectre(ICreatureOutline outline, PlayerGameState2 playerGameState) :
+    public MorneholdSpectre(CreatureOutline outline, PlayerGameState playerGameState) :
         base(outline, new(), playerGameState)
     {
     }
@@ -19,8 +19,13 @@ public class MorneholdSpectre : CreatureImplementation
         var board = PlayerGameState.Enemy.Board;
 
         var idx = Random.Shared.Next(0, board.Count - 1);
-        var target = board.ElementAt(idx);
+        var target = board.ElementAt(idx) as CreatureImplementation;
 
-        // await PlayerGameState.ResolveDamageAsync(target, 3);
+        await target!.TakeDamageAsync(3);
+        if (target.CreatureState.Def < 1)
+        {
+            await target.OnExitAsync();
+            await target.DestroyAsync();
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace OpenCCG.Cards.Test;
 
 public class VanillaCreature : CreatureImplementation
 {
-    public VanillaCreature(ICreatureOutline outline, CreatureAbilities abilities, PlayerGameState2 playerGameState
+    public VanillaCreature(CreatureOutline outline, CreatureAbilities abilities, PlayerGameState playerGameState
     ) : base(
         outline, abilities, playerGameState)
     {

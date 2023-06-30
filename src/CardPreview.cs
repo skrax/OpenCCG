@@ -1,30 +1,31 @@
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
-using OpenCCG.Data;
-using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
-public partial class CardPreview : TextureRect, INodeInit<CardGameStateDto>
+public partial class CardPreview : TextureRect, INodeInit<CardImplementationDto>
 {
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
 
-    public void Init(CardGameStateDto outline)
+    public void Init(CardImplementationDto dto)
     {
-        var record = outline.Record;
-        _infoPanel.Value = record.Description;
-        _costPanel.Value = outline.Cost;
-        _atkPanel.Value = outline.Atk;
-        _defPanel.Value = outline.Def;
-        _namePanel.Value = record.Name;
-        if (record.Type is not CardRecordType.Creature)
+        _infoPanel.Value = dto.Outline.Description;
+        _costPanel.Value = dto.Outline.Cost;
+        _namePanel.Value = dto.Outline.Name;
+        Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
+
+        if (dto.IsCreature)
+        {
+            _atkPanel.Value = dto.CreatureOutline!.Atk;
+            _defPanel.Value = dto.CreatureOutline.Def;
+        }
+        else if (dto.IsSpell)
         {
             _atkPanel.Visible = false;
             _defPanel.Visible = false;
         }
-
-        Texture = GD.Load<Texture2D>(record.ImgPath);
     }
 
     public void DrawOutline(bool enabled)

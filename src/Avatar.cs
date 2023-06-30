@@ -43,7 +43,7 @@ public partial class Avatar : TextureRect
     {
         if (!IsEnemy) return;
         var board = GetNode<BoardArea>("/root/Main/EnemyBoard");
-        if (board._cards.Any(x => x.CardGameState.Record.Abilities.Defender)) return;
+        if (board._cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
 
         DrawOutline(true);
     }
@@ -74,9 +74,9 @@ public partial class Avatar : TextureRect
         {
             case CardBoard attacker:
             {
-                Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked avatar");
+                Logger.Info<CardBoard>($"{attacker!.CardImplementationDto.Id} attacked avatar");
 
-                GetNode<Main>("/root/Main").CombatPlayer(attacker.CardGameState.Id);
+                GetNode<Main>("/root/Main").CombatPlayer(attacker.CardImplementationDto.Id);
                 break;
             }
             case CardEffectPreview effect:

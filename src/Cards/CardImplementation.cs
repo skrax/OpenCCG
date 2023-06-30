@@ -6,23 +6,22 @@ namespace OpenCCG.Cards;
 
 public abstract class CardImplementation
 {
-    protected CardImplementation(ICardOutline outline, PlayerGameState2 playerGameState)
+    protected CardImplementation(ICardOutline outline, PlayerGameState playerGameState, ICardState state)
     {
         Outline = outline;
         PlayerGameState = playerGameState;
-        Cost = outline.Cost;
-        Zone = CardZone.None;
+        State = state;
+        State.Cost = outline.Cost;
+        State.Zone = CardZone.None;
     }
 
     public Guid Id { get; } = Guid.NewGuid();
 
     public ICardOutline Outline { get; }
+    
+    public ICardState State { get; set; }
 
-    public int Cost { get; set; }
-
-    public CardZone Zone { get; set; }
-
-    protected PlayerGameState2 PlayerGameState { get; }
+    protected PlayerGameState PlayerGameState { get; }
 
     public virtual Task OnPlayAsync() => Task.CompletedTask;
     public virtual Task OnPlayAsync(CardImplementation cardImplementation) => Task.CompletedTask;
@@ -37,9 +36,9 @@ public abstract class CardImplementation
 
     public void MoveToZone(CardZone zone)
     {
-        if (zone == Zone) return;
+        if (zone == State.Zone) return;
 
-        switch (Zone)
+        switch (State.Zone)
         {
             case CardZone.None:
                 break;
@@ -47,7 +46,8 @@ public abstract class CardImplementation
                 PlayerGameState.Deck.Remove(this);
                 break;
             case CardZone.Hand:
-                return;
+                PlayerGameState.Hand.Remove(this);
+                break;
             case CardZone.Board:
                 PlayerGameState.Board.Remove(this);
                 break;
@@ -58,7 +58,7 @@ public abstract class CardImplementation
                 throw new ArgumentOutOfRangeException();
         }
 
-        Zone = zone;
+        State.Zone = zone;
 
         switch (zone)
         {
@@ -81,10 +81,5 @@ public abstract class CardImplementation
         }
     }
 
-    public CardImplementationDto AsDto()
-    {
-        return new CardImplementationDto();
-    }
+    public abstract CardImplementationDto AsDto();
 }
-
-public record CardImplementationDto();

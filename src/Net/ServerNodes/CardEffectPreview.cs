@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
@@ -31,8 +32,8 @@ public partial class CardEffectPreview : Node, IMessageReceiver<MessageType>
         );
     }
 
-    public void TmpShowCard(long peerId, CardGameStateDto cardGameStateDto)
+    public void TmpShowCard(long peerId, CardImplementationDto dto)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.TmpShowCard, cardGameStateDto);
+        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.TmpShowCard, dto);
     }
 }

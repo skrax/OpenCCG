@@ -1,17 +1,16 @@
 using System;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
-using OpenCCG.Data;
-using OpenCCG.Net.Dto;
 
 namespace OpenCCG;
 
-public partial class Card : TextureRect, INodeInit<CardGameStateDto>
+public partial class Card : TextureRect, INodeInit<CardImplementationDto>
 {
     private static bool _canPreview = true;
 
-    private CardGameStateDto _cardGameState;
+    private CardImplementationDto _cardGameState;
     [Export] private PackedScene _cardPreviewScene;
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
@@ -19,25 +18,27 @@ public partial class Card : TextureRect, INodeInit<CardGameStateDto>
 
     public Guid Id { get; private set; }
 
-    public void Init(CardGameStateDto outline)
+    public void Init(CardImplementationDto dto)
     {
         SetProcess(false);
-        _cardGameState = outline;
-        var record = outline.Record;
-        Id = outline.Id;
-        _infoPanel.Value = record.Description;
-        _costPanel.Value = outline.Cost;
-        _atkPanel.Value = outline.Atk;
-        _defPanel.Value = outline.Def;
-        _namePanel.Value = record.Name;
-        if (record.Type is not CardRecordType.Creature)
+        _cardGameState = dto;
+        Id = dto.Id;
+        _infoPanel.Value = dto.Outline.Description;
+        _namePanel.Value = dto.Outline.Name;
+        Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
+        _costPanel.Value = dto.State.Cost;
+        
+        if (dto.IsCreature)
+        {
+            _atkPanel.Value = dto.CreatureState!.Atk;
+            _defPanel.Value = dto.CreatureState!.Def;
+        }
+        else if (dto.IsSpell)
         {
             _atkPanel.Visible = false;
             _defPanel.Visible = false;
         }
 
-        Logger.Info<Card>($"Init Card: {outline.Atk}/{outline.Def}/{outline.Cost}");
-        Texture = GD.Load<Texture2D>(record.ImgPath);
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;
     }

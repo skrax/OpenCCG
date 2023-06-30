@@ -6,7 +6,7 @@ namespace OpenCCG.Cards.Test;
 
 public class TestSetImplementations
 {
-    private static readonly Dictionary<string, Func<PlayerGameState2, CardImplementation>> Mappings = new();
+    private static readonly Dictionary<string, Func<PlayerGameState, CardImplementation>> Mappings = new();
 
     public static void Init()
     {
@@ -26,22 +26,22 @@ public class TestSetImplementations
         RegisterCreature("TEST-C-008", (outline, state) => new MorneholdSpectre(outline, state));
     }
 
-    public static CardImplementation GetImplementation(string key, PlayerGameState2 playerGameState)
+    public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)
         => Mappings[key](playerGameState);
 
-    private static void Register(string key, Func<PlayerGameState2, CardImplementation> mapping)
+    private static void Register(string key, Func<PlayerGameState, CardImplementation> mapping)
     {
         Mappings.Add(key, mapping);
     }
 
     private static void RegisterCreature(string key,
-        Func<ICreatureOutline, PlayerGameState2, CardImplementation> mapping)
+        Func<CreatureOutline, PlayerGameState, CardImplementation> mapping)
     {
-        Mappings.Add(key, x => mapping((TestSetOutlines.Cards[key] as ICreatureOutline)!, x));
+        Mappings.Add(key, x => mapping((TestSetOutlines.Cards[key] as CreatureOutline)!, x));
     }
 
-    private static void RegisterSpell(string key, Func<ISpellOutline, PlayerGameState2, CardImplementation> mapping)
+    private static void RegisterSpell(string key, Func<SpellOutline, PlayerGameState, CardImplementation> mapping)
     {
-        Mappings.Add(key, x => mapping((TestSetOutlines.Cards[key] as ISpellOutline)!, x));
+        Mappings.Add(key, x => mapping((TestSetOutlines.Cards[key] as SpellOutline)!, x));
     }
 }

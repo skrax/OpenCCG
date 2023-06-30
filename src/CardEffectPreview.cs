@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
 using OpenCCG.Net;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 
@@ -32,17 +32,18 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         return messageType switch
         {
             MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
-            MessageType.TmpShowCard => Executor.Make<CardGameStateDto>(TmpShowTarget, Executor.ResponseMode.NoResponse)
+            MessageType.TmpShowCard => Executor.Make<CardImplementationDto>(TmpShowTarget,
+                Executor.ResponseMode.NoResponse)
         };
     }
 
-    private void Show(CardGameStateDto cardGameStateDto)
+    private void Show(CardImplementationDto dto)
     {
         Visible = true;
-        Texture = GD.Load<Texture2D>(cardGameStateDto.Record.ImgPath);
-        _costPanel.Value = cardGameStateDto.Cost;
-        _descriptionPanel.Value = cardGameStateDto.Record.Description;
-        _namePanel.Value = cardGameStateDto.Record.Name;
+        Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
+        _descriptionPanel.Value = dto.Outline.Description;
+        _namePanel.Value = dto.Outline.Name;
+        _costPanel.Value = dto.State.Cost;
     }
 
     private void Reset()
@@ -94,9 +95,9 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         ForceDrag(GetInstanceId(), preview);
     }
 
-    private async Task TmpShowTarget(CardGameStateDto cardGameStateDto)
+    private async Task TmpShowTarget(CardImplementationDto dto)
     {
-        Show(cardGameStateDto);
+        Show(dto);
         await Task.Delay(TimeSpan.FromSeconds(3));
         Reset();
     }
@@ -141,7 +142,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
             }
 
             Reset();
-            if (!_tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id, null)))
+            if (!_tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardImplementationDto.Id, null)))
             {
                 ForceDrag();
                 return;

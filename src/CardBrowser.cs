@@ -295,6 +295,4 @@ public partial class CardBrowser : Control
             }
         }
     }
-
-    private record SavedDeck(string format, CardUIDeck.JsonRecord[] list);
 }

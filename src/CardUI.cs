@@ -13,11 +13,11 @@ public partial class CardUI : TextureRect, INodeInit<ICardOutline>
 
     public ICardOutline Outline { get; private set; }
 
-    public void Init(ICardOutline outline)
+    public void Init(ICardOutline dto)
     {
-        _infoPanel.Value = outline.Description;
-        _costPanel.Value = outline.Cost;
-        switch (outline)
+        _infoPanel.Value = dto.Description;
+        _costPanel.Value = dto.Cost;
+        switch (dto)
         {
             case ICreatureOutline creatureOutline:
                 _atkPanel.Value = creatureOutline.Atk;
@@ -28,12 +28,12 @@ public partial class CardUI : TextureRect, INodeInit<ICardOutline>
                 _defPanel.Visible = false;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(outline));
+                throw new ArgumentOutOfRangeException(nameof(dto));
         }
 
-        _namePanel.Value = outline.Name;
+        _namePanel.Value = dto.Name;
 
-        Texture = GD.Load<Texture2D>(outline.ImgPath);
-        Outline = outline;
+        Texture = GD.Load<Texture2D>(dto.ImgPath);
+        Outline = dto;
     }
 }

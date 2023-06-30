@@ -2,13 +2,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG;
 
-public partial class CardBoard : Control, INodeInit<CardGameStateDto>
+public partial class CardBoard : Control, INodeInit<CardImplementationDto>
 {
     [Export] private AnimationPlayer _anim;
     [Export] private CardStatPanel _atkPanel, _defPanel;
@@ -17,25 +18,24 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     private bool _isDragging, _canStopDrag;
     private CardPreview? _preview;
 
-    private bool _targetingDisabled;
     [Export] private TextureRect _textureRect;
-    public CardGameStateDto CardGameState;
+    public CardImplementationDto CardImplementationDto;
     public bool IsEnemy { get; private set; }
 
-    public void Init(CardGameStateDto outline)
+    public void Init(CardImplementationDto dto)
     {
         IsEnemy = GetParent<BoardArea>().IsEnemy;
-        CardGameState = outline;
-        _atkPanel.Value = CardGameState.Atk;
-        _defPanel.Value = outline.Def;
+        CardImplementationDto = dto;
+        _atkPanel.Value = CardImplementationDto.CreatureState!.Atk;
+        _defPanel.Value = dto.CreatureState!.Def;
 
-        _textureRect.Texture = GD.Load<Texture2D>(CardGameState.Record.ImgPath);
+        _textureRect.Texture = GD.Load<Texture2D>(CardImplementationDto.Outline.ImgPath);
 
         var shader = _textureRect.Material as ShaderMaterial;
-        shader?.SetShaderParameter("doMix", outline.ISummoningProtectionOn);
+        shader?.SetShaderParameter("doMix", !dto.CreatureState!.IsExposed);
         if (!IsEnemy)
         {
-            var canAttack = outline is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+            var canAttack = dto.CreatureState is { AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
 
@@ -66,7 +66,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
     private void OnDragSelectTargetStop()
     {
-        var canAttack = !IsEnemy && CardGameState is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+        var canAttack = !IsEnemy && CardImplementationDto.CreatureState is { AttacksAvailable: > 0 };
         DrawOutline(canAttack);
     }
 
@@ -74,9 +74,9 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     {
         if (GetInstanceId() == instanceId) return;
         if (!IsEnemy) return;
-        if (CardGameState.ISummoningProtectionOn) return;
-        if (!CardGameState.Record.Abilities.Defender &&
-            GetParent<BoardArea>()._cards.Any(x => x.CardGameState.Record.Abilities.Defender)) return;
+        if (!CardImplementationDto.CreatureState!.IsExposed) return;
+        if (!CardImplementationDto.CreatureAbilities!.Defender &&
+            GetParent<BoardArea>()._cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
 
         DrawOutline(true);
     }
@@ -100,21 +100,19 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         _anim.Play("shake");
     }
 
-    public async Task UpdateAsync(CardGameStateDto cardGameState)
+    public async Task UpdateAsync(CardImplementationDto dto)
     {
-        _targetingDisabled = true;
+        CardImplementationDto = dto;
+        _atkPanel.Value = dto.CreatureState!.Atk;
+        var diff = dto.CreatureState!.Def - _defPanel.Value;
+        _defPanel.Value = dto.CreatureState!.Def;
 
-        _atkPanel.Value = cardGameState.Atk;
-        var diff = cardGameState.Def - _defPanel.Value;
-        _defPanel.Value = cardGameState.Def;
-
-        CardGameState = cardGameState;
 
         var shader = _textureRect.Material as ShaderMaterial;
-        shader?.SetShaderParameter("doMix", cardGameState.ISummoningProtectionOn);
+        shader?.SetShaderParameter("doMix", !dto.CreatureState!.IsExposed);
         if (!IsEnemy)
         {
-            var canAttack = cardGameState is { IsSummoningSicknessOn: false, AttacksAvailable: > 0 };
+            var canAttack = dto.CreatureState is { AttacksAvailable: > 0 };
             shader?.SetShaderParameter("drawOutline", canAttack);
         }
 
@@ -125,8 +123,6 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
             await Task.Delay(TimeSpan.FromSeconds(1.5));
             _dmgPopup.Visible = false;
         }
-
-        _targetingDisabled = false;
     }
 
     public void ForceDrag()
@@ -141,8 +137,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
     public override Variant _GetDragData(Vector2 atPosition)
     {
-        if (CardGameState.AttacksAvailable <= 0) return default;
-        if (CardGameState.IsSummoningSicknessOn) return default;
+        if (CardImplementationDto.CreatureState!.AttacksAvailable <= 0) return default;
         if (IsEnemy) return default;
 
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
@@ -167,7 +162,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
 
         return obj switch
         {
-            CardBoard => IsEnemy && !CardGameState.ISummoningProtectionOn,
+            CardBoard => IsEnemy && CardImplementationDto.CreatureState!.IsExposed,
             CardEffectPreview => true,
             _ => false
         };
@@ -181,8 +176,9 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
         {
             case CardBoard attacker:
             {
-                Logger.Info<CardBoard>($"{attacker!.CardGameState.Id} attacked {CardGameState.Id}");
-                GetNode<Main>("/root/Main").CombatPlayerCard(attacker.CardGameState.Id, CardGameState.Id);
+                Logger.Info<CardBoard>($"{attacker!.CardImplementationDto.Id} attacked {CardImplementationDto.Id}");
+                GetNode<Main>("/root/Main")
+                    .CombatPlayerCard(attacker.CardImplementationDto.Id, CardImplementationDto.Id);
                 break;
             }
             case CardEffectPreview effect:
@@ -220,7 +216,7 @@ public partial class CardBoard : Control, INodeInit<CardGameStateDto>
     private void ShowPreview()
     {
         _preview ??= _cardPreviewScene.Make<CardPreview>(GetParent().GetParent());
-        _preview.Init(CardGameState);
+        _preview.Init(CardImplementationDto);
         var pos = GlobalPosition;
         pos.X += Size.X + 40;
         pos.Y -= _preview.Size.Y / 2 - Size.Y / 2;
