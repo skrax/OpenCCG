@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://d0fb3ln1oyfld"]
+[gd_scene load_steps=16 format=3 uid="uid://d0fb3ln1oyfld"]
 
 [ext_resource type="Shader" path="res://shaders/card-board.gdshader" id="1_0ggqa"]
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="2_wipga"]
 [ext_resource type="Script" path="res://src/CardBoard.cs" id="3_7q1kr"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_0j6jh"]
 [ext_resource type="PackedScene" uid="uid://dysns3hnic57" path="res://scenes/card-preview.tscn" id="4_sw4rk"]
+[ext_resource type="Texture2D" uid="uid://owakc5850v80" path="res://addons/kenney_particle_pack/twirl_03.png" id="6_3i6dl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4a4ib"]
 resource_local_to_scene = true
@@ -48,6 +49,27 @@ tracks/0/keys = {
 _data = {
 "RESET": SubResource("Animation_1edrg"),
 "shake": SubResource("Animation_ow2en")
+}
+
+[sub_resource type="Animation" id="Animation_yfc25"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 1, 1, 1), Color(0, 1, 1, 0.568627)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rdolo"]
+_data = {
+"idle": SubResource("Animation_yfc25")
 }
 
 [node name="CardBoard" type="Control" node_paths=PackedStringArray("_anim", "_atkPanel", "_defPanel", "_dmgPopup", "_textureRect")]
@@ -155,4 +177,19 @@ vertical_alignment = 1
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CardBoard"]
 libraries = {
 "": SubResource("AnimationLibrary_3lums")
+}
+
+[node name="Ward" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 1, 1, 0.604743)
+position = Vector2(67, 67)
+rotation = -1.13446
+scale = Vector2(0.367759, 0.367759)
+texture = ExtResource("6_3i6dl")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Ward"]
+autoplay = "idle"
+speed_scale = 0.2
+libraries = {
+"": SubResource("AnimationLibrary_rdolo")
 }
