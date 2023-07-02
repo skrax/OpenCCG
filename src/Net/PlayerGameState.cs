@@ -130,13 +130,14 @@ public class PlayerGameState
         {
             await creatureImplementation.OnPlayAsync();
             creatureImplementation.MoveToZone(CardZone.Board);
-            await creatureImplementation.OnEnterBoardAsync();
+            await creatureImplementation.EnterBoardAsync();
             UpdateCardCount();
             await creatureImplementation.OnEnterAsync();
         }
         else if (card is SpellImplementation spellImplementation)
         {
             await spellImplementation.OnPlayAsync();
+            spellImplementation.RemoveFromHand();
             spellImplementation.MoveToZone(CardZone.Pit);
             UpdateCardCount();
         }

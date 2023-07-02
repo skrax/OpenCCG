@@ -81,5 +81,11 @@ public abstract class CardImplementation
         }
     }
 
+    public void RemoveFromHand()
+    {
+        PlayerGameState.Nodes.Hand.RemoveCard(PlayerGameState.PeerId, Id);
+        PlayerGameState.Enemy.Nodes.EnemyHand.RemoveCard(PlayerGameState.EnemyPeerId);
+    }
+
     public abstract CardImplementationDto AsDto();
 }

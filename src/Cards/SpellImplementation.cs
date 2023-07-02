@@ -4,7 +4,7 @@ namespace OpenCCG.Cards;
 
 public abstract class SpellImplementation : CardImplementation
 {
-    protected SpellImplementation(PlayerGameState playerGameState, SpellOutline outline) :
+    protected SpellImplementation(SpellOutline outline, PlayerGameState playerGameState) :
         base(outline, playerGameState,
             new SpellState
             {
@@ -13,6 +13,7 @@ public abstract class SpellImplementation : CardImplementation
             })
     {
     }
+    
 
     public override CardImplementationDto AsDto() => CardImplementationDto.AsSpell(Id, SpellOutline, SpellState);
 

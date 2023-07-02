@@ -24,6 +24,7 @@ public class TestSetImplementations
             Haste = true
         }, state));
         RegisterCreature("TEST-C-008", (outline, state) => new MorneholdSpectre(outline, state));
+        RegisterSpell("TEST-S-001",(outline, state) => new ThrowingKnife(outline,state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)

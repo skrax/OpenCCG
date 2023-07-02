@@ -45,16 +45,20 @@ public abstract class CreatureImplementation : CardImplementation
         await UpdateAsync();
     }
 
-    public async Task OnEnterBoardAsync()
+    public async Task EnterBoardAsync()
     {
         CreatureState.IsExposed = Abilities.Exposed || Abilities.Defender;
         CreatureState.AttacksAvailable = Abilities.Haste ? CreatureState.MaxAttacksPerTurn : 0;
 
         var dto = AsDto();
 
-        PlayerGameState.Nodes.Hand.RemoveCard(PlayerGameState.PeerId, Id);
-        PlayerGameState.Enemy.Nodes.EnemyHand.RemoveCard(PlayerGameState.EnemyPeerId);
+        RemoveFromHand();
 
+        await PlaceOnBoard(dto);
+    }
+
+    private async Task PlaceOnBoard(CardImplementationDto dto)
+    {
         await Task.WhenAll(
             PlayerGameState.Nodes.Board.PlaceCard(PlayerGameState.PeerId, dto),
             PlayerGameState.Enemy.Nodes.EnemyBoard.PlaceCard(PlayerGameState.EnemyPeerId, dto));
@@ -90,5 +94,6 @@ public abstract class CreatureImplementation : CardImplementation
         await UpdateAsync();
     }
 
-    public override CardImplementationDto AsDto() => CardImplementationDto.AsCreature(Id, CreatureOutline, CreatureState, Abilities);
+    public override CardImplementationDto AsDto() =>
+        CardImplementationDto.AsCreature(Id, CreatureOutline, CreatureState, Abilities);
 }
