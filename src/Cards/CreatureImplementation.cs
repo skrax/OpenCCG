@@ -52,8 +52,6 @@ public abstract class CreatureImplementation : CardImplementation
 
         var dto = AsDto();
 
-        RemoveFromHand();
-
         await PlaceOnBoard(dto);
     }
 

@@ -128,6 +128,8 @@ public class PlayerGameState
 
         if (card is CreatureImplementation creatureImplementation)
         {
+            creatureImplementation.RemoveFromHand();
+            creatureImplementation.MoveToZone(CardZone.None);
             await creatureImplementation.OnPlayAsync();
             creatureImplementation.MoveToZone(CardZone.Board);
             await creatureImplementation.EnterBoardAsync();
@@ -136,6 +138,8 @@ public class PlayerGameState
         }
         else if (card is SpellImplementation spellImplementation)
         {
+            spellImplementation.RemoveFromHand();
+            spellImplementation.MoveToZone(CardZone.None);
             await spellImplementation.OnPlayAsync();
             spellImplementation.RemoveFromHand();
             spellImplementation.MoveToZone(CardZone.Pit);

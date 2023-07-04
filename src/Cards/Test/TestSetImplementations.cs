@@ -10,6 +10,18 @@ public class TestSetImplementations
 
     public static void Init()
     {
+        RegisterCreatures();
+
+        RegisterSpells();
+    }
+
+    private static void RegisterSpells()
+    {
+        RegisterSpell("TEST-S-001", (outline, state) => new ThrowingKnife(outline, state));
+    }
+
+    private static void RegisterCreatures()
+    {
         RegisterCreature("TEST-C-001", (outline, state) => new VanillaCreature(outline, new(), state));
         RegisterCreature("TEST-C-002", (outline, state) => new VanillaCreature(outline, new(), state));
         RegisterCreature("TEST-C-003", (outline, state) => new VanillaCreature(outline, new(), state));
@@ -24,7 +36,15 @@ public class TestSetImplementations
             Haste = true
         }, state));
         RegisterCreature("TEST-C-008", (outline, state) => new MorneholdSpectre(outline, state));
-        RegisterSpell("TEST-S-001",(outline, state) => new ThrowingKnife(outline,state));
+        RegisterCreature("TEST-C-009", (outline, state) => new VanillaCreature(outline, new CreatureAbilities
+        {
+            Drain = true
+        }, state));
+        
+        RegisterCreature("TEST-C-010", (outline, state) => new VanillaCreature(outline, new CreatureAbilities
+        {
+            Defender = true
+        }, state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)
