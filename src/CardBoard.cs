@@ -60,6 +60,8 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
         if (dto.Type == RequireTargetType.Avatar) return;
         if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
         if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
+        if (dto.Card.IsCreature && !dto.Card.CreatureAbilities!.Arcane &&
+            !CardImplementationDto.CreatureState!.IsExposed) return;
 
         DrawOutline(true);
     }
@@ -160,12 +162,24 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
         if (instanceId == GetInstanceId()) return false;
         var obj = InstanceFromId(data.As<ulong>());
 
-        return obj switch
+        switch (obj)
         {
-            CardBoard => IsEnemy && CardImplementationDto.CreatureState!.IsExposed,
-            CardEffectPreview => true,
-            _ => false
-        };
+            case CardBoard:
+                return IsEnemy && CardImplementationDto.CreatureState!.IsExposed;
+            case CardEffectPreview preview:
+            {
+                if (preview.CurrentInputDto!.Side == RequireTargetSide.Enemy && !IsEnemy) return false;
+                if (preview.CurrentInputDto!.Side == RequireTargetSide.Friendly && IsEnemy) return false;
+                if (preview.CurrentInputDto.Card.IsCreature &&
+                    !preview.CurrentInputDto.Card.CreatureAbilities!.Arcane &&
+                    !CardImplementationDto.CreatureState!.IsExposed)
+                    return false;
+
+                return true;
+            }
+            default:
+                return false;
+        }
     }
 
     public override void _DropData(Vector2 atPosition, Variant data)

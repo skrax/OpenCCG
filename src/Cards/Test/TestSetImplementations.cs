@@ -40,11 +40,12 @@ public class TestSetImplementations
         {
             Drain = true
         }, state));
-        
+
         RegisterCreature("TEST-C-010", (outline, state) => new VanillaCreature(outline, new CreatureAbilities
         {
             Defender = true
         }, state));
+        RegisterCreature("TEST-C-011", (outline, state) => new MorneholdAssassin(outline, state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)

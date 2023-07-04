@@ -13,7 +13,7 @@ namespace OpenCCG;
 public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageType>
 {
     [Export] private CardStatPanel _costPanel;
-    private RequireTargetInputDto? _currentInputDto;
+    public RequireTargetInputDto? CurrentInputDto;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
     [Export] private SkipSelectionField _skipSelectionField;
 
@@ -50,14 +50,14 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
     {
         Texture = null;
         Visible = false;
-        _currentInputDto = null;
+        CurrentInputDto = null;
     }
 
     private async Task<RequireTargetOutputDto> RequireTarget(RequireTargetInputDto input)
     {
         Show(input.Card);
         _tsc = new TaskCompletionSource<RequireTargetOutputDto>();
-        _currentInputDto = input;
+        CurrentInputDto = input;
 
         ForceDrag();
 
@@ -76,7 +76,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
     private void ForceDrag()
     {
-        if (_currentInputDto == null) return;
+        if (CurrentInputDto == null) return;
 
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
@@ -90,7 +90,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         };
         line.Target(this, preview);
         _skipSelectionField.Enable();
-        EventSink.OnDragSelectTargetStart?.Invoke(_currentInputDto!);
+        EventSink.OnDragSelectTargetStart?.Invoke(CurrentInputDto!);
 
         ForceDrag(GetInstanceId(), preview);
     }
@@ -131,11 +131,11 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
         _skipSelectionField.Disable();
 
-        if (target is CardBoard cardBoard && _currentInputDto!.Type != RequireTargetType.Avatar)
+        if (target is CardBoard cardBoard && CurrentInputDto!.Type != RequireTargetType.Avatar)
         {
             var isEnemyBoard = cardBoard.GetParent<BoardArea>().IsEnemy;
-            if ((isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Friendly) ||
-                (!isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Enemy))
+            if ((isEnemyBoard && CurrentInputDto.Side == RequireTargetSide.Friendly) ||
+                (!isEnemyBoard && CurrentInputDto.Side == RequireTargetSide.Enemy))
             {
                 ForceDrag();
                 return;
@@ -150,8 +150,8 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         }
 
         if (target is Avatar { IsEnemy: false } &&
-            _currentInputDto!.Type != RequireTargetType.Creature &&
-            _currentInputDto!.Side != RequireTargetSide.Enemy)
+            CurrentInputDto!.Type != RequireTargetType.Creature &&
+            CurrentInputDto!.Side != RequireTargetSide.Enemy)
         {
             Reset();
             if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, false)))
@@ -162,8 +162,8 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         }
 
         if (target is Avatar { IsEnemy: true } &&
-            _currentInputDto!.Type != RequireTargetType.Creature &&
-            _currentInputDto.Side != RequireTargetSide.Friendly)
+            CurrentInputDto!.Type != RequireTargetType.Creature &&
+            CurrentInputDto.Side != RequireTargetSide.Friendly)
         {
             Reset();
             if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, true)))

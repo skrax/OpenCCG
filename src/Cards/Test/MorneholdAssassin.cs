@@ -1,20 +1,24 @@
 using System;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using OpenCCG.Net;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Cards.Test;
 
-public class ThrowingKnife : SpellImplementation
+public class MorneholdAssassin : CreatureImplementation
 {
     private const int Damage = 2;
-    public ThrowingKnife(SpellOutline outline, PlayerGameState playerGameState) : base(outline, playerGameState)
+
+    public MorneholdAssassin(CreatureOutline outline, PlayerGameState playerGameState) :
+        base(outline, new(), playerGameState)
     {
     }
 
     public override async Task OnPlayAsync()
     {
+        RETRY:
         var requireInput = new RequireTargetInputDto(AsDto(), RequireTargetType.All, RequireTargetSide.All);
         var output = await PlayerGameState.Nodes
                                           .CardEffectPreview
@@ -22,7 +26,8 @@ public class ThrowingKnife : SpellImplementation
 
         if (output.cardId.HasValue)
         {
-            await ResolveCreatureDamage(output.cardId.Value);
+            var success = await ResolveCreatureDamage(output.cardId.Value);
+            if (!success) goto RETRY;
         }
         else if (output.isEnemyAvatar.HasValue)
         {
@@ -44,11 +49,13 @@ public class ThrowingKnife : SpellImplementation
         }
     }
 
-    private async Task ResolveCreatureDamage(Guid cardId)
+    private async Task<bool> ResolveCreatureDamage(Guid cardId)
     {
         if ((PlayerGameState.Board.SingleOrDefault(x => x.Id == cardId) ??
              PlayerGameState.Enemy.Board.SingleOrDefault(x => x.Id == cardId))
-            is not CreatureImplementation card) return;
+            is not CreatureImplementation card) return false;
+
+        if (!Abilities.Arcane && !card.CreatureState.IsExposed) return false;
 
         PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
         await card.TakeDamageAsync(Damage);
@@ -58,5 +65,7 @@ public class ThrowingKnife : SpellImplementation
             await card.OnExitAsync();
             await card.DestroyAsync();
         }
+
+        return true;
     }
 }
