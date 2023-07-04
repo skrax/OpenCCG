@@ -37,6 +37,7 @@ public class MorneholdAssassin : CreatureImplementation
 
     private void ResolveAvatarDamage(bool isEnemyAvatar)
     {
+        PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
         if (isEnemyAvatar)
         {
             PlayerGameState.Enemy.Health -= Damage;

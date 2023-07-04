@@ -23,10 +23,7 @@ public class ImminentCatastrophe : SpellImplementation
 
         PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
 
-        foreach (var creature in creatures)
-        {
-            await creature.TakeDamageAsync(Damage);
-        }
+        await Task.WhenAll(creatures.Select(x => x.TakeDamageAsync(Damage)));
 
         var deadCreatures = creatures.Where(x => x.CreatureState.Def < 1).ToList();
 
