@@ -10,10 +10,13 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4a4ib"]
 resource_local_to_scene = true
 shader = ExtResource("1_0ggqa")
-shader_parameter/doMix = false
 shader_parameter/drawOutline = false
-shader_parameter/mixColor = Color(0, 0, 0, 1)
 shader_parameter/outlineColor = Color(0, 1, 0, 1)
+shader_parameter/doMix = false
+shader_parameter/iteration_times = 5
+shader_parameter/speed = 1.0
+shader_parameter/color = Color(0, 0.368627, 0.541176, 1)
+shader_parameter/intensity = 0.005
 
 [sub_resource type="LabelSettings" id="LabelSettings_5ex16"]
 font_size = 15
