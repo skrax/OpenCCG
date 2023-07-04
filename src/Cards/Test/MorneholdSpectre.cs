@@ -24,6 +24,7 @@ public class MorneholdSpectre : CreatureImplementation
         await target!.TakeDamageAsync(3);
         if (target.CreatureState.Def < 1)
         {
+            target.MoveToZone(CardZone.None);
             await target.OnExitAsync();
             await target.DestroyAsync();
         }

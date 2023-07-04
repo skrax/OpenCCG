@@ -185,8 +185,8 @@ public class PlayerGameState
             await attacker.OnEndCombatAsync();
             if (target.CreatureState.Def <= 0)
             {
+                target.MoveToZone(CardZone.None);
                 await target.OnExitAsync();
-                target.MoveToZone(CardZone.Pit);
                 await target.DestroyAsync();
             }
         }
@@ -194,14 +194,14 @@ public class PlayerGameState
         {
             if (target.CreatureState.Def <= 0)
             {
+                target.MoveToZone(CardZone.None);
+                attacker.MoveToZone(CardZone.None);
                 await Task.WhenAll(attacker.OnExitAsync(), target.OnExitAsync());
-                target.MoveToZone(CardZone.Pit);
-                attacker.MoveToZone(CardZone.Pit);
                 await Task.WhenAll(attacker.DestroyAsync(), target.DestroyAsync());
             }
             else
             {
-                attacker.MoveToZone(CardZone.Pit);
+                attacker.MoveToZone(CardZone.None);
                 await attacker.OnExitAsync();
                 await attacker.DestroyAsync();
             }
