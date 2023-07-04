@@ -77,9 +77,8 @@ public abstract class CreatureImplementation : CardImplementation
         await Task.WhenAll(t1, t2);
     }
 
-    public async Task DestroyAsync()
+    public async Task RemoveFromBoardAsync()
     {
-        MoveToZone(CardZone.Pit);
         await Task.WhenAll(PlayerGameState.Nodes.Board.RemoveCard(PlayerGameState.PeerId, Id),
             PlayerGameState.Nodes.EnemyBoard.RemoveCard(PlayerGameState.EnemyPeerId, Id));
     }

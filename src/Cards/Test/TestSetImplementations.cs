@@ -18,6 +18,13 @@ public class TestSetImplementations
     private static void RegisterSpells()
     {
         RegisterSpell("TEST-S-001", (outline, state) => new ThrowingKnife(outline, state));
+        RegisterSpell("TEST-S-002", (outline, state) => new FellTheMighty(outline, state));
+        RegisterSpell("TEST-S-003", (outline, state) => new SquishTheWimpy(outline, state));
+        RegisterSpell("TEST-S-004", (outline, state) => new Firebomb(outline, state));
+        RegisterSpell("TEST-S-005", (outline, state) => new ImminentCatastrophe(outline, state));
+        RegisterSpell("TEST-S-006", (outline, state) => new DeepAnalysis(outline, state));
+        RegisterSpell("TEST-S-007", (outline, state) => new HeedTheCall(outline, state));
+        RegisterSpell("TEST-S-008", (outline, state) => new StringUp(outline, state));
     }
 
     private static void RegisterCreatures()

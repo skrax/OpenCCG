@@ -16,6 +16,7 @@ public class MorneholdSpectre : CreatureImplementation
     {
         if (!PlayerGameState.Enemy.Board.Any()) return;
 
+        PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
         var board = PlayerGameState.Enemy.Board;
 
         var idx = Random.Shared.Next(0, board.Count - 1);
@@ -25,8 +26,9 @@ public class MorneholdSpectre : CreatureImplementation
         if (target.CreatureState.Def < 1)
         {
             target.MoveToZone(CardZone.None);
+            await target.RemoveFromBoardAsync();
             await target.OnExitAsync();
-            await target.DestroyAsync();
+            target.MoveToZone(CardZone.Pit);
         }
     }
 }

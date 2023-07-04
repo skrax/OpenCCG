@@ -55,8 +55,9 @@ public class ThrowingKnife : SpellImplementation
         if (card.CreatureState.Def <= 0)
         {
             card.MoveToZone(CardZone.None);
+            await card.RemoveFromBoardAsync();
             await card.OnExitAsync();
-            await card.DestroyAsync();
+            card.MoveToZone(CardZone.Pit);
         }
     }
 }

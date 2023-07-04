@@ -6,17 +6,15 @@ using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Cards.Test;
 
-public class BerenMorne : CreatureImplementation
+public class Firebomb : SpellImplementation
 {
     private const int Damage = 5;
-
-    public BerenMorne(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new(), playerGameState)
+    public Firebomb(SpellOutline outline, PlayerGameState playerGameState) : base(outline, playerGameState)
     {
     }
 
-    public override async Task OnEndTurnAsync()
+    public override async Task OnPlayAsync()
     {
-        RETRY:
         var requireInput = new RequireTargetInputDto(AsDto(), RequireTargetType.All, RequireTargetSide.All);
         var output = await PlayerGameState.Nodes
                                           .CardEffectPreview
@@ -24,15 +22,13 @@ public class BerenMorne : CreatureImplementation
 
         if (output.cardId.HasValue)
         {
-            var success = await ResolveCreatureDamage(output.cardId.Value);
-            if (!success) goto RETRY;
+            await ResolveCreatureDamage(output.cardId.Value);
         }
         else if (output.isEnemyAvatar.HasValue)
         {
             ResolveAvatarDamage(output.isEnemyAvatar.Value);
         }
     }
-
 
     private void ResolveAvatarDamage(bool isEnemyAvatar)
     {
@@ -48,13 +44,11 @@ public class BerenMorne : CreatureImplementation
         }
     }
 
-    private async Task<bool> ResolveCreatureDamage(Guid cardId)
+    private async Task ResolveCreatureDamage(Guid cardId)
     {
         if ((PlayerGameState.Board.SingleOrDefault(x => x.Id == cardId) ??
              PlayerGameState.Enemy.Board.SingleOrDefault(x => x.Id == cardId))
-            is not CreatureImplementation card) return false;
-
-        if (!Abilities.Arcane && !card.CreatureState.IsExposed) return false;
+            is not CreatureImplementation card) return;
 
         PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
         await card.TakeDamageAsync(Damage);
@@ -65,7 +59,5 @@ public class BerenMorne : CreatureImplementation
             await card.OnExitAsync();
             card.MoveToZone(CardZone.Pit);
         }
-
-        return true;
     }
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using OpenCCG.Net;
 
 namespace OpenCCG.Cards;
@@ -13,7 +14,8 @@ public abstract class SpellImplementation : CardImplementation
             })
     {
     }
-    
+
+    public abstract override Task OnPlayAsync();
 
     public override CardImplementationDto AsDto() => CardImplementationDto.AsSpell(Id, SpellOutline, SpellState);
 
