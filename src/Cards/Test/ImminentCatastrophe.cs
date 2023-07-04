@@ -32,7 +32,7 @@ public class ImminentCatastrophe : SpellImplementation
             creature.MoveToZone(CardZone.None);
         }
 
-        await Task.WhenAll(creatures.Select(x => x.RemoveFromBoardAsync()));
+        await Task.WhenAll(deadCreatures.Select(x => x.RemoveFromBoardAsync()));
 
         foreach (var creature in deadCreatures)
         {
