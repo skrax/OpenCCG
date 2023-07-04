@@ -46,6 +46,8 @@ public class TestSetImplementations
             Defender = true
         }, state));
         RegisterCreature("TEST-C-011", (outline, state) => new MorneholdAssassin(outline, state));
+        RegisterCreature("TEST-C-012", (outline, state) => new BerenMorne(outline, state));
+        RegisterCreature("TEST-C-013", (outline, state) => new BountyHunter(outline, state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)

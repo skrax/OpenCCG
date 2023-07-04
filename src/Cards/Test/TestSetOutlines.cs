@@ -56,7 +56,7 @@ public static class TestSetOutlines
             8, 5, 5,
             "res://img/cards/beren_morne.png"),
         new("TEST-C-013", "Bounty Hunter",
-            "\n\n[center][b]Play:[/b] Expose a creature[/center]",
+            "\n[center][b]Arcane[/b]\n[b]Play:[/b] Expose a creature[/center]",
             3, 4, 3,
             "res://img/cards/bounty_hunter.png"),
     };
