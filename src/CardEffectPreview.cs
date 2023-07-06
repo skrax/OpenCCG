@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
 using OpenCCG.Net;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 
@@ -13,7 +13,7 @@ namespace OpenCCG;
 public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageType>
 {
     [Export] private CardStatPanel _costPanel;
-    private RequireTargetInputDto? _currentInputDto;
+    public RequireTargetInputDto? CurrentInputDto;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
     [Export] private SkipSelectionField _skipSelectionField;
 
@@ -32,31 +32,32 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         return messageType switch
         {
             MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
-            MessageType.TmpShowCard => Executor.Make<CardGameStateDto>(TmpShowTarget, Executor.ResponseMode.NoResponse)
+            MessageType.TmpShowCard => Executor.Make<CardImplementationDto>(TmpShowTarget,
+                Executor.ResponseMode.NoResponse)
         };
     }
 
-    private void Show(CardGameStateDto cardGameStateDto)
+    private void Show(CardImplementationDto dto)
     {
         Visible = true;
-        Texture = GD.Load<Texture2D>(cardGameStateDto.Record.ImgPath);
-        _costPanel.Value = cardGameStateDto.Cost;
-        _descriptionPanel.Value = cardGameStateDto.Record.Description;
-        _namePanel.Value = cardGameStateDto.Record.Name;
+        Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
+        _descriptionPanel.Value = dto.Outline.Description;
+        _namePanel.Value = dto.Outline.Name;
+        _costPanel.Value = dto.State.Cost;
     }
 
     private void Reset()
     {
         Texture = null;
         Visible = false;
-        _currentInputDto = null;
+        CurrentInputDto = null;
     }
 
     private async Task<RequireTargetOutputDto> RequireTarget(RequireTargetInputDto input)
     {
         Show(input.Card);
         _tsc = new TaskCompletionSource<RequireTargetOutputDto>();
-        _currentInputDto = input;
+        CurrentInputDto = input;
 
         ForceDrag();
 
@@ -75,24 +76,28 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
     private void ForceDrag()
     {
+        if (CurrentInputDto == null) return;
+
         var line = GetNode<TargetLine>("/root/Main/TargetLine");
         var preview = new Control();
         preview.GlobalPosition = GetGlobalMousePosition();
         preview.TreeExited += () =>
         {
+            EventSink.OnDragSelectTargetStop?.Invoke();
             _skipSelectionField.Disable();
             line.Reset();
             SetProcess(true);
         };
         line.Target(this, preview);
         _skipSelectionField.Enable();
+        EventSink.OnDragSelectTargetStart?.Invoke(CurrentInputDto!);
 
         ForceDrag(GetInstanceId(), preview);
     }
 
-    private async Task TmpShowTarget(CardGameStateDto cardGameStateDto)
+    private async Task TmpShowTarget(CardImplementationDto dto)
     {
-        Show(cardGameStateDto);
+        Show(dto);
         await Task.Delay(TimeSpan.FromSeconds(3));
         Reset();
     }
@@ -126,18 +131,18 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
         _skipSelectionField.Disable();
 
-        if (target is CardBoard cardBoard && _currentInputDto!.Type != RequireTargetType.Avatar)
+        if (target is CardBoard cardBoard && CurrentInputDto!.Type != RequireTargetType.Avatar)
         {
             var isEnemyBoard = cardBoard.GetParent<BoardArea>().IsEnemy;
-            if ((isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Friendly) ||
-                (!isEnemyBoard && _currentInputDto.Side == RequireTargetSide.Enemy))
+            if ((isEnemyBoard && CurrentInputDto.Side == RequireTargetSide.Friendly) ||
+                (!isEnemyBoard && CurrentInputDto.Side == RequireTargetSide.Enemy))
             {
                 ForceDrag();
                 return;
             }
 
             Reset();
-            if (!_tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardGameState.Id, null)))
+            if (!_tsc.TrySetResult(new RequireTargetOutputDto(cardBoard.CardImplementationDto.Id, null)))
             {
                 ForceDrag();
                 return;
@@ -145,8 +150,8 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         }
 
         if (target is Avatar { IsEnemy: false } &&
-            _currentInputDto!.Type != RequireTargetType.Creature &&
-            _currentInputDto!.Side != RequireTargetSide.Enemy)
+            CurrentInputDto!.Type != RequireTargetType.Creature &&
+            CurrentInputDto!.Side != RequireTargetSide.Enemy)
         {
             Reset();
             if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, false)))
@@ -157,8 +162,8 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         }
 
         if (target is Avatar { IsEnemy: true } &&
-            _currentInputDto!.Type != RequireTargetType.Creature &&
-            _currentInputDto.Side != RequireTargetSide.Friendly)
+            CurrentInputDto!.Type != RequireTargetType.Creature &&
+            CurrentInputDto.Side != RequireTargetSide.Friendly)
         {
             Reset();
             if (!_tsc.TrySetResult(new RequireTargetOutputDto(null, true)))

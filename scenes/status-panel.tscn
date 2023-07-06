@@ -1,8 +1,15 @@
-[gd_scene load_steps=8 format=3 uid="uid://usm5ti5ecytg"]
+[gd_scene load_steps=10 format=3 uid="uid://usm5ti5ecytg"]
 
 [ext_resource type="Texture2D" uid="uid://wart73b367qr" path="res://img/avatar/00018-679053703.png" id="1_ptxdf"]
 [ext_resource type="Script" path="res://src/Avatar.cs" id="2_1l014"]
+[ext_resource type="Shader" path="res://shaders/card.gdshader" id="2_dwt8v"]
 [ext_resource type="Script" path="res://src/StatusPanel.cs" id="3_13snm"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tbph0"]
+resource_local_to_scene = true
+shader = ExtResource("2_dwt8v")
+shader_parameter/drawOutline = false
+shader_parameter/outlineColor = Color(0, 1, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nn7et"]
 bg_color = Color(1, 0.266667, 0.607843, 1)
@@ -28,6 +35,7 @@ _energyLabel = NodePath("EnergyCount")
 _healthLabel = NodePath("HealthCount")
 
 [node name="Avatar" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_tbph0")
 custom_minimum_size = Vector2(123.904, 123.904)
 layout_mode = 0
 offset_left = 901.0

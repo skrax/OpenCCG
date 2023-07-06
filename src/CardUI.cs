@@ -1,31 +1,39 @@
+using System;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
-using OpenCCG.Data;
 
 namespace OpenCCG;
 
-public partial class CardUI : TextureRect, INodeInit<CardRecord>
+public partial class CardUI : TextureRect, INodeInit<ICardOutline>
 {
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
 
     [Export] private CardInfoPanel _infoPanel, _namePanel;
 
-    public CardRecord Record { get; private set; }
+    public ICardOutline Outline { get; private set; }
 
-    public void Init(CardRecord record)
+    public void Init(ICardOutline dto)
     {
-        _infoPanel.Value = record.Description;
-        _costPanel.Value = record.Cost;
-        _atkPanel.Value = record.Atk;
-        _defPanel.Value = record.Def;
-        _namePanel.Value = record.Name;
-        if (record.Type is not CardRecordType.Creature)
+        _infoPanel.Value = dto.Description;
+        _costPanel.Value = dto.Cost;
+        switch (dto)
         {
-            _atkPanel.Visible = false;
-            _defPanel.Visible = false;
+            case ICreatureOutline creatureOutline:
+                _atkPanel.Value = creatureOutline.Atk;
+                _defPanel.Value = creatureOutline.Def;
+                break;
+            case ISpellOutline spellOutline:
+                _atkPanel.Visible = false;
+                _defPanel.Visible = false;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(dto));
         }
 
-        Texture = GD.Load<Texture2D>(record.ImgPath);
-        Record = record;
+        _namePanel.Value = dto.Name;
+
+        Texture = GD.Load<Texture2D>(dto.ImgPath);
+        Outline = dto;
     }
 }

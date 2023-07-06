@@ -4,7 +4,7 @@ namespace OpenCCG;
 
 public partial class CardInfoPanel : Panel
 {
-    [Export] private Label _descriptionLabel;
+    [Export] private RichTextLabel _descriptionLabel;
 
     public string Value
     {

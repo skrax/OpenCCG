@@ -116,6 +116,31 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         await tsc.Task;
     }
 
+
+    /// <summary>
+    ///     Send a message to a peer and adds a new entry to <see cref="Observers" /> which awaits a response.
+    /// </summary>
+    /// <param name="self">Implementation</param>
+    /// <param name="peerId">Peer to message</param>
+    /// <param name="messageType">Type of message</param>
+    /// <param name="timeOut">TimeSpan until awaiting a response is canceled. Defaults to 3 minutes</param>
+    /// <returns></returns>
+    static async Task GetAsync(IMessageReceiver<TMessageType> self, long peerId,
+        TMessageType messageType, TimeSpan? timeOut = null)
+    {
+        var id = Guid.NewGuid().ToString();
+        var message = new Message<TMessageType>(id, messageType);
+
+        var tsc = new TaskCompletionSource();
+        timeOut ??= TimeSpan.FromMinutes(3);
+        var observer = new Observer(tsc, timeOut.Value);
+        self.Observers!.Add(id, observer);
+
+        self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
+
+        await tsc.Task;
+    }
+
     /// <summary>
     ///     Sends a message to a peer without awaiting a response.
     /// </summary>

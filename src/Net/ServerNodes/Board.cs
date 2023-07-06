@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
@@ -26,14 +27,14 @@ public partial class Board : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public void PlaceCard(long peerId, CardGameStateDto cardGameStateDtoJson)
+    public async Task PlaceCard(long peerId, CardImplementationDto dto)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.PlaceCard, cardGameStateDtoJson);
+        await IMessageReceiver<MessageType>.GetAsync(this, peerId, MessageType.PlaceCard, dto);
     }
 
-    public async Task UpdateCardAsync(long peerId, CardGameStateDto cardGameStateDtoJson)
+    public async Task UpdateCardAsync(long peerId, CardImplementationDto dto)
     {
-        await IMessageReceiver<MessageType>.GetAsync(this, peerId, MessageType.UpdateCard, cardGameStateDtoJson);
+        await IMessageReceiver<MessageType>.GetAsync(this, peerId, MessageType.UpdateCard, dto);
     }
 
     public async Task PlayCombatAnimAsync(long peerId, Guid from, Guid to)
@@ -48,9 +49,9 @@ public partial class Board : Node, IMessageReceiver<MessageType>
             new PlayCombatDto(from, null, true));
     }
 
-    public void RemoveCard(long peerId, Guid cardId)
+    public async Task RemoveCard(long peerId, Guid cardId)
     {
-        IMessageReceiver<MessageType>.FireAndForget(this, peerId, MessageType.RemoveCard,
+        await IMessageReceiver<MessageType>.GetAsync(this, peerId, MessageType.RemoveCard,
             new RemoveCardDto(cardId));
     }
 }

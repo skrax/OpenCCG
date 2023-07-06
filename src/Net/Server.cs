@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Cards;
+using OpenCCG.Cards.Test;
 using OpenCCG.Core;
-using OpenCCG.Data;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Net;
 
-public record QueuePlayerDto(CardUIDeck.JsonRecord[] Deck, string? Password);
+public record QueuePlayerDto(SavedDeck Deck, string? Password);
 
-public record QueuedPlayer(long peerId, List<CardRecord> deckList);
+public record QueuedPlayer(long peerId, List<ICardOutline> deckList);
 
 public partial class Server : Node, IMessageReceiver<MessageType>
 {
@@ -77,6 +78,8 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             CardEffectPreview = GetNode<ServerNodes.CardEffectPreview>("CardEffectPreview"),
             EnemyCardEffectPreview = GetNode<ServerNodes.CardEffectPreview>("EnemyCardEffectPreview")
         };
+
+        TestSetImplementations.Init();
     }
 
     private void OnPeerConnected(long id)
@@ -128,10 +131,10 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
     private async Task QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
     {
-        var deckList = new List<CardRecord>(30);
-        foreach (var card in queuePlayerDto.Deck)
+        var deckList = new List<ICardOutline>(30);
+        foreach (var card in queuePlayerDto.Deck.list)
         {
-            var cardRecord = Database.Cards[card.Id];
+            var cardRecord = TestSetOutlines.Cards[card.Id];
             for (var i = 0; i < card.Count; ++i) deckList.Add(cardRecord);
         }
 
@@ -173,8 +176,8 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             _gameState.PlayerGameStateCommandQueues.Add(p1.PeerId, p1Q);
             _gameState.PlayerGameStateCommandQueues.Add(p2.PeerId, p2Q);
 
-            p1Q.Start();
-            p2Q.Start();
+            await p1Q.StartAsync();
+            await p2Q.StartAsync();
             await p1Q.EnqueueAsync(x => x.StartTurnAsync);
         }
         else

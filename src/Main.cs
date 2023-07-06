@@ -58,7 +58,7 @@ public partial class Main : Node, IMessageReceiver<MessageType>
         var password = runtimeData._useQueuePassword ? runtimeData._queuePassword : null;
         using var file = FileAccess.Open(runtimeData._deckPath, FileAccess.ModeFlags.Read);
         if (file == null) throw new FileLoadException();
-        var deck = JsonSerializer.Deserialize<CardUIDeck.JsonRecord[]>(file.GetAsText())!;
+        var deck = JsonSerializer.Deserialize<SavedDeck>(file.GetAsText())!;
 
         var dto = new QueuePlayerDto(deck, password);
 

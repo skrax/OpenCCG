@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using OpenCCG.Cards;
 using OpenCCG.Core;
 using OpenCCG.Net;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
@@ -27,7 +27,7 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.RemoveCard => Executor.Make<Guid>(RemoveCard, Executor.ResponseMode.NoResponse),
-            MessageType.DrawCard => Executor.Make<CardGameStateDto>(DrawCard, Executor.ResponseMode.NoResponse)
+            MessageType.DrawCard => Executor.Make<CardImplementationDto>(DrawCard, Executor.ResponseMode.Respond)
         };
     }
 
@@ -40,10 +40,9 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
         cardEntity.QueueFree();
     }
 
-    private void DrawCard(CardGameStateDto card)
+    private void DrawCard(CardImplementationDto card)
     {
-        var entity = CardScene.Make<Card, CardGameStateDto>(card, this);
-
+        var entity = CardScene.Make<Card, CardImplementationDto>(card, this);
         _cards.Add(entity);
     }
 }

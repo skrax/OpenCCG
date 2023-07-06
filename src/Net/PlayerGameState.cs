@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenCCG.Cards;
+using OpenCCG.Cards.Test;
 using OpenCCG.Core;
-using OpenCCG.Data;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
 
@@ -27,19 +28,19 @@ public class PlayerGameState
 
     public int MaxEnergy { get; set; }
 
-    public LinkedList<CardGameState> Deck { get; private set; } = new();
+    public LinkedList<CardImplementation> Deck { get; private set; } = new();
 
-    public LinkedList<CardGameState> Hand { get; } = new();
+    public LinkedList<CardImplementation> Hand { get; } = new();
 
-    public LinkedList<CardGameState> Board { get; } = new();
+    public LinkedList<CardImplementation> Board { get; } = new();
 
-    public LinkedList<CardGameState> Pit { get; } = new();
+    public LinkedList<CardImplementation> Pit { get; } = new();
 
-    public List<CardRecord> DeckList { get; private set; }
+    public List<ICardOutline> DeckList { get; private set; }
 
     public bool IsTurn { get; set; }
 
-    public void Init(List<CardRecord> deckList)
+    public void Init(List<ICardOutline> deckList)
     {
         Nodes.MidPanel.SetStatusMessage(PeerId, "");
         Energy = MaxEnergy = 0;
@@ -53,44 +54,43 @@ public class PlayerGameState
         var shuffledDeckList = DeckList
                                .Select(x =>
                                {
-                                   var card = new CardGameState(x, this)
-                                   {
-                                       Zone = CardZone.Deck,
-                                       MaxAttacksPerTurn = 1
-                                   };
-
-                                   card.ResetStats();
-
+                                   var card = TestSetImplementations.GetImplementation(x.Id, this);
+                                   card.MoveToZone(CardZone.Deck);
                                    return card;
                                })
                                .Shuffle();
 
-        Deck = new LinkedList<CardGameState>(shuffledDeckList);
+        Deck = new LinkedList<CardImplementation>(shuffledDeckList);
+
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, null));
     }
 
-
-    public void Start()
+    public async Task StartAsync()
     {
-        Draw(Rules.InitialCardsDrawn);
-        UpdateEnergyRpc();
-
-        Nodes.StatusPanel.SetHealth(PeerId, Health);
-        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
+        await DrawAsync(Rules.InitialCardsDrawn);
+        UpdateEnergy();
+        UpdateHealth();
     }
 
     public async Task StartTurnAsync()
     {
+        if (IsTurn) return;
         IsTurn = true;
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
-        UpdateEnergyRpc();
-        Draw();
+        UpdateEnergy();
+        await DrawAsync();
 
-        foreach (var cardGameState in Board) await cardGameState.OnUpkeepAsync();
+        foreach (CreatureImplementation creature in Board)
+        {
+            await creature.OnUpkeepAsync();
+        }
 
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(true, null));
 
-        foreach (var cardGameState in Board) await cardGameState.OnStartTurnAsync(this);
+        foreach (CreatureImplementation creature in Board)
+        {
+            await creature.OnStartTurnAsync();
+        }
     }
 
     public async Task EndTurnAsync()
@@ -99,13 +99,15 @@ public class PlayerGameState
 
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, "End Step"));
 
-        foreach (var cardGameState in Board)
+        foreach (CreatureImplementation creature in Board)
         {
-            cardGameState.AttacksAvailable = 0;
-            await cardGameState.UpdateCreatureAsync();
+            await creature.OnEndStepAsync();
         }
 
-        foreach (var cardGameState in Board) await cardGameState.OnEndTurnAsync(this);
+        foreach (CreatureImplementation creature in Board)
+        {
+            await creature.OnEndTurnAsync();
+        }
 
         IsTurn = false;
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, null));
@@ -113,175 +115,169 @@ public class PlayerGameState
         await Enemy.StartTurnAsync();
     }
 
-    public void Draw(int count = 1)
-    {
-        for (var i = 0; i < count; ++i)
-        {
-            if (Deck.First == null) break;
-            var card = Deck.First.Value;
-
-            Deck.RemoveFirst();
-            Hand.AddLast(card);
-
-            var dto = card.AsDto();
-
-            Nodes.Hand.DrawCard(PeerId, dto);
-            Nodes.EnemyHand.DrawCard(EnemyPeerId);
-            UpdateCardCountRpc();
-        }
-    }
-
-    private void UpdateCardCountRpc()
-    {
-        Nodes.StatusPanel.SetCardCount(PeerId, Hand.Count);
-        Nodes.EnemyStatusPanel.SetCardCount(EnemyPeerId, Hand.Count);
-    }
-
-    private void UpdateEnergyRpc()
-    {
-        Nodes.StatusPanel.SetEnergy(PeerId, Energy, MaxEnergy);
-        Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy, MaxEnergy);
-    }
-
     public async Task<bool> PlayCardAsync(Guid id)
     {
         if (!IsTurn) return false;
 
-        var card = Hand.FirstOrDefault(x => x.Id == id);
-
+        var card = Hand.SingleOrDefault(x => x.Id == id);
         if (card == null) return false;
-        if (Energy - card.Cost < 0) return false;
+        if (Energy - card.State.Cost < 0) return false;
 
-        Energy -= card.Cost;
-        UpdateEnergyRpc();
+        Energy -= card.State.Cost;
+        UpdateEnergy();
 
-        Hand.Remove(card);
-
-        if (card.Record.Type is CardRecordType.Spell)
+        if (card is CreatureImplementation creatureImplementation)
         {
-            Nodes.Hand.RemoveCard(PeerId, id);
-            Nodes.EnemyHand.RemoveCard(EnemyPeerId);
-
-            await card.OnSpellAsync(this);
-
-            Pit.AddLast(card);
-            card.Zone = CardZone.Pit;
+            creatureImplementation.RemoveFromHand();
+            creatureImplementation.MoveToZone(CardZone.None);
+            await creatureImplementation.OnPlayAsync();
+            creatureImplementation.MoveToZone(CardZone.Board);
+            await creatureImplementation.EnterBoardAsync();
+            UpdateCardCount();
+            await creatureImplementation.OnEnterAsync();
         }
-        else if (card.Record.Type is CardRecordType.Creature)
+        else if (card is SpellImplementation spellImplementation)
         {
-            card.Zone = CardZone.Board;
-            Board.AddLast(card);
-
-            card.IsSummoningProtectionOn = card.Record.Abilities is { Exposed: false, Defender: false };
-            card.IsSummoningSicknessOn = !card.Record.Abilities.Haste;
-
-            await card.OnEnterAsync(this);
-
-            var dto = card.AsDto();
-
-            Nodes.Board.PlaceCard(PeerId, dto);
-            Nodes.Hand.RemoveCard(PeerId, id);
-
-            Nodes.EnemyBoard.PlaceCard(EnemyPeerId, dto);
-            Nodes.EnemyHand.RemoveCard(EnemyPeerId);
+            spellImplementation.RemoveFromHand();
+            spellImplementation.MoveToZone(CardZone.None);
+            await spellImplementation.OnPlayAsync();
+            spellImplementation.MoveToZone(CardZone.Pit);
+            UpdateCardCount();
         }
-
-        UpdateCardCountRpc();
 
         return true;
+    }
+
+    public async Task CombatAsync(CombatPlayerCardDto dto)
+    {
+        if (!IsTurn) return;
+
+        if (Board.SingleOrDefault(x => x.Id == dto.AttackerId) is not CreatureImplementation attacker ||
+            Enemy.Board.SingleOrDefault(x => x.Id == dto.TargetId) is not CreatureImplementation target) return;
+        if (attacker.CreatureState.AttacksAvailable <= 0) return;
+        if (!target.CreatureState.IsExposed) return;
+        if (!target.Abilities.Defender && Enemy.Board.Cast<CreatureImplementation>().Any(x => x.Abilities.Defender))
+            return;
+
+        await attacker.OnStartCombatTurnAsync();
+
+        await Task.WhenAll(Nodes.Board.PlayCombatAnimAsync(PeerId, attacker.Id, target.Id),
+            Nodes.EnemyBoard.PlayCombatAnimAsync(EnemyPeerId, attacker.Id, target.Id)
+        );
+
+        --attacker.CreatureState.AttacksAvailable;
+        attacker.CreatureState.IsExposed = true;
+
+        await Task.WhenAll(attacker.TakeDamageAsync(target.CreatureState.Atk),
+            target.TakeDamageAsync(attacker.CreatureState.Atk));
+
+        if (attacker.Abilities.Drain && attacker.CreatureState.Atk > 0)
+        {
+            Health += attacker.CreatureState.Atk;
+            UpdateHealth();
+        }
+
+        if (target.Abilities.Drain && target.CreatureState.Atk > 0)
+        {
+            Enemy.Health += target.CreatureState.Atk;
+            Enemy.UpdateHealth();
+        }
+
+        if (attacker.CreatureState.Def > 0)
+        {
+            await attacker.OnEndCombatAsync();
+            if (target.CreatureState.Def <= 0)
+            {
+                target.MoveToZone(CardZone.None);
+                await target.RemoveFromBoardAsync();
+                await target.OnExitAsync();
+                target.MoveToZone(CardZone.Pit);
+            }
+        }
+        else
+        {
+            if (target.CreatureState.Def <= 0)
+            {
+                target.MoveToZone(CardZone.None);
+                attacker.MoveToZone(CardZone.None);
+                await Task.WhenAll(attacker.RemoveFromBoardAsync(), target.RemoveFromBoardAsync());
+                await Task.WhenAll(attacker.OnExitAsync(), target.OnExitAsync());
+                target.MoveToZone(CardZone.Pit);
+                attacker.MoveToZone(CardZone.Pit);
+            }
+            else
+            {
+                attacker.MoveToZone(CardZone.None);
+                await attacker.RemoveFromBoardAsync();
+                await attacker.OnExitAsync();
+                attacker.MoveToZone(CardZone.Pit);
+            }
+        }
     }
 
     public async Task CombatPlayerAsync(Guid attackerId)
     {
         if (!IsTurn) return;
 
-        var attacker = Board.First(x => x.Id == attackerId);
+        if (Board.SingleOrDefault(x => x.Id == attackerId) is not CreatureImplementation attacker) return;
+        if (attacker.CreatureState.AttacksAvailable < 1) return;
+        if (Enemy.Board.Cast<CreatureImplementation>().Any(x => x.Abilities.Defender)) return;
 
-        if (attacker.IsSummoningSicknessOn) return;
-        if (attacker.AttacksAvailable <= 0) return;
-        if (Enemy.Board.Any(x => x.Record.Abilities.Defender)) return;
+        await Task.WhenAll(Nodes.Board.PlayCombatAvatarAnimAsync(PeerId, attacker.Id),
+            Nodes.EnemyBoard.PlayCombatAvatarAnimAsync(EnemyPeerId, attacker.Id)
+        );
 
-        var t1 = Nodes.Board.PlayCombatAvatarAnimAsync(PeerId, attackerId);
-        var t2 = Nodes.EnemyBoard.PlayCombatAvatarAnimAsync(EnemyPeerId, attackerId);
+        --attacker.CreatureState.AttacksAvailable;
+        attacker.CreatureState.IsExposed = true;
 
-        await Task.WhenAll(t1, t2);
+        await attacker.UpdateAsync();
 
-        --attacker.AttacksAvailable;
-        attacker.IsSummoningProtectionOn = false;
-        await attacker.UpdateCreatureAsync();
-        var atk = Math.Max(0, attacker.Atk);
-        Enemy.Health -= atk;
-
-        Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
-        Nodes.StatusPanel.SetHealth(EnemyPeerId, Enemy.Health);
-
-        if (attacker.Record.Abilities.Drain)
+        if (attacker.CreatureState.Atk > 0)
         {
-            Health += Math.Max(0, atk);
-            Nodes.StatusPanel.SetHealth(PeerId, Health);
-            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
+            Enemy.Health -= attacker.CreatureState.Atk;
+            Enemy.UpdateHealth();
+        }
+
+        if (attacker.Abilities.Drain && attacker.CreatureState.Atk > 0)
+        {
+            Health += attacker.CreatureState.Atk;
+            UpdateHealth();
         }
     }
 
-    public async Task ResolveDamageAsync(CardGameState card, int damage)
+    public async Task DrawAsync(int count = 1)
     {
-        card.Def -= damage;
+        for (var i = 0; i < count; ++i)
+        {
+            if (Deck.First == null) break;
+            var card = Deck.First.Value;
+            card.MoveToZone(CardZone.Hand);
 
-        await card.UpdateCreatureAsync();
-        if (card.Def <= 0) card.DestroyCreature();
+            var dto = card.AsDto();
+
+            await Task.WhenAll(Nodes.Hand.DrawCard(PeerId, dto), Nodes.EnemyHand.DrawCard(EnemyPeerId));
+
+            UpdateCardCount();
+        }
     }
 
-    public async Task CombatAsync(CombatPlayerCardDto combatPlayerCardDto)
+    public void UpdateHealth()
     {
-        // TODO feedback
-        if (!IsTurn) return;
-
-        var attackerId = combatPlayerCardDto.AttackerId;
-        var targetId = combatPlayerCardDto.TargetId;
-
-        var attacker = Board.First(x => x.Id == attackerId);
-        var target = Enemy.Board.First(x => x.Id == targetId);
-
-        // TODO feedback
-        if (attacker.IsSummoningSicknessOn) return;
-        if (target.IsSummoningProtectionOn) return;
-        if (attacker.AttacksAvailable <= 0) return;
-        if (Enemy.Board.Any(x => x.Record.Abilities.Defender) && !target.Record.Abilities.Defender) return;
-
-        await attacker.OnStartCombatAsync(this);
-
-        var t1 = Nodes.Board.PlayCombatAnimAsync(PeerId, attackerId, targetId);
-        var t2 = Nodes.EnemyBoard.PlayCombatAnimAsync(EnemyPeerId, attackerId, targetId);
-
-        await Task.WhenAll(t1, t2);
-
-        --attacker.AttacksAvailable;
-        attacker.IsSummoningProtectionOn = false;
-        await attacker.UpdateCreatureAsync();
-        await Task.WhenAll(ResolveDamageAsync(attacker, target.Atk), ResolveDamageAsync(target, attacker.Atk));
-
-        if (attacker.Record.Abilities.Drain)
-        {
-            Health += Math.Max(0, attacker.Atk);
-            Nodes.StatusPanel.SetHealth(PeerId, Health);
-            Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
-        }
-
-        if (target.Record.Abilities.Drain)
-        {
-            Enemy.Health += Math.Max(0, target.Atk);
-            Nodes.StatusPanel.SetHealth(EnemyPeerId, Enemy.Health);
-            Nodes.EnemyStatusPanel.SetHealth(PeerId, Enemy.Health);
-        }
-
-        if (attacker.Zone == CardZone.Board)
-            await attacker.OnEndCombatAsync(this);
-        else
-            await attacker.OnExitAsync(this);
-
-        if (target.Zone != CardZone.Board) await target.OnExitAsync(Enemy);
+        Nodes.StatusPanel.SetHealth(PeerId, Health);
+        Nodes.EnemyStatusPanel.SetHealth(EnemyPeerId, Health);
     }
 
+    public void UpdateCardCount()
+    {
+        Nodes.StatusPanel.SetCardCount(PeerId, Hand.Count);
+        Nodes.EnemyStatusPanel.SetCardCount(EnemyPeerId, Hand.Count);
+    }
+
+    public void UpdateEnergy()
+    {
+        Nodes.StatusPanel.SetEnergy(PeerId, Energy, MaxEnergy);
+        Nodes.EnemyStatusPanel.SetEnergy(EnemyPeerId, Energy, MaxEnergy);
+    }
 
     public void Disconnect()
     {

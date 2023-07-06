@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 namespace OpenCCG;
@@ -6,9 +7,26 @@ public partial class Dropzone : Control
 {
     public override void _Ready()
     {
-        EventSink.OnDragCardStart += () => MouseFilter = MouseFilterEnum.Stop;
-        EventSink.OnDragCardStop += () => MouseFilter = MouseFilterEnum.Ignore;
+        EventSink.OnDragCardStart += StopMouse;
+        EventSink.OnDragCardStop += IgnoreMouse;
     }
+
+    public override void _ExitTree()
+    {
+        EventSink.OnDragCardStart -= StopMouse;
+        EventSink.OnDragCardStop -= IgnoreMouse;
+    }
+
+    private void IgnoreMouse()
+    {
+        MouseFilter = MouseFilterEnum.Ignore;
+    }
+
+    private void StopMouse()
+    {
+        MouseFilter = MouseFilterEnum.Stop;
+    }
+
 
     public override bool _CanDropData(Vector2 atPosition, Variant data)
     {

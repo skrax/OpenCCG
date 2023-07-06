@@ -1,16 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://dn7ayibqvf3jk"]
+[gd_scene load_steps=8 format=3 uid="uid://dn7ayibqvf3jk"]
 
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_8stps"]
 [ext_resource type="Script" path="res://src/Card.cs" id="2_davtw"]
 [ext_resource type="PackedScene" uid="uid://dysns3hnic57" path="res://scenes/card-preview.tscn" id="3_ab0j7"]
 [ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_bkiwm"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_wwja8"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_rmwia"]
-font_size = 12
-
-[sub_resource type="LabelSettings" id="LabelSettings_i7brf"]
-font_size = 11
 
 [sub_resource type="LabelSettings" id="LabelSettings_jwlpm"]
 font_size = 18
@@ -44,19 +38,23 @@ mouse_filter = 1
 script = ExtResource("3_bkiwm")
 _descriptionLabel = NodePath("Label")
 
-[node name="Label" type="Label" parent="NamePanel"]
+[node name="Label" type="RichTextLabel" parent="NamePanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 1
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/bold_font_size = 12
+theme_override_font_sizes/italics_font_size = 12
+theme_override_font_sizes/bold_italics_font_size = 12
+theme_override_font_sizes/mono_font_size = 12
+bbcode_enabled = true
 text = "Golthrang, Destroyer of Worlds"
-label_settings = SubResource("LabelSettings_rmwia")
-vertical_alignment = 1
-autowrap_mode = 3
-max_lines_visible = 2
+scroll_active = false
+shortcut_keys_enabled = false
 
 [node name="InfoPanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
 self_modulate = Color(0, 0, 0, 1)
@@ -65,29 +63,32 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -68.4
+offset_top = -96.4
 offset_right = 0.399994
-offset_bottom = 0.300018
+offset_bottom = 0.600006
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 1
 script = ExtResource("3_bkiwm")
 _descriptionLabel = NodePath("Description")
 
-[node name="Description" type="Label" parent="InfoPanel"]
+[node name="Description" type="RichTextLabel" parent="InfoPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 1
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 11
+theme_override_font_sizes/bold_font_size = 11
+theme_override_font_sizes/italics_font_size = 11
+theme_override_font_sizes/bold_italics_font_size = 11
+theme_override_font_sizes/mono_font_size = 11
+bbcode_enabled = true
 text = "Sample Description Text"
-label_settings = SubResource("LabelSettings_i7brf")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-text_overrun_behavior = 3
+scroll_active = false
+shortcut_keys_enabled = false
 
 [node name="AttackPanel" type="Panel" parent="." node_paths=PackedStringArray("_statLabel")]
 layout_mode = 1

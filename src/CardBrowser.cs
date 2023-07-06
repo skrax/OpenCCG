@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Godot;
+using OpenCCG.Cards;
+using OpenCCG.Cards.Test;
 using OpenCCG.Core;
-using OpenCCG.Data;
 using FileAccess = Godot.FileAccess;
 
 namespace OpenCCG;
@@ -61,7 +62,7 @@ public partial class CardBrowser : Control
                 if (!child.IsQueuedForDeletion())
                     child.QueueFree();
 
-            foreach (var cardRecord in Database.Cards.Values) AddCardToView(cardRecord);
+            foreach (var outline in TestSetOutlines.All) AddCardToView(outline);
         };
 
         _searchEdit.TextChanged += () =>
@@ -71,11 +72,16 @@ public partial class CardBrowser : Control
                 if (!child.IsQueuedForDeletion())
                     child.QueueFree();
 
-            foreach (var cardRecord in Database.Cards.Values.Where(x => x.Description.Contains(text)))
-                AddCardToView(cardRecord);
+            foreach (var outline in TestSetOutlines.All.Where(x => x.Description.Contains(text)))
+            {
+                AddCardToView(outline);
+            }
         };
 
-        foreach (var cardRecord in Database.Cards.Values.OrderBy(x => x.Cost)) AddCardToView(cardRecord);
+        foreach (var outline in TestSetOutlines.All.OrderBy(x => x.Cost))
+        {
+            AddCardToView(outline);
+        }
 
         ResetCounters();
     }
@@ -107,36 +113,36 @@ public partial class CardBrowser : Control
     }
 
 
-    private void AddCardToView(CardRecord cardRecord)
+    private void AddCardToView(ICardOutline outline)
     {
-        var card = CardUIScene.Make<CardUI, CardRecord>(cardRecord, _cardViewFlowContainer);
+        var card = CardUIScene.Make<CardUI, ICardOutline>(outline, _cardViewFlowContainer);
         card.GuiInput += x =>
         {
             if (!x.IsActionPressed(InputActions.SpriteClick)) return;
 
-            if (_deck.TryGetValue(cardRecord.Id, out var cardDeck))
+            if (_deck.TryGetValue(outline.Id, out var cardDeck))
             {
                 cardDeck.SetCount(cardDeck.Count + 1);
-                IncreaseCounters(cardDeck.Record);
+                IncreaseCounters(cardDeck.Outline);
             }
             else
             {
-                AddCardToDeck(card.Record);
+                AddCardToDeck(card.Outline);
 
-                IncreaseCounters(cardRecord);
+                IncreaseCounters(outline);
             }
         };
     }
 
-    private CardUIDeck AddCardToDeck(CardRecord cardRecord)
+    private CardUIDeck AddCardToDeck(ICardOutline outline)
     {
-        var cardDeck = CardUIDeckScene.Make<CardUIDeck, CardRecord>(cardRecord, _deckContainer);
+        var cardDeck = CardUIDeckScene.Make<CardUIDeck, ICardOutline>(outline, _deckContainer);
         var nodes = _deckContainer.GetChildren();
         for (var index = 0; index < nodes.Count; index++)
         {
             var child = nodes[index];
             if (child is not CardUIDeck cardUiDeck) continue;
-            if (cardUiDeck.Record.Cost < cardRecord.Cost) continue;
+            if (cardUiDeck.Outline.Cost < outline.Cost) continue;
 
             _deckContainer.MoveChild(cardDeck, index);
             break;
@@ -147,25 +153,25 @@ public partial class CardBrowser : Control
             if (!inputEvent.IsActionPressed(InputActions.SpriteClick)) return;
 
             cardDeck.SetCount(cardDeck.Count - 1);
-            DecreaseCounters(cardDeck.Record);
+            DecreaseCounters(cardDeck.Outline);
             if (cardDeck.Count != 0) return;
 
-            _deck.Remove(cardRecord.Id);
+            _deck.Remove(outline.Id);
             cardDeck.QueueFree();
         };
-        _deck.Add(cardRecord.Id, cardDeck);
+        _deck.Add(outline.Id, cardDeck);
 
         return cardDeck;
     }
 
-    private void IncreaseCounters(CardRecord cardRecord)
+    private void IncreaseCounters(ICardOutline outline)
     {
-        switch (cardRecord.Type)
+        switch (outline)
         {
-            case CardRecordType.Creature:
+            case ICreatureOutline:
                 _creatureCountLabel.Value++;
                 break;
-            case CardRecordType.Spell:
+            case ISpellOutline:
                 _spellCountLabel.Value++;
                 break;
             default:
@@ -173,7 +179,7 @@ public partial class CardBrowser : Control
         }
 
         _totalCountLabel.Value++;
-        switch (cardRecord.Cost)
+        switch (outline.Cost)
         {
             case 0:
                 _cardCountBar0.Count++;
@@ -206,14 +212,14 @@ public partial class CardBrowser : Control
         }
     }
 
-    private void DecreaseCounters(CardRecord cardRecord)
+    private void DecreaseCounters(ICardOutline outline)
     {
-        switch (cardRecord.Type)
+        switch (outline)
         {
-            case CardRecordType.Creature:
+            case ICreatureOutline:
                 _creatureCountLabel.Value--;
                 break;
-            case CardRecordType.Spell:
+            case ISpellOutline:
                 _spellCountLabel.Value--;
                 break;
             default:
@@ -221,7 +227,7 @@ public partial class CardBrowser : Control
         }
 
         _totalCountLabel.Value--;
-        switch (cardRecord.Cost)
+        switch (outline.Cost)
         {
             case 0:
                 _cardCountBar0.Count--;
@@ -256,7 +262,8 @@ public partial class CardBrowser : Control
 
     private void SaveDeck()
     {
-        var json = JsonSerializer.Serialize(_deck.Values.Select(x => x.ToJsonRecord()).ToList());
+        var deck = new SavedDeck("1.0", _deck.Values.Select(x => x.ToJsonRecord()).ToArray());
+        var json = JsonSerializer.Serialize(deck);
 
         using var file = FileAccess.Open($"user://{_deckNameEdit.Text}.deck", FileAccess.ModeFlags.Write);
         if (file == null) throw new FileLoadException();
@@ -270,18 +277,22 @@ public partial class CardBrowser : Control
         if (file == null) throw new FileLoadException();
 
 
-        var deserialized = JsonSerializer.Deserialize<CardUIDeck.JsonRecord[]>(file.GetAsText());
+        var deserialized = JsonSerializer.Deserialize<SavedDeck>(file.GetAsText());
 
         if (deserialized == null) throw new FileLoadException();
+        if (deserialized.format != "1.0") throw new FileLoadException($"Unsupported Deck Format {deserialized.format}");
 
         ClearDeck();
         _deckNameEdit.Text = Path.GetFileNameWithoutExtension(path);
 
-        foreach (var jsonRecord in deserialized)
+        foreach (var jsonRecord in deserialized.list)
         {
-            var cardRecord = Database.Cards[jsonRecord.Id];
-            AddCardToDeck(cardRecord).SetCount(jsonRecord.Count);
-            for (var i = 0; i < jsonRecord.Count; ++i) IncreaseCounters(cardRecord);
+            var outline = TestSetOutlines.Cards[jsonRecord.Id];
+            AddCardToDeck(outline).SetCount(jsonRecord.Count);
+            for (var i = 0; i < jsonRecord.Count; ++i)
+            {
+                IncreaseCounters(outline);
+            }
         }
     }
 }
