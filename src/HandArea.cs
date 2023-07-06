@@ -27,7 +27,7 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
         return messageType switch
         {
             MessageType.RemoveCard => Executor.Make<Guid>(RemoveCard, Executor.ResponseMode.NoResponse),
-            MessageType.DrawCard => Executor.Make<CardImplementationDto>(DrawCard, Executor.ResponseMode.NoResponse)
+            MessageType.DrawCard => Executor.Make<CardImplementationDto>(DrawCard, Executor.ResponseMode.Respond)
         };
     }
 

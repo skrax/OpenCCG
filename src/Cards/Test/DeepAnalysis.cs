@@ -11,10 +11,9 @@ public class DeepAnalysis : SpellImplementation
     {
     }
 
-    public override Task OnPlayAsync()
+    public override async Task OnPlayAsync()
     {
-        PlayerGameState.Draw(Amount);
+        await PlayerGameState.DrawAsync(Amount);
         PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
-        return Task.CompletedTask;
     }
 }

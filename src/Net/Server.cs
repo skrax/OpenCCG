@@ -78,7 +78,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             CardEffectPreview = GetNode<ServerNodes.CardEffectPreview>("CardEffectPreview"),
             EnemyCardEffectPreview = GetNode<ServerNodes.CardEffectPreview>("EnemyCardEffectPreview")
         };
-        
+
         TestSetImplementations.Init();
     }
 
@@ -176,8 +176,8 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             _gameState.PlayerGameStateCommandQueues.Add(p1.PeerId, p1Q);
             _gameState.PlayerGameStateCommandQueues.Add(p2.PeerId, p2Q);
 
-            p1Q.Start();
-            p2Q.Start();
+            await p1Q.StartAsync();
+            await p2Q.StartAsync();
             await p1Q.EnqueueAsync(x => x.StartTurnAsync);
         }
         else

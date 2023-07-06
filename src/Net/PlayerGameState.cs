@@ -65,9 +65,9 @@ public class PlayerGameState
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, null));
     }
 
-    public void Start()
+    public async Task StartAsync()
     {
-        Draw(Rules.InitialCardsDrawn);
+        await DrawAsync(Rules.InitialCardsDrawn);
         UpdateEnergy();
         UpdateHealth();
     }
@@ -78,7 +78,7 @@ public class PlayerGameState
         IsTurn = true;
         Energy = MaxEnergy = Math.Min(Rules.MaxEnergy, MaxEnergy + Rules.EnergyGainedPerTurn);
         UpdateEnergy();
-        Draw();
+        await DrawAsync();
 
         foreach (CreatureImplementation creature in Board)
         {
@@ -141,7 +141,6 @@ public class PlayerGameState
             spellImplementation.RemoveFromHand();
             spellImplementation.MoveToZone(CardZone.None);
             await spellImplementation.OnPlayAsync();
-            spellImplementation.RemoveFromHand();
             spellImplementation.MoveToZone(CardZone.Pit);
             UpdateCardCount();
         }
@@ -246,7 +245,7 @@ public class PlayerGameState
         }
     }
 
-    public void Draw(int count = 1)
+    public async Task DrawAsync(int count = 1)
     {
         for (var i = 0; i < count; ++i)
         {
@@ -256,8 +255,7 @@ public class PlayerGameState
 
             var dto = card.AsDto();
 
-            Nodes.Hand.DrawCard(PeerId, dto);
-            Nodes.EnemyHand.DrawCard(EnemyPeerId);
+            await Task.WhenAll(Nodes.Hand.DrawCard(PeerId, dto), Nodes.EnemyHand.DrawCard(EnemyPeerId));
 
             UpdateCardCount();
         }
