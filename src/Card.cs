@@ -87,6 +87,7 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
         pos.X -= _preview.Size.X / 2 - Size.X / 2;
         _preview.Position = pos;
         _preview.Visible = true;
+        _preview.ZIndex = ZIndex + 1;
     }
 
     public void DisablePreview()
