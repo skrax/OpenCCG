@@ -102,7 +102,6 @@ texture = ExtResource("10_a36md")
 offset_top = 953.0
 offset_right = 1920.0
 offset_bottom = 1208.0
-theme_override_constants/separation = 0
 alignment = 1
 script = ExtResource("1_kp75l")
 _heightCurve = ExtResource("6_8m5r4")

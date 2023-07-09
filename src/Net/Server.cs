@@ -176,8 +176,11 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             _gameState.PlayerGameStateCommandQueues.Add(p1.PeerId, p1Q);
             _gameState.PlayerGameStateCommandQueues.Add(p2.PeerId, p2Q);
 
-            await p1Q.StartAsync();
-            await p2Q.StartAsync();
+            p1Q.Start();
+            p2Q.Start();
+            await Task.WhenAll(p1Q.EnqueueWithCompletionAsync(x => x.StartAsync),
+                p2Q.EnqueueWithCompletionAsync(x => x.StartAsync)
+            );
             await p1Q.EnqueueAsync(x => x.StartTurnAsync);
         }
         else

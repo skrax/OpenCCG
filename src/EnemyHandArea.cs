@@ -70,7 +70,6 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
             if (_cards.Count > 3)
             {
                 var sampleIndex = (float)(index - 0) / (_cards.Count - 1 - 0);
-                Logger.Info<HandArea>($"{index}/{_cards.Count} -> {sampleIndex}");
                 var pos = c.GlobalPosition;
                 pos.Y += _heightCurve.Sample(sampleIndex) * 18;
                 c.GlobalPosition = pos;

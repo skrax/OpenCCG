@@ -15,6 +15,8 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
     private CardPreview? _preview;
+    public bool _drawAnim;
+    [Export] private Curve _drawCurve;
 
     public Guid Id { get; private set; }
 
@@ -27,7 +29,7 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
         _namePanel.Value = dto.Outline.Name;
         Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
         _costPanel.Value = dto.State.Cost;
-        
+
         if (dto.IsCreature)
         {
             _atkPanel.Value = dto.CreatureState!.Atk;
@@ -41,6 +43,34 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
 
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;
+    }
+
+    public async void PlayDrawAnimAsync(Vector2 start, Vector2 end, TaskCompletionSource taskCompletionSource)
+    {
+        if (!_drawAnim) return;
+        _drawAnim = false;
+        var t = 0f;
+        var delta = 1000 / 60f;
+        Logger.Info($"{delta} {start} {end}");
+        while (t < 1f)
+        {
+            t += delta / 360;
+            t = Math.Clamp(t, 0f, 1f);
+            Logger.Info($"proc {t} {GetInstanceId()}");
+
+            var pos = GlobalPosition;
+            pos.X = Mathf.Lerp(start.X, end.X, t);
+            var lol = (pos.X - end.X) / (start.X - end.X);
+
+            var h = _drawCurve.Sample(lol) * -200f;
+            pos.Y = start.Y + h;
+
+            GlobalPosition = pos;
+            await Task.Delay(TimeSpan.FromMilliseconds(delta));
+        }
+
+        Logger.Info($"done {t} {GetInstanceId()}");
+        taskCompletionSource.SetResult();
     }
 
     public override void _Process(double delta)

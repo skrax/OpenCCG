@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dn7ayibqvf3jk"]
+[gd_scene load_steps=9 format=3 uid="uid://dn7ayibqvf3jk"]
 
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_8stps"]
 [ext_resource type="Script" path="res://src/Card.cs" id="2_davtw"]
 [ext_resource type="PackedScene" uid="uid://dysns3hnic57" path="res://scenes/card-preview.tscn" id="3_ab0j7"]
 [ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_bkiwm"]
+[ext_resource type="Curve" uid="uid://bg2okeeikxsme" path="res://CardDrawCurve.tres" id="4_mlk4l"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_wwja8"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_jwlpm"]
@@ -26,6 +27,7 @@ _atkPanel = NodePath("AttackPanel")
 _defPanel = NodePath("DefPanel")
 _infoPanel = NodePath("InfoPanel")
 _namePanel = NodePath("NamePanel")
+_drawCurve = ExtResource("4_mlk4l")
 
 [node name="NamePanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
 layout_mode = 1
