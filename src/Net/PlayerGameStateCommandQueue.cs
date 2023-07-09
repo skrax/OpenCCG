@@ -35,9 +35,8 @@ public class PlayerGameStateCommandQueue
             }
     }
 
-    public async Task StartAsync()
+    public void Start()
     {
-        await PlayerGameState.StartAsync();
         Task.Run(() => ProcessTaskQueueAsync(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
     }
 

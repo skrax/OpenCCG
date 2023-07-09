@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
@@ -10,9 +11,17 @@ namespace OpenCCG;
 public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType>
 {
     private static readonly PackedScene CardHiddenScene = GD.Load<PackedScene>("res://scenes/card-hidden.tscn");
-    private readonly List<TextureRect> _cards = new();
+    private readonly List<CardHidden> _cards = new();
+    [Export] private Curve _heightCurve, _rotationCurve, _separationCurve;
+    private TaskCompletionSource _drawAnimTsc;
 
     public Dictionary<string, IObserver>? Observers => null;
+
+    public override void _Ready()
+    {
+        SortChildren += CustomSort;
+        PreSortChildren += PreCustomSort;
+    }
 
     [Rpc]
     public async void HandleMessageAsync(string messageJson)
@@ -38,9 +47,45 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
         cardEntity.QueueFree();
     }
 
-    private void DrawCard()
+    private async Task DrawCard()
     {
-        var entity = CardHiddenScene.Make<TextureRect>(this);
+        var entity = CardHiddenScene.Make<CardHidden>(this);
         _cards.Add(entity);
+        entity._drawAnim = true;
+
+        _drawAnimTsc = new TaskCompletionSource();
+
+        await _drawAnimTsc.Task;
+    }
+
+
+    private void PreCustomSort()
+    {
+        if (!_cards.Any()) return;
+        var separation = (int)_separationCurve.Sample((_cards.Count - 0f) / 12f) * 40;
+
+        if (HasThemeConstantOverride("separation"))
+            AddThemeConstantOverride("separation", separation);
+    }
+
+    private void CustomSort()
+    {
+        for (var index = 0; index < _cards.Count; index++)
+        {
+            var c = _cards[index];
+
+            if (_cards.Count > 3)
+            {
+                var sampleIndex = (float)(index - 0) / (_cards.Count - 1 - 0);
+                var pos = c.GlobalPosition;
+                pos.Y += _heightCurve.Sample(sampleIndex) * 18;
+                c.GlobalPosition = pos;
+                c.RotationDegrees = _rotationCurve.Sample(sampleIndex) * -4f;
+            }
+
+            c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition, _drawAnimTsc);
+
+            c.ZIndex = _cards.Count - index;
+        }
     }
 }

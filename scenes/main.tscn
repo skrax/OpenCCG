@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://j4opc717kx3j"]
+[gd_scene load_steps=25 format=3 uid="uid://j4opc717kx3j"]
 
 [ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
 [ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
@@ -7,6 +7,9 @@
 [ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
 [ext_resource type="Script" path="res://src/Dropzone.cs" id="3_x8tt0"]
 [ext_resource type="Script" path="res://src/BoardArea.cs" id="4_4t5gh"]
+[ext_resource type="Curve" uid="uid://dlhs5oxncag7t" path="res://CardHeightCurve.tres" id="6_8m5r4"]
+[ext_resource type="Curve" uid="uid://cv6pqdivmwc2p" path="res://CardRotationCurve.tres" id="7_pec5a"]
+[ext_resource type="Curve" uid="uid://dc1gwp2rhsq4i" path="res://CardSeparationCuve.tres" id="8_uv6j5"]
 [ext_resource type="Script" path="res://src/TargetLine.cs" id="9_cltvt"]
 [ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
 [ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="9_xpu3a"]
@@ -99,9 +102,11 @@ texture = ExtResource("10_a36md")
 offset_top = 953.0
 offset_right = 1920.0
 offset_bottom = 1208.0
-theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("1_kp75l")
+_heightCurve = ExtResource("6_8m5r4")
+_rotationCurve = ExtResource("7_pec5a")
+_separationCurve = ExtResource("8_uv6j5")
 
 [node name="EnemyHand" type="HBoxContainer" parent="."]
 offset_top = -127.0
@@ -110,6 +115,9 @@ offset_bottom = 128.0
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("3_8aogm")
+_heightCurve = ExtResource("6_8m5r4")
+_rotationCurve = ExtResource("7_pec5a")
+_separationCurve = ExtResource("8_uv6j5")
 
 [node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("_StatusPanel", "_EnemyStatusPanel", "EnemyBoardArea")]
 offset_top = 572.0
