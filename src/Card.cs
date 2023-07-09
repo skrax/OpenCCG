@@ -50,13 +50,11 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
         if (!_drawAnim) return;
         _drawAnim = false;
         var t = 0f;
-        var delta = 1000 / 60f;
-        Logger.Info($"{delta} {start} {end}");
+        const float delta = 1000 / 60f;
         while (t < 1f)
         {
             t += delta / 360;
             t = Math.Clamp(t, 0f, 1f);
-            Logger.Info($"proc {t} {GetInstanceId()}");
 
             var pos = GlobalPosition;
             pos.X = Mathf.Lerp(start.X, end.X, t);
@@ -69,7 +67,6 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
             await Task.Delay(TimeSpan.FromMilliseconds(delta));
         }
 
-        Logger.Info($"done {t} {GetInstanceId()}");
         taskCompletionSource.SetResult();
     }
 
