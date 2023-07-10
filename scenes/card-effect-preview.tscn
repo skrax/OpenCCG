@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bi081wvfogtvn"]
+[gd_scene load_steps=8 format=3 uid="uid://bi081wvfogtvn"]
 
 [ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_blvu1"]
 [ext_resource type="Script" path="res://src/CardEffectPreview.cs" id="2_11vm1"]
 [ext_resource type="Script" path="res://src/CardInfoPanel.cs" id="3_nvm4n"]
 [ext_resource type="Script" path="res://src/CardStatPanel.cs" id="4_lylxl"]
+[ext_resource type="Texture2D" uid="uid://bg62h16xpe76i" path="res://addons/kenney_particle_pack/spark_05.png" id="5_4wh5n"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_jwlpm"]
 font_size = 18
@@ -11,7 +12,8 @@ font_size = 18
 [sub_resource type="LabelSettings" id="LabelSettings_880an"]
 font_size = 10
 
-[node name="CardEffectPreview" type="TextureRect" node_paths=PackedStringArray("_costPanel", "_descriptionPanel", "_namePanel")]
+[node name="CardEffectPreview" type="TextureRect" node_paths=PackedStringArray("_costPanel", "_descriptionPanel", "_namePanel", "_projectile")]
+z_index = 20
 custom_minimum_size = Vector2(153.6, 230.4)
 offset_right = 153.6
 offset_bottom = 230.4
@@ -22,6 +24,7 @@ script = ExtResource("2_11vm1")
 _costPanel = NodePath("CostPanel")
 _descriptionPanel = NodePath("InfoPanel")
 _namePanel = NodePath("NamePanel")
+_projectile = NodePath("Projectile")
 
 [node name="NamePanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
 layout_mode = 1
@@ -226,3 +229,8 @@ text = "COST"
 label_settings = SubResource("LabelSettings_880an")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Projectile" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(71, -159)
+texture = ExtResource("5_4wh5n")

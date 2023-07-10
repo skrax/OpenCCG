@@ -15,9 +15,9 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public void SetEnergy(long peerId, int current, int max)

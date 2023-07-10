@@ -22,11 +22,11 @@ public partial class Main : Node, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
-            _ => throw new NotImplementedException()
+            _ => null
         };
     }
 

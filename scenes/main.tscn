@@ -233,7 +233,6 @@ script = ExtResource("13_pb0qo")
 
 [node name="CardEffectPreview" parent="." node_paths=PackedStringArray("_skipSelectionField") instance=ExtResource("13_hy35u")]
 visible = false
-z_index = 2
 offset_left = 681.0
 offset_top = 788.0
 offset_right = 834.6
@@ -243,7 +242,6 @@ _skipSelectionField = NodePath("../MidPanel/SkipTargetField")
 
 [node name="EnemyCardEffectPreview" parent="." instance=ExtResource("13_hy35u")]
 visible = false
-z_index = 2
 offset_left = 1190.0
 offset_top = 66.0
 offset_right = 1343.6

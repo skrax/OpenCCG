@@ -15,9 +15,9 @@ public partial class MidPanel : Node, IMessageReceiver<MessageType>
         throw new NotImplementedException();
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public void EndTurnButtonSetActive(long peerId, EndTurnButtonSetActiveDto dto)

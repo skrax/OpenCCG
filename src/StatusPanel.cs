@@ -26,13 +26,14 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
             MessageType.SetEnergy => Executor.Make<SetEnergyDto>(SetEnergy, Executor.ResponseMode.NoResponse),
             MessageType.SetCardCount => Executor.Make<int>(SetCardCount, Executor.ResponseMode.NoResponse),
-            MessageType.SetHealth => Executor.Make<int>(SetHealth, Executor.ResponseMode.NoResponse)
+            MessageType.SetHealth => Executor.Make<int>(SetHealth, Executor.ResponseMode.NoResponse),
+            _ => null
         };
     }
 

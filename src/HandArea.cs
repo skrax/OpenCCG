@@ -15,7 +15,6 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
     private static readonly PackedScene CardScene = GD.Load<PackedScene>("res://scenes/card.tscn");
     private readonly List<Card> _cards = new();
     [Export] private Curve _heightCurve, _rotationCurve, _separationCurve;
-    private TaskCompletionSource _drawAnimTsc;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -31,12 +30,13 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
             MessageType.RemoveCard => Executor.Make<Guid>(RemoveCard, Executor.ResponseMode.NoResponse),
-            MessageType.DrawCard => Executor.Make<CardImplementationDto>(DrawCard, Executor.ResponseMode.Respond)
+            MessageType.DrawCard => Executor.Make<CardImplementationDto>(DrawCard, Executor.ResponseMode.Respond),
+            _ => null
         };
     }
 
@@ -53,11 +53,7 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
     {
         var entity = CardScene.Make<Card, CardImplementationDto>(card, this);
         _cards.Add(entity);
-        entity._drawAnim = true;
-
-        _drawAnimTsc = new TaskCompletionSource();
-
-        await _drawAnimTsc.Task;
+        await entity.PlayDrawAnimAsync();
     }
 
     private void PreCustomSort()
@@ -83,7 +79,7 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
                 c.GlobalPosition = pos;
                 c.RotationDegrees = _rotationCurve.Sample(sampleIndex) * 4f;
             }
-            c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition, _drawAnimTsc);
+            c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition);
 
             c.ZIndex = _cards.Count - index;
         }

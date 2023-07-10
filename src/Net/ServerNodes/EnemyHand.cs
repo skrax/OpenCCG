@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
@@ -15,9 +14,9 @@ public partial class EnemyHand : Node, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
 
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public void RemoveCard(long peerId)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Godot;
+using OpenCCG.Core;
 
 namespace OpenCCG.Net.Rpc;
 
@@ -25,7 +26,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
     /// </summary>
     /// <param name="messageType"></param>
     /// <returns></returns>
-    Executor GetExecutor(TMessageType messageType);
+    Executor? GetExecutor(TMessageType messageType);
 
     /// <summary>
     ///     Call this from <see cref="HandleMessageAsync(string)" />.
@@ -38,8 +39,11 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
 
         var message = JsonSerializer.Deserialize<Message<TMessageType>>(messageJson)!;
 
+        Logger.Info<IMessageReceiver<TMessageType>>($"Receiving: {message} from {senderPeerId}");
+
         if (self.Observers != null && self.Observers.TryGetValue(message.Id, out var observer))
         {
+            Logger.Info<IMessageReceiver<TMessageType>>($"Triggering Observer: {message} from {senderPeerId}");
             observer.Handle(message.Json);
             self.Observers.Remove(message.Id);
             observer.Dispose();
@@ -47,6 +51,12 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         else
         {
             var executor = self.GetExecutor(message.Type);
+            if (executor == null)
+            {
+                Logger.Warning<IMessageReceiver<TMessageType>>($"No executor for {message} from {senderPeerId}");
+                return;
+            }
+
             var responseData = executor.Execution is Executor.ExecutionMode.Async
                 ? await executor.AsyncOp!(senderPeerId, message.Json)
                 : executor.Op!(senderPeerId, message.Json);
@@ -56,6 +66,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
             var response = message with { Json = responseData };
             var responseJson = JsonSerializer.Serialize(response);
 
+            Logger.Info<IMessageReceiver<MessageType>>($"Responding: {response} to {senderPeerId}");
             self.RpcId(senderPeerId, nameof(HandleMessageAsync), responseJson);
         }
     }
@@ -83,6 +94,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         var observer = new Observer<TOut>(tsc, timeOut.Value);
         self.Observers!.Add(id, observer);
 
+        Logger.Info<IMessageReceiver<MessageType>>($"Sending: {message} to {peerId} as {nameof(GetAsync)}");
         self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
 
         return await tsc.Task;
@@ -111,6 +123,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         var observer = new Observer(tsc, timeOut.Value);
         self.Observers!.Add(id, observer);
 
+        Logger.Info<IMessageReceiver<MessageType>>($"Sending: {message} to {peerId} as {nameof(GetAsync)}");
         self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
 
         await tsc.Task;
@@ -136,6 +149,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         var observer = new Observer(tsc, timeOut.Value);
         self.Observers!.Add(id, observer);
 
+        Logger.Info<IMessageReceiver<MessageType>>($"Sending: {message} to {peerId} as {nameof(GetAsync)}");
         self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
 
         await tsc.Task;
@@ -152,6 +166,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         var id = Guid.NewGuid().ToString();
         var message = new Message<TMessageType>(id, messageType);
 
+        Logger.Info<IMessageReceiver<MessageType>>($"Sending: {message} to {peerId} as {nameof(FireAndForget)}");
         self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
     }
 
@@ -168,6 +183,7 @@ public interface IMessageReceiver<in TMessageType> : IGodotRpcNode
         var id = Guid.NewGuid().ToString();
         var message = new Message<TMessageType>(id, messageType, JsonSerializer.Serialize(t));
 
+        Logger.Info<IMessageReceiver<MessageType>>($"Sending: {message} to {peerId} as {nameof(FireAndForget)}");
         self.RpcId(peerId, nameof(HandleMessageAsync), JsonSerializer.Serialize(message));
     }
 }

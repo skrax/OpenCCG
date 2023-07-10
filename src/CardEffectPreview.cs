@@ -16,6 +16,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
     public RequireTargetInputDto? CurrentInputDto;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
     [Export] private SkipSelectionField _skipSelectionField;
+    [Export] private Sprite2D _projectile;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
 
@@ -27,13 +28,14 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
             MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
             MessageType.TmpShowCard => Executor.Make<CardImplementationDto>(TmpShowTarget,
-                Executor.ResponseMode.NoResponse)
+                Executor.ResponseMode.NoResponse),
+            _ => null
         };
     }
 
@@ -98,7 +100,32 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
     private async Task TmpShowTarget(CardImplementationDto dto)
     {
         Show(dto);
-        await Task.Delay(TimeSpan.FromSeconds(3));
+        //await Task.Delay(TimeSpan.FromSeconds(3));
+        _projectile.Visible = true;
+        var start = GlobalPosition;
+        var end = new Vector2(960F, 540F);
+        var direction = end - start;
+        var rot = Mathf.Atan2(direction.Y, direction.X) - 90f;
+        Logger.Info($"facing: {rot},{Mathf.RadToDeg(rot)}");
+
+        _projectile.Rotation = rot;
+        var t = 0f;
+        const float delta = 1000 / 60f;
+        while (t < 1f)
+        {
+            t += delta / (360 * 2);
+            t = Math.Clamp(t, 0f, 1f);
+
+            var pos = new Vector2(
+                Mathf.Lerp(start.X, end.X, t),
+                Mathf.Lerp(start.Y, end.Y, t));
+
+            _projectile.GlobalPosition = pos;
+            await Task.Delay(TimeSpan.FromMilliseconds(delta));
+        }
+
+        _projectile.Visible = false;
+
         Reset();
     }
 

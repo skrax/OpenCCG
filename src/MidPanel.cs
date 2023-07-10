@@ -19,13 +19,14 @@ public partial class MidPanel : Control, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
             MessageType.EndTurnButtonSetActive => Executor.Make<EndTurnButtonSetActiveDto>(EndTurnButtonSetActive,
                 Executor.ResponseMode.NoResponse),
-            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage, Executor.ResponseMode.NoResponse)
+            MessageType.SetStatusMessage => Executor.Make<string>(SetStatusMessage, Executor.ResponseMode.NoResponse),
+            _ => null
         };
     }
 

@@ -29,7 +29,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
@@ -38,7 +38,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
             MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard, Executor.ResponseMode.Respond),
             MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
                 Executor.ResponseMode.Respond),
-            _ => throw new NotImplementedException()
+            _ => null 
         };
     }
 

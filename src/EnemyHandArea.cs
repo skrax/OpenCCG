@@ -13,7 +13,6 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
     private static readonly PackedScene CardHiddenScene = GD.Load<PackedScene>("res://scenes/card-hidden.tscn");
     private readonly List<CardHidden> _cards = new();
     [Export] private Curve _heightCurve, _rotationCurve, _separationCurve;
-    private TaskCompletionSource _drawAnimTsc;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -29,12 +28,13 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
             MessageType.RemoveCard => Executor.Make(RemoveCard, Executor.ResponseMode.NoResponse),
-            MessageType.DrawCard => Executor.Make(DrawCard, Executor.ResponseMode.Respond)
+            MessageType.DrawCard => Executor.Make(DrawCard, Executor.ResponseMode.Respond),
+            _ => null
         };
     }
 
@@ -51,13 +51,8 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
     {
         var entity = CardHiddenScene.Make<CardHidden>(this);
         _cards.Add(entity);
-        entity._drawAnim = true;
-
-        _drawAnimTsc = new TaskCompletionSource();
-
-        await _drawAnimTsc.Task;
+        await entity.PlayDrawAnimAsync();
     }
-
 
     private void PreCustomSort()
     {
@@ -83,7 +78,7 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
                 c.RotationDegrees = _rotationCurve.Sample(sampleIndex) * -4f;
             }
 
-            c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition, _drawAnimTsc);
+            c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition);
 
             c.ZIndex = _cards.Count - index;
         }

@@ -22,9 +22,9 @@ public partial class Board : Node, IMessageReceiver<MessageType>
 
     public Dictionary<string, IObserver> Observers { get; } = new();
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public async Task PlaceCard(long peerId, CardImplementationDto dto)

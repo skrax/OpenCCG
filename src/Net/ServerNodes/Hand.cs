@@ -16,9 +16,9 @@ public partial class Hand : Node, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
 
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public async Task DrawCard(long peerId, CardImplementationDto dto)

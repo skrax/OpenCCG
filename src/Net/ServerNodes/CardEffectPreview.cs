@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;
@@ -18,9 +16,9 @@ public partial class CardEffectPreview : Node, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public async Task<RequireTargetOutputDto> RequireTargetsAsync(long peerId, RequireTargetInputDto input)

@@ -1,18 +1,26 @@
 using System;
 using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Core;
 
 namespace OpenCCG;
 
 public partial class CardHidden : TextureRect
 {
-    public bool _drawAnim;
+    private TaskCompletionSource? _drawAnimTsc;
+    private bool _drawAnim;
     [Export] private Curve _drawCurve;
 
-    public async void PlayDrawAnimAsync(Vector2 start, Vector2 end, TaskCompletionSource taskCompletionSource)
+    public async Task PlayDrawAnimAsync()
     {
-        if (!_drawAnim) return;
+        _drawAnimTsc = new();
+        _drawAnim = true;
+        await _drawAnimTsc.Task;
+        _drawAnimTsc = null;
+    }
+
+    public async void PlayDrawAnimAsync(Vector2 start, Vector2 end)
+    {
+        if (_drawAnim is false || _drawAnimTsc is null) return;
         _drawAnim = false;
         var t = 0f;
         const float delta = 1000 / 60f;
@@ -32,6 +40,6 @@ public partial class CardHidden : TextureRect
             await Task.Delay(TimeSpan.FromMilliseconds(delta));
         }
 
-        taskCompletionSource.SetResult();
+        _drawAnimTsc.SetResult();
     }
 }

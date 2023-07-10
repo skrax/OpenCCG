@@ -30,7 +30,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
-    public Executor GetExecutor(MessageType messageType)
+    public Executor? GetExecutor(MessageType messageType)
     {
         return messageType switch
         {
@@ -40,7 +40,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer, Executor.ResponseMode.NoResponse),
             MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
             MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer, Executor.ResponseMode.NoResponse),
-            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+            _ => null
         };
     }
 
