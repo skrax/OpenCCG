@@ -18,17 +18,10 @@ public class FellTheMighty : SpellImplementation
 
         PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
         if (board.Any() && enemyBoard.Any())
-        {
             await ResolveAllBoardsAsync();
-        }
         else if (board.Any())
-        {
             await ResolveBoardAsync();
-        }
-        else if (enemyBoard.Any())
-        {
-            await ResolveEnemyBoardAsync();
-        }
+        else if (enemyBoard.Any()) await ResolveEnemyBoardAsync();
     }
 
     private async Task ResolveAllBoardsAsync()
@@ -52,10 +45,7 @@ public class FellTheMighty : SpellImplementation
                         .Concat(orderedEnemy.TakeWhile(x => x.CreatureState.Atk == atk))
                         .ToList();
 
-        foreach (var creature in creatures)
-        {
-            creature.MoveToZone(CardZone.None);
-        }
+        foreach (var creature in creatures) creature.MoveToZone(CardZone.None);
 
         await Task.WhenAll(creatures.Select(x => x.RemoveFromBoardAsync()));
 
@@ -80,10 +70,7 @@ public class FellTheMighty : SpellImplementation
                         .TakeWhile(x => x.CreatureState.Atk == atk)
                         .ToList();
 
-        foreach (var creature in creatures)
-        {
-            creature.MoveToZone(CardZone.None);
-        }
+        foreach (var creature in creatures) creature.MoveToZone(CardZone.None);
 
         await Task.WhenAll(creatures.Select(x => x.RemoveFromBoardAsync()));
 
@@ -108,10 +95,7 @@ public class FellTheMighty : SpellImplementation
                         .TakeWhile(x => x.CreatureState.Atk == atk)
                         .ToList();
 
-        foreach (var creature in creatures)
-        {
-            creature.MoveToZone(CardZone.None);
-        }
+        foreach (var creature in creatures) creature.MoveToZone(CardZone.None);
 
         await Task.WhenAll(creatures.Select(x => x.RemoveFromBoardAsync()));
 

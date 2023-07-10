@@ -17,15 +17,15 @@ public class StringUp : SpellImplementation
         RETRY:
         var output = await PlayerGameState.Nodes.CardEffectPreview.RequireTargetsAsync(PlayerGameState.PeerId, input);
 
-        if(output.isEnemyAvatar.HasValue) goto RETRY;
+        if (output.isEnemyAvatar.HasValue) goto RETRY;
         if (output.cardId.HasValue)
         {
             if ((PlayerGameState.Board.SingleOrDefault(x => x.Id == output.cardId) ??
                  PlayerGameState.Enemy.Board.SingleOrDefault(x => x.Id == output.cardId))
                 is not CreatureImplementation card) goto RETRY;
-            
+
             PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());
-            
+
             card.MoveToZone(CardZone.None);
             await card.RemoveFromBoardAsync();
             await card.OnExitAsync();

@@ -8,7 +8,7 @@ namespace OpenCCG.Cards.Test;
 public class MorneholdSpectre : CreatureImplementation
 {
     public MorneholdSpectre(CreatureOutline outline, PlayerGameState playerGameState) :
-        base(outline, new(), playerGameState)
+        base(outline, new CreatureAbilities(), playerGameState)
     {
     }
 

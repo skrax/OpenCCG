@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Core;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.ServerNodes;
+using Serilog;
 
 namespace OpenCCG;
 
@@ -78,7 +78,7 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
         if (!IsEnemy) return;
         if (!CardImplementationDto.CreatureState!.IsExposed) return;
         if (!CardImplementationDto.CreatureAbilities!.Defender &&
-            GetParent<BoardArea>()._cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
+            GetParent<BoardArea>().Cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
 
         DrawOutline(true);
     }
@@ -190,7 +190,8 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
         {
             case CardBoard attacker:
             {
-                Logger.Info<CardBoard>($"{attacker!.CardImplementationDto.Id} attacked {CardImplementationDto.Id}");
+                Log.Information("{AttackerId} attacked {TargetId}",
+                    attacker.CardImplementationDto.Id, CardImplementationDto.Id);
                 GetNode<Main>("/root/Main")
                     .CombatPlayerCard(attacker.CardImplementationDto.Id, CardImplementationDto.Id);
                 break;

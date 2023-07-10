@@ -6,13 +6,13 @@ namespace OpenCCG;
 
 public partial class CardHidden : TextureRect
 {
-    private TaskCompletionSource? _drawAnimTsc;
     private bool _drawAnim;
+    private TaskCompletionSource? _drawAnimTsc;
     [Export] private Curve _drawCurve;
 
     public async Task PlayDrawAnimAsync()
     {
-        _drawAnimTsc = new();
+        _drawAnimTsc = new TaskCompletionSource();
         _drawAnim = true;
         await _drawAnimTsc.Task;
         _drawAnimTsc = null;

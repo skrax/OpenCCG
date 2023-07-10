@@ -29,11 +29,16 @@ public class TestSetImplementations
 
     private static void RegisterCreatures()
     {
-        RegisterCreature("TEST-C-001", (outline, state) => new VanillaCreature(outline, new(), state));
-        RegisterCreature("TEST-C-002", (outline, state) => new VanillaCreature(outline, new(), state));
-        RegisterCreature("TEST-C-003", (outline, state) => new VanillaCreature(outline, new(), state));
-        RegisterCreature("TEST-C-004", (outline, state) => new VanillaCreature(outline, new(), state));
-        RegisterCreature("TEST-C-005", (outline, state) => new VanillaCreature(outline, new(), state));
+        RegisterCreature("TEST-C-001",
+            (outline, state) => new VanillaCreature(outline, new CreatureAbilities(), state));
+        RegisterCreature("TEST-C-002",
+            (outline, state) => new VanillaCreature(outline, new CreatureAbilities(), state));
+        RegisterCreature("TEST-C-003",
+            (outline, state) => new VanillaCreature(outline, new CreatureAbilities(), state));
+        RegisterCreature("TEST-C-004",
+            (outline, state) => new VanillaCreature(outline, new CreatureAbilities(), state));
+        RegisterCreature("TEST-C-005",
+            (outline, state) => new VanillaCreature(outline, new CreatureAbilities(), state));
         RegisterCreature("TEST-C-006", (outline, state) => new VanillaCreature(outline, new CreatureAbilities
         {
             Exposed = true
@@ -58,7 +63,9 @@ public class TestSetImplementations
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)
-        => Mappings[key](playerGameState);
+    {
+        return Mappings[key](playerGameState);
+    }
 
     private static void Register(string key, Func<PlayerGameState, CardImplementation> mapping)
     {

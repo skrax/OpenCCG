@@ -15,11 +15,14 @@ public abstract class SpellImplementation : CardImplementation
     {
     }
 
-    public abstract override Task OnPlayAsync();
-
-    public override CardImplementationDto AsDto() => CardImplementationDto.AsSpell(Id, SpellOutline, SpellState);
-
     public SpellOutline SpellOutline => (SpellOutline)Outline;
 
     public SpellState SpellState => (SpellState)State;
+
+    public abstract override Task OnPlayAsync();
+
+    public override CardImplementationDto AsDto()
+    {
+        return CardImplementationDto.AsSpell(Id, SpellOutline, SpellState);
+    }
 }

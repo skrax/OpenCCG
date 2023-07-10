@@ -10,7 +10,8 @@ public class BerenMorne : CreatureImplementation
 {
     private const int Damage = 5;
 
-    public BerenMorne(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new(), playerGameState)
+    public BerenMorne(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new CreatureAbilities(),
+        playerGameState)
     {
     }
 

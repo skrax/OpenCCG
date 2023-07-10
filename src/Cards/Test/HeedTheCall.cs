@@ -15,7 +15,8 @@ public class HeedTheCall : SpellImplementation
 
         for (var i = 0; i < 2; ++i)
         {
-            var spectre = (CreatureImplementation) TestSetImplementations.GetImplementation("TEST-C-008", PlayerGameState);
+            var spectre =
+                (CreatureImplementation)TestSetImplementations.GetImplementation("TEST-C-008", PlayerGameState);
             spectre.MoveToZone(CardZone.Board);
             await spectre.EnterBoardAsync();
         }

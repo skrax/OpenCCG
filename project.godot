@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.0", "C#", "Forward Plus")
 [autoload]
 
 RuntimeData="*res://src/RuntimeData.cs"
+Logging="*res://src/Core/Logging.cs"
 
 [display]
 

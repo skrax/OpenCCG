@@ -80,17 +80,11 @@ public class PlayerGameState
         UpdateEnergy();
         await DrawAsync();
 
-        foreach (CreatureImplementation creature in Board)
-        {
-            await creature.OnUpkeepAsync();
-        }
+        foreach (CreatureImplementation creature in Board) await creature.OnUpkeepAsync();
 
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(true, null));
 
-        foreach (CreatureImplementation creature in Board)
-        {
-            await creature.OnStartTurnAsync();
-        }
+        foreach (CreatureImplementation creature in Board) await creature.OnStartTurnAsync();
     }
 
     public async Task EndTurnAsync()
@@ -99,15 +93,9 @@ public class PlayerGameState
 
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, "End Step"));
 
-        foreach (CreatureImplementation creature in Board)
-        {
-            await creature.OnEndStepAsync();
-        }
+        foreach (CreatureImplementation creature in Board) await creature.OnEndStepAsync();
 
-        foreach (CreatureImplementation creature in Board)
-        {
-            await creature.OnEndTurnAsync();
-        }
+        foreach (CreatureImplementation creature in Board) await creature.OnEndTurnAsync();
 
         IsTurn = false;
         Nodes.MidPanel.EndTurnButtonSetActive(PeerId, new EndTurnButtonSetActiveDto(false, null));

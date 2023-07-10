@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenCCG.Core;
+using Serilog;
 
 namespace OpenCCG.Net;
 
@@ -31,7 +31,7 @@ public class PlayerGameStateCommandQueue
             }
             catch (Exception ex)
             {
-                Logger.Error<PlayerGameState>(ex, "Error occurred executing task work item.");
+                Log.Error(ex, "Error occurred executing task work item");
             }
     }
 

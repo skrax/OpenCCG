@@ -1,8 +1,6 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenCCG.Net;
-using OpenCCG.Net.ServerNodes;
 
 namespace OpenCCG.Cards.Test;
 
@@ -27,10 +25,7 @@ public class ImminentCatastrophe : SpellImplementation
 
         var deadCreatures = creatures.Where(x => x.CreatureState.Def < 1).ToList();
 
-        foreach (var creature in deadCreatures)
-        {
-            creature.MoveToZone(CardZone.None);
-        }
+        foreach (var creature in deadCreatures) creature.MoveToZone(CardZone.None);
 
         await Task.WhenAll(deadCreatures.Select(x => x.RemoveFromBoardAsync()));
 

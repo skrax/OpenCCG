@@ -16,12 +16,6 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
 
     public Dictionary<string, IObserver>? Observers => null;
 
-    public override void _Ready()
-    {
-        SortChildren += CustomSort;
-        PreSortChildren += PreCustomSort;
-    }
-
     [Rpc]
     public async void HandleMessageAsync(string messageJson)
     {
@@ -36,6 +30,12 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
             MessageType.DrawCard => Executor.Make(DrawCard, Executor.ResponseMode.Respond),
             _ => null
         };
+    }
+
+    public override void _Ready()
+    {
+        SortChildren += CustomSort;
+        PreSortChildren += PreCustomSort;
     }
 
     private void RemoveCard()

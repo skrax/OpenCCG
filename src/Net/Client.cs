@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using OpenCCG.Core;
+using Serilog;
 
 namespace OpenCCG.Net;
 
@@ -38,7 +38,7 @@ public partial class Client : Node
 
     private void OnConnectionFailed()
     {
-        Logger.Error<Client>("Connection failed");
+        Log.Error("Connection failed");
     }
 
     public override void _ExitTree()
@@ -48,23 +48,23 @@ public partial class Client : Node
 
     private void OnServerDisconnected()
     {
-        Logger.Info<Client>("Server disconnected");
+        Log.Information("Server disconnected");
     }
 
     private void OnConnectedToServer()
     {
-        Logger.Info<Client>("Connected to server");
+        Log.Information("Connected to server");
 
         _main.Enqueue();
     }
 
     private void OnPeerConnected(long id)
     {
-        Logger.Info<Client>($"Peer connected {id}");
+        Log.Information("Peer connected {Id}", id);
     }
 
     private void OnPeerDisconnected(long id)
     {
-        Logger.Info<Client>($"Peer disconnected {id}");
+        Log.Information("Peer disconnected {Id}", id);
     }
 }

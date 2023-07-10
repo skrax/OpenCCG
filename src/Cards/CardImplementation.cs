@@ -18,21 +18,40 @@ public abstract class CardImplementation
     public Guid Id { get; } = Guid.NewGuid();
 
     public ICardOutline Outline { get; }
-    
+
     public ICardState State { get; set; }
 
     protected PlayerGameState PlayerGameState { get; }
 
-    public virtual Task OnPlayAsync() => Task.CompletedTask;
-    public virtual Task OnPlayAsync(CardImplementation cardImplementation) => Task.CompletedTask;
+    public virtual Task OnPlayAsync()
+    {
+        return Task.CompletedTask;
+    }
 
-    public virtual Task OnEnterAsync(CreatureImplementation other) => Task.CompletedTask;
+    public virtual Task OnPlayAsync(CardImplementation cardImplementation)
+    {
+        return Task.CompletedTask;
+    }
 
-    public virtual Task OnExitAsync(CreatureImplementation other) => Task.CompletedTask;
+    public virtual Task OnEnterAsync(CreatureImplementation other)
+    {
+        return Task.CompletedTask;
+    }
 
-    public virtual Task OnStartCombatTurnAsync(CreatureImplementation other) => Task.CompletedTask;
+    public virtual Task OnExitAsync(CreatureImplementation other)
+    {
+        return Task.CompletedTask;
+    }
 
-    public virtual Task OnEndCombatAsync(CreatureImplementation other) => Task.CompletedTask;
+    public virtual Task OnStartCombatTurnAsync(CreatureImplementation other)
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnEndCombatAsync(CreatureImplementation other)
+    {
+        return Task.CompletedTask;
+    }
 
     public void MoveToZone(CardZone zone)
     {

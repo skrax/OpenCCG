@@ -9,6 +9,6 @@ public class CreatureAbilities
     public bool Drain { get; init; }
 
     public bool Defender { get; init; }
-    
+
     public bool Arcane { get; init; }
 }

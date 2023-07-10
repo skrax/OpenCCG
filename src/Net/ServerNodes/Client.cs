@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using OpenCCG.Core;
+using Serilog;
 
 namespace OpenCCG.Net.ServerNodes;
 
@@ -34,23 +34,23 @@ public partial class Client : Node
 
     private void OnServerDisconnected()
     {
-        Logger.Info<Client>("Server disconnected");
+        Log.Information("Server disconnected");
     }
 
     private void OnConnectedToServer()
     {
-        Logger.Info<Client>("Connected to server");
+        Log.Information("Connected to server");
     }
 
     private void OnPeerConnected(long id)
     {
-        Logger.Info<Client>($"Peer connected {id}");
+        Log.Information($"Peer connected {id}");
 
         GetParent().SetMultiplayerAuthority(Multiplayer.GetUniqueId(), false);
     }
 
     private void OnPeerDisconnected(long id)
     {
-        Logger.Info<Client>($"Peer disconnected {id}");
+        Log.Information($"Peer disconnected {id}");
     }
 }

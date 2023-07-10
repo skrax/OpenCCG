@@ -10,14 +10,14 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
 {
     private static bool _canPreview = true;
 
-    private CardImplementationDto _cardGameState;
-    [Export] private PackedScene _cardPreviewScene;
-    [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
+    private CardImplementationDto _cardGameState = null!;
+    [Export] private PackedScene _cardPreviewScene = null!;
+    [Export] private CardStatPanel _costPanel = null!, _atkPanel = null!, _defPanel;
+    private bool _drawAnim;
+    private TaskCompletionSource? _drawAnimTsc;
+    [Export] private Curve _drawCurve;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
     private CardPreview? _preview;
-    private TaskCompletionSource? _drawAnimTsc;
-    private bool _drawAnim;
-    [Export] private Curve _drawCurve;
 
     public Guid Id { get; private set; }
 
@@ -48,7 +48,7 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
 
     public async Task PlayDrawAnimAsync()
     {
-        _drawAnimTsc = new();
+        _drawAnimTsc = new TaskCompletionSource();
         _drawAnim = true;
         await _drawAnimTsc.Task;
         _drawAnimTsc = null;

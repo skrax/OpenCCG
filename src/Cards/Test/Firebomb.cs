@@ -9,6 +9,7 @@ namespace OpenCCG.Cards.Test;
 public class Firebomb : SpellImplementation
 {
     private const int Damage = 5;
+
     public Firebomb(SpellOutline outline, PlayerGameState playerGameState) : base(outline, playerGameState)
     {
     }
@@ -21,13 +22,8 @@ public class Firebomb : SpellImplementation
                                           .RequireTargetsAsync(PlayerGameState.PeerId, requireInput);
 
         if (output.cardId.HasValue)
-        {
             await ResolveCreatureDamage(output.cardId.Value);
-        }
-        else if (output.isEnemyAvatar.HasValue)
-        {
-            ResolveAvatarDamage(output.isEnemyAvatar.Value);
-        }
+        else if (output.isEnemyAvatar.HasValue) ResolveAvatarDamage(output.isEnemyAvatar.Value);
     }
 
     private void ResolveAvatarDamage(bool isEnemyAvatar)

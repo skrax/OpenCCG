@@ -8,7 +8,7 @@ namespace OpenCCG.Cards.Test;
 
 public class BountyHunter : CreatureImplementation
 {
-    public BountyHunter(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new()
+    public BountyHunter(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new CreatureAbilities
     {
         Arcane = true
     }, playerGameState)

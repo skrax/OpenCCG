@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using OpenCCG.Net;
 using OpenCCG.Net.ServerNodes;
@@ -12,7 +11,7 @@ public class MorneholdAssassin : CreatureImplementation
     private const int Damage = 2;
 
     public MorneholdAssassin(CreatureOutline outline, PlayerGameState playerGameState) :
-        base(outline, new(), playerGameState)
+        base(outline, new CreatureAbilities(), playerGameState)
     {
     }
 

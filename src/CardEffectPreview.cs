@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Core;
 using OpenCCG.Net;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
+using Serilog;
 
 namespace OpenCCG;
 
 public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageType>
 {
     [Export] private CardStatPanel _costPanel;
-    public RequireTargetInputDto? CurrentInputDto;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
-    [Export] private SkipSelectionField _skipSelectionField;
     [Export] private Sprite2D _projectile;
+    [Export] private SkipSelectionField _skipSelectionField;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
+    public RequireTargetInputDto? CurrentInputDto;
 
     public Dictionary<string, IObserver>? Observers => null;
 
@@ -106,7 +106,6 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         var end = new Vector2(960F, 540F);
         var direction = end - start;
         var rot = Mathf.Atan2(direction.Y, direction.X) - 90f;
-        Logger.Info($"facing: {rot},{Mathf.RadToDeg(rot)}");
 
         _projectile.Rotation = rot;
         var t = 0f;
@@ -134,7 +133,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
             _tsc.Task.IsFaulted)
         {
-            Logger.Error<CardEffectPreview>($"No request id set to use {nameof(SkipTarget)}");
+            Log.Error($"No request id set to use {nameof(SkipTarget)}");
             ForceDrag();
             return;
         }
@@ -150,7 +149,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         if (_tsc is null || _tsc.Task.IsCompleted || _tsc.Task.IsCanceled || _tsc.Task.IsCanceled ||
             _tsc.Task.IsFaulted)
         {
-            Logger.Error<CardEffectPreview>($"No request id set to use {nameof(TryUpstreamTarget)}");
+            Log.Error($"No request id set to use {nameof(TryUpstreamTarget)}");
             ForceDrag();
             return;
         }

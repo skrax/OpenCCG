@@ -58,7 +58,7 @@ public static class TestSetOutlines
         new("TEST-C-013", "Bounty Hunter",
             "\n[center][b]Arcane[/b]\n[b]Play:[/b] Expose a creature[/center]",
             3, 4, 3,
-            "res://img/cards/bounty_hunter.png"),
+            "res://img/cards/bounty_hunter.png")
     };
 
     public static readonly ICardOutline[] Spells = new SpellOutline[]
@@ -94,7 +94,7 @@ public static class TestSetOutlines
         new("TEST-S-008", "String up",
             "\n\n[center]Destroy a creature[/center]",
             4,
-            "res://img/cards/string_up.png"),
+            "res://img/cards/string_up.png")
     };
 
     public static readonly ICardOutline[] All = Creatures.Concat(Spells).ToArray();

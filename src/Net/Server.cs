@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
-using OpenCCG.Core;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
+using Serilog;
 
 namespace OpenCCG.Net;
 
@@ -51,7 +51,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
         if (result is Error.Ok)
         {
-            Logger.Info<Server>("listening on port 57618");
+            Log.Information("listening on port 57618");
             GetTree().GetMultiplayer().MultiplayerPeer = peer;
             Multiplayer.PeerConnected += OnPeerConnected;
             Multiplayer.PeerDisconnected += OnPeerDisconnected;
@@ -84,12 +84,12 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
     private void OnPeerConnected(long id)
     {
-        Logger.Info<Server>($"Peer connected {id}");
+        Log.Information("Peer connected {Id}", id);
     }
 
     private async void OnPeerDisconnected(long id)
     {
-        Logger.Info<Server>($"Peer disconnected {id}");
+        Log.Information("Peer disconnected {Id}", id);
         if (_gameState.PlayerGameStateCommandQueues.TryGetValue(id, out var commandQueue))
         {
             await commandQueue.EnqueueAsync(x => x.Disconnect);

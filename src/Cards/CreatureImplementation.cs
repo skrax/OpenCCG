@@ -30,12 +30,35 @@ public abstract class CreatureImplementation : CardImplementation
 
     public CreatureAbilities Abilities { get; }
 
-    public virtual Task OnEnterAsync() => Task.CompletedTask;
-    public virtual Task OnExitAsync() => Task.CompletedTask;
-    public virtual Task OnStartTurnAsync() => Task.CompletedTask;
-    public virtual Task OnEndTurnAsync() => Task.CompletedTask;
-    public virtual Task OnStartCombatTurnAsync() => Task.CompletedTask;
-    public virtual Task OnEndCombatAsync() => Task.CompletedTask;
+    public virtual Task OnEnterAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnExitAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnStartTurnAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnEndTurnAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnStartCombatTurnAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnEndCombatAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public async Task OnUpkeepAsync()
     {
@@ -91,6 +114,8 @@ public abstract class CreatureImplementation : CardImplementation
         await UpdateAsync();
     }
 
-    public override CardImplementationDto AsDto() =>
-        CardImplementationDto.AsCreature(Id, CreatureOutline, CreatureState, Abilities);
+    public override CardImplementationDto AsDto()
+    {
+        return CardImplementationDto.AsCreature(Id, CreatureOutline, CreatureState, Abilities);
+    }
 }

@@ -1,5 +1,4 @@
 using OpenCCG.Cards;
-using OpenCCG.Net.Dto;
 
 namespace OpenCCG.Net.ServerNodes;
 

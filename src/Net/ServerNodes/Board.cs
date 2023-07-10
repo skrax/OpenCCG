@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.Net.ServerNodes;

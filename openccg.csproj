@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Serilog" Version="3.0.1" />
+    <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
+    <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.1.0" />
     <PackageReference Include="Stateless" Version="5.13.0" />
   </ItemGroup>
   <ItemGroup>

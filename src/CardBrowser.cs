@@ -7,6 +7,7 @@ using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
 using OpenCCG.Core;
+using Serilog;
 using FileAccess = Godot.FileAccess;
 
 namespace OpenCCG;
@@ -55,7 +56,7 @@ public partial class CardBrowser : Control
 
         _clearTextButton.Pressed += () =>
         {
-            Logger.Info("text cleared");
+            Log.Information("text cleared");
             _searchEdit.Text = "";
 
             foreach (var child in _cardViewFlowContainer.GetChildren())
@@ -73,15 +74,10 @@ public partial class CardBrowser : Control
                     child.QueueFree();
 
             foreach (var outline in TestSetOutlines.All.Where(x => x.Description.Contains(text)))
-            {
                 AddCardToView(outline);
-            }
         };
 
-        foreach (var outline in TestSetOutlines.All.OrderBy(x => x.Cost))
-        {
-            AddCardToView(outline);
-        }
+        foreach (var outline in TestSetOutlines.All.OrderBy(x => x.Cost)) AddCardToView(outline);
 
         ResetCounters();
     }
@@ -289,10 +285,7 @@ public partial class CardBrowser : Control
         {
             var outline = TestSetOutlines.Cards[jsonRecord.Id];
             AddCardToDeck(outline).SetCount(jsonRecord.Count);
-            for (var i = 0; i < jsonRecord.Count; ++i)
-            {
-                IncreaseCounters(outline);
-            }
+            for (var i = 0; i < jsonRecord.Count; ++i) IncreaseCounters(outline);
         }
     }
 }

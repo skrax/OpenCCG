@@ -18,12 +18,6 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
 
     public Dictionary<string, IObserver>? Observers => null;
 
-    public override void _Ready()
-    {
-        SortChildren += CustomSort;
-        PreSortChildren += PreCustomSort;
-    }
-
     [Rpc]
     public async void HandleMessageAsync(string messageJson)
     {
@@ -38,6 +32,12 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
             MessageType.DrawCard => Executor.Make<CardImplementationDto>(DrawCard, Executor.ResponseMode.Respond),
             _ => null
         };
+    }
+
+    public override void _Ready()
+    {
+        SortChildren += CustomSort;
+        PreSortChildren += PreCustomSort;
     }
 
     private void RemoveCard(Guid cardId)
@@ -79,6 +79,7 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
                 c.GlobalPosition = pos;
                 c.RotationDegrees = _rotationCurve.Sample(sampleIndex) * 4f;
             }
+
             c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition);
 
             c.ZIndex = _cards.Count - index;
