@@ -61,8 +61,12 @@ public static class TestSetOutlines
             "res://img/cards/bounty_hunter.png"),
         new("TEST-C-014", "Equites",
             "\n[center][b]Haste[/b]\n[b]Start Combat:[/b] Gain +1 ATK for each friendly creature[/center]",
-            3,1,3,
-            "res://img/cards/equites.png")
+            3, 1, 3,
+            "res://img/cards/equites.png"),
+        new("TEST-C-015", "Peltast",
+            "\n[center][b]Start Combat:[/b] Deal 2\ndamage to the enemy\n avatar[/center]",
+            1, 1, 1,
+            "res://img/cards/peltast.png")
     };
 
     public static readonly ICardOutline[] Spells = new SpellOutline[]

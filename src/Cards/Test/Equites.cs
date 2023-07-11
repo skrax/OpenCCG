@@ -17,7 +17,6 @@ public class Equites : CreatureImplementation
     {
         var gained = PlayerGameState.Board.Count;
         CreatureState.Atk += gained;
-        Log.Information("Equites gained {Amount}", gained);
         await UpdateAsync();
     }
 }

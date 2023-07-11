@@ -62,6 +62,7 @@ public class TestSetImplementations
         RegisterCreature("TEST-C-012", (outline, state) => new BerenMorne(outline, state));
         RegisterCreature("TEST-C-013", (outline, state) => new BountyHunter(outline, state));
         RegisterCreature("TEST-C-014", (outline, state) => new Equites(outline, state));
+        RegisterCreature("TEST-C-015", (outline, state) => new Peltast(outline, state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)
