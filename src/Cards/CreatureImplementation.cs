@@ -50,7 +50,7 @@ public abstract class CreatureImplementation : CardImplementation
         return Task.CompletedTask;
     }
 
-    public virtual Task OnStartCombatTurnAsync()
+    public virtual Task OnStartCombatAsync()
     {
         return Task.CompletedTask;
     }

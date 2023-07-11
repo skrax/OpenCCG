@@ -147,7 +147,7 @@ public class PlayerGameState
         if (!target.Abilities.Defender && Enemy.Board.Cast<CreatureImplementation>().Any(x => x.Abilities.Defender))
             return;
 
-        await attacker.OnStartCombatTurnAsync();
+        await attacker.OnStartCombatAsync();
 
         await Task.WhenAll(Nodes.Board.PlayCombatAnimAsync(PeerId, attacker.Id, target.Id),
             Nodes.EnemyBoard.PlayCombatAnimAsync(EnemyPeerId, attacker.Id, target.Id)
@@ -211,6 +211,8 @@ public class PlayerGameState
         if (attacker.CreatureState.AttacksAvailable < 1) return;
         if (Enemy.Board.Cast<CreatureImplementation>().Any(x => x.Abilities.Defender)) return;
 
+        await attacker.OnStartCombatAsync();
+
         await Task.WhenAll(Nodes.Board.PlayCombatAvatarAnimAsync(PeerId, attacker.Id),
             Nodes.EnemyBoard.PlayCombatAvatarAnimAsync(EnemyPeerId, attacker.Id)
         );
@@ -231,6 +233,8 @@ public class PlayerGameState
             Health += attacker.CreatureState.Atk;
             UpdateHealth();
         }
+
+        await attacker.OnEndCombatAsync();
     }
 
     public async Task DrawAsync(int count = 1)

@@ -100,7 +100,8 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
     private async Task TmpShowTarget(CardImplementationDto dto)
     {
         Show(dto);
-        //await Task.Delay(TimeSpan.FromSeconds(3));
+        await Task.Delay(TimeSpan.FromSeconds(3));
+#if false
         _projectile.Visible = true;
         var start = GlobalPosition;
         var end = new Vector2(960F, 540F);
@@ -124,6 +125,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         }
 
         _projectile.Visible = false;
+#endif
 
         Reset();
     }

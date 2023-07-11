@@ -25,9 +25,9 @@ _cardPreviewScene = ExtResource("3_ab0j7")
 _costPanel = NodePath("CostPanel")
 _atkPanel = NodePath("AttackPanel")
 _defPanel = NodePath("DefPanel")
+_drawCurve = ExtResource("4_mlk4l")
 _infoPanel = NodePath("InfoPanel")
 _namePanel = NodePath("NamePanel")
-_drawCurve = ExtResource("4_mlk4l")
 
 [node name="NamePanel" type="Panel" parent="." node_paths=PackedStringArray("_descriptionLabel")]
 layout_mode = 1

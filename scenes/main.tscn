@@ -119,7 +119,7 @@ _heightCurve = ExtResource("6_8m5r4")
 _rotationCurve = ExtResource("7_pec5a")
 _separationCurve = ExtResource("8_uv6j5")
 
-[node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("_StatusPanel", "_EnemyStatusPanel", "EnemyBoardArea")]
+[node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("StatusPanel", "EnemyStatusPanel", "EnemyBoardArea")]
 offset_top = 572.0
 offset_right = 1920.0
 offset_bottom = 827.0
@@ -127,11 +127,11 @@ mouse_filter = 2
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
-_StatusPanel = NodePath("../StatusPanel")
-_EnemyStatusPanel = NodePath("../EnemyStatusPanel")
+StatusPanel = NodePath("../StatusPanel")
+EnemyStatusPanel = NodePath("../EnemyStatusPanel")
 EnemyBoardArea = NodePath("../EnemyBoard")
 
-[node name="EnemyBoard" type="HBoxContainer" parent="." node_paths=PackedStringArray("_StatusPanel", "_EnemyStatusPanel", "EnemyBoardArea")]
+[node name="EnemyBoard" type="HBoxContainer" parent="." node_paths=PackedStringArray("StatusPanel", "EnemyStatusPanel", "EnemyBoardArea")]
 offset_top = 253.0
 offset_right = 1920.0
 offset_bottom = 508.0
@@ -139,8 +139,8 @@ mouse_filter = 2
 theme_override_constants/separation = 40
 alignment = 1
 script = ExtResource("4_4t5gh")
-_StatusPanel = NodePath("../EnemyStatusPanel")
-_EnemyStatusPanel = NodePath("../StatusPanel")
+StatusPanel = NodePath("../EnemyStatusPanel")
+EnemyStatusPanel = NodePath("../StatusPanel")
 EnemyBoardArea = NodePath("../Board")
 IsEnemy = true
 
