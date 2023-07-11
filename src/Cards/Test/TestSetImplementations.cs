@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using OpenCCG.Net;
 
 namespace OpenCCG.Cards.Test;
@@ -63,6 +62,11 @@ public class TestSetImplementations
         RegisterCreature("TEST-C-013", (outline, state) => new BountyHunter(outline, state));
         RegisterCreature("TEST-C-014", (outline, state) => new Equites(outline, state));
         RegisterCreature("TEST-C-015", (outline, state) => new Peltast(outline, state));
+        RegisterCreature("TEST-C-016", (outline, state) => new VanillaCreature(outline, new CreatureAbilities()
+        {
+            Defender = true
+        }, state));
+        RegisterCreature("TEST-C-017", (outline, state) => new FieldMedic(outline, state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)

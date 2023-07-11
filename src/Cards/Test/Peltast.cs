@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using OpenCCG.Net;
-using Serilog;
 
 namespace OpenCCG.Cards.Test;
 
