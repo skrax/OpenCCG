@@ -39,7 +39,7 @@ public class SquishTheWimpy : SpellImplementation
                            .OrderBy(x => x.CreatureState.Atk)
                            .ToList();
 
-        var atk = Math.Max(ordered.First().CreatureState.Atk, orderedEnemy.First().CreatureState.Atk);
+        var atk = Math.Min(ordered.First().CreatureState.Atk, orderedEnemy.First().CreatureState.Atk);
 
         var creatures = ordered
                         .TakeWhile(x => x.CreatureState.Atk == atk)

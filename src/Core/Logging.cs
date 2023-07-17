@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using OpenCCG.Core.Serilog;
 using Serilog;
@@ -14,14 +15,16 @@ public partial class Logging : Node
                                               .Enrich.FromLogContext()
                                               .WriteTo.Godot()
                                               .WriteTo.GrafanaLoki("http://localhost:3100", new LokiLabel[]
-                                              {
-                                                  new LokiLabel()
                                                   {
-                                                      Key = "Godot", Value = "Godot Messages"
-                                                  }
-                                              },
-                                                  propertiesAsLabels: new []{ "MessageId" })
+                                                      new LokiLabel()
+                                                      {
+                                                          Key = "Godot", Value = "Godot Messages"
+                                                      }
+                                                  },
+                                                  propertiesAsLabels: SessionContext.LogPropertyNames()
+                                                      .Concat(new[] { "MessageId" }))
                                               .CreateLogger();
+
         SelfLog.Enable(GD.Print);
     }
 

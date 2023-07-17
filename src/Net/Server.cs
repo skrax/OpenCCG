@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
+using OpenCCG.Core;
+using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
@@ -98,10 +100,13 @@ public partial class Server : Node, IMessageReceiver<MessageType>
                     out var enemyCommandQueue))
             {
                 _gameState.PlayerGameStateCommandQueues.Remove(enemyCommandQueue.PlayerGameState.PeerId);
+
+                SessionContextProvider.SessionContextsByPeerId.Remove(enemyCommandQueue.PlayerGameState.PeerId);
                 enemyCommandQueue.Stop();
             }
 
             _gameState.PlayerGameStateCommandQueues.Remove(id);
+            SessionContextProvider.SessionContextsByPeerId.Remove(id);
             commandQueue.Stop();
         }
     }
@@ -171,6 +176,9 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             p1.Enemy = p2;
             p2.Enemy = p1;
 
+            var sessionContext = new SessionContext(Guid.NewGuid());
+            SessionContextProvider.SessionContextsByPeerId.Add(p1.PeerId, sessionContext);
+            SessionContextProvider.SessionContextsByPeerId.Add(p2.PeerId, sessionContext);
             var p1Q = new PlayerGameStateCommandQueue(p1);
             var p2Q = new PlayerGameStateCommandQueue(p2);
             _gameState.PlayerGameStateCommandQueues.Add(p1.PeerId, p1Q);
