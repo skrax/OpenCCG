@@ -1,4 +1,8 @@
 using System;
+using System.Linq;
+using System.Resources;
+using System.Text;
+using Serilog;
 
 namespace OpenCCG.Cards;
 
@@ -20,11 +24,29 @@ public record CardImplementationDto
     public static CardImplementationDto AsCreature(Guid id, CreatureOutline outline, CreatureState state,
         CreatureAbilities abilities)
     {
-        return new CardImplementationDto(id, outline, state, abilities, null, null);
+        if (string.IsNullOrWhiteSpace(state.AddedText))
+        {
+            return new CardImplementationDto(id, outline, state, abilities, null, null);
+        }
+
+        var stripped = outline.Description.TrimStart('\n');
+        var description = state.AddedText + stripped;
+        var combinedOutline = outline with { Description = description };
+        
+        return new CardImplementationDto(id, combinedOutline, state, abilities, null, null);
     }
 
     public static CardImplementationDto AsSpell(Guid id, SpellOutline outline, SpellState state)
     {
-        return new CardImplementationDto(id, null, null, null, outline, state);
+        if (string.IsNullOrWhiteSpace(state.AddedText))
+        {
+            return new CardImplementationDto(id, null, null, null, outline, state);
+        }
+
+        var stripped = outline.Description.TrimStart('\n');
+        var description = state.AddedText + stripped;
+        var combinedOutline = outline with { Description = description };
+        
+        return new CardImplementationDto(id, null, null, null, combinedOutline, state);
     }
 }

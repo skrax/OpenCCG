@@ -25,6 +25,8 @@ public class TestSetImplementations
         RegisterSpell("TEST-S-006", (outline, state) => new DeepAnalysis(outline, state));
         RegisterSpell("TEST-S-007", (outline, state) => new HeedTheCall(outline, state));
         RegisterSpell("TEST-S-008", (outline, state) => new StringUp(outline, state));
+        RegisterSpell("TEST-S-009", (outline, state) => new CallToArms(outline, state));
+        RegisterSpell("TEST-S-010", (outline, state) => new RiseToTheOccasion(outline, state));
     }
 
     private static void RegisterCreatures()
@@ -67,6 +69,8 @@ public class TestSetImplementations
             Defender = true
         }, state));
         RegisterCreature("TEST-C-017", (outline, state) => new FieldMedic(outline, state));
+        RegisterCreature("TEST-C-018", (outline, state) => new ChampionOfNargaeya(outline, state));
+        RegisterCreature("TEST-C-019", (outline, state) => new Hastatus(outline, state));
     }
 
     public static CardImplementation GetImplementation(string key, PlayerGameState playerGameState)

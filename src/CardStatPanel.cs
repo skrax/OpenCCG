@@ -9,6 +9,23 @@ public partial class CardStatPanel : Panel
     public int Value
     {
         get => int.Parse(_statLabel.Text);
-        set => _statLabel.Text = $"{value}";
+        private set => _statLabel.Text = $"{value}";
+    }
+
+    public void SetValue(int currentValue, int originalValue)
+    {
+        Value = currentValue;
+        if (currentValue < originalValue)
+        {
+            _statLabel.Modulate = Colors.Red;
+        }
+        else if (currentValue > originalValue)
+        {
+            _statLabel.Modulate = Colors.Green;
+        }
+        else
+        {
+            _statLabel.Modulate = Colors.White;
+        }
     }
 }

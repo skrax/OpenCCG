@@ -37,7 +37,9 @@ public class PlayerGameStateCommandQueue
 
     public void Start()
     {
-        Task.Run(() => ProcessTaskQueueAsync(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
+        var token = _cancellationTokenSource.Token;
+        token.ThrowIfCancellationRequested();
+        Task.Run(() => ProcessTaskQueueAsync(token), token);
     }
 
     public void Stop()

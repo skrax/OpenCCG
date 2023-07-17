@@ -14,4 +14,18 @@ public class CreatureState : ICardState
     public int Cost { get; set; }
 
     public CardZone Zone { get; set; }
+
+    public string AddedText { get; set; } = string.Empty;
+
+    public CreatureState Copy() => new()
+    {
+       Atk = Atk,
+       Def = Def,
+       AttacksAvailable = AttacksAvailable,
+       MaxAttacksPerTurn = MaxAttacksPerTurn,
+       IsExposed = IsExposed,
+       Cost = Cost,
+       Zone = Zone,
+       AddedText = new(AddedText)
+    };
 }

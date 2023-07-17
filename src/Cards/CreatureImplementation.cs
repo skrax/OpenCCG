@@ -28,7 +28,7 @@ public abstract class CreatureImplementation : CardImplementation
 
     public CreatureState CreatureState => (CreatureState)State;
 
-    public CreatureAbilities Abilities { get; }
+    public CreatureAbilities Abilities { get; set; }
 
     public virtual Task OnEnterAsync()
     {
@@ -75,10 +75,10 @@ public abstract class CreatureImplementation : CardImplementation
 
         var dto = AsDto();
 
-        await PlaceOnBoard(dto);
+        await PlaceOnBoardAsync(dto);
     }
 
-    private async Task PlaceOnBoard(CardImplementationDto dto)
+    private async Task PlaceOnBoardAsync(CardImplementationDto dto)
     {
         await Task.WhenAll(
             PlayerGameState.Nodes.Board.PlaceCard(PlayerGameState.PeerId, dto),

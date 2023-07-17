@@ -12,14 +12,14 @@ public partial class CardPreview : TextureRect, INodeInit<CardImplementationDto>
     public void Init(CardImplementationDto dto)
     {
         _infoPanel.Value = dto.Outline.Description;
-        _costPanel.Value = dto.Outline.Cost;
+        _costPanel.SetValue(dto.State.Cost, dto.Outline.Cost);
         _namePanel.Value = dto.Outline.Name;
         Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
 
         if (dto.IsCreature)
         {
-            _atkPanel.Value = dto.CreatureOutline!.Atk;
-            _defPanel.Value = dto.CreatureOutline.Def;
+            _atkPanel.SetValue(dto.CreatureState.Atk, dto.CreatureOutline.Atk);
+            _defPanel.SetValue(dto.CreatureState.Def, dto.CreatureOutline.Def);
         }
         else if (dto.IsSpell)
         {

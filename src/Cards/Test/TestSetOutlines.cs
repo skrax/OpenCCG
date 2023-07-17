@@ -72,9 +72,17 @@ public static class TestSetOutlines
             2, 2, 4,
             "res://img/cards/defender_of_nargaeya.png"),
         new("TEST-C-017", "Field Medic",
-            "\n[center][b]Enter:[/b] Give a creature\n+0/+2[/center]",
+            "\n[center][b]Arcane[/b]\n[b]Enter:[/b] Give a creature\n+0/+2[/center]",
             1, 1, 1,
-            "res://img/cards/field_medic.png")
+            "res://img/cards/field_medic.png"),
+        new("TEST-C-018", "Champion of Nargaeya",
+            "\n\n[center][b]End Combat:[/b] Gain +1/+1[/center]",
+            2, 3, 3,
+            "res://img/cards/champion_of_nargaeya.png"),
+        new("TEST-C-019", "Hastatus",
+            "\n\n[center][b]Play:[/b] Summon a copy of this creature.[/center]",
+            1, 1, 1,
+            "res://img/cards/hastatus.png")
     };
 
     public static readonly ICardOutline[] Spells = new SpellOutline[]
@@ -85,11 +93,11 @@ public static class TestSetOutlines
             "res://img/cards/throwing_knife.png"),
         new("TEST-S-002", "Fell the Mighty",
             "\n\n[center]Destroy the highest attack creature(s)[/center]",
-            4,
+            5,
             "res://img/cards/fell_the_mighty.png"),
         new("TEST-S-003", "Squish the Wimpy",
             "\n\n[center]Destroy the lowest attack creatures(s)[/center]",
-            3,
+            4,
             "res://img/cards/squish_the_wimpy.png"),
         new("TEST-S-004", "Firebomb",
             "\n\n[center]Deal 5 damage[/center]",
@@ -97,7 +105,7 @@ public static class TestSetOutlines
             "res://img/cards/firebomb.png"),
         new("TEST-S-005", "Imminent Catastrophe",
             "\n\n[center]Deal 7 damage to all creatures[/center]",
-            7,
+            9,
             "res://img/cards/imminent_catastrophe.png"),
         new("TEST-S-006", "Deep Analysis",
             "\n\n[center]Draw 2 cards[/center]",
@@ -110,7 +118,15 @@ public static class TestSetOutlines
         new("TEST-S-008", "String up",
             "\n\n[center]Destroy a creature[/center]",
             4,
-            "res://img/cards/string_up.png")
+            "res://img/cards/string_up.png"),
+        new("TEST-S-009", "Call to Arms",
+            "\n\n[center]Give all friendly creatures +2/+2[/center]",
+            4,
+            "res://img/cards/call_to_arms.png"),
+        new("TEST-S-010", "Rise to the Occasion",
+            "\n\n[center]Draw a creature.\nGive it +5/+5 and Haste[/center]",
+            5,
+            "res://img/cards/rise_to_the_occasion.png")
     };
 
     public static readonly ICardOutline[] All = Creatures.Concat(Spells).ToArray();

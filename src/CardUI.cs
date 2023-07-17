@@ -16,12 +16,12 @@ public partial class CardUI : TextureRect, INodeInit<ICardOutline>
     public void Init(ICardOutline dto)
     {
         _infoPanel.Value = dto.Description;
-        _costPanel.Value = dto.Cost;
+        _costPanel.SetValue(dto.Cost, dto.Cost);
         switch (dto)
         {
             case ICreatureOutline creatureOutline:
-                _atkPanel.Value = creatureOutline.Atk;
-                _defPanel.Value = creatureOutline.Def;
+                _atkPanel.SetValue(creatureOutline.Atk, creatureOutline.Atk);
+                _defPanel.SetValue(creatureOutline.Def, creatureOutline.Def);
                 break;
             case ISpellOutline spellOutline:
                 _atkPanel.Visible = false;

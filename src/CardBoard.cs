@@ -26,9 +26,8 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
     {
         IsEnemy = GetParent<BoardArea>().IsEnemy;
         CardImplementationDto = dto;
-        _atkPanel.Value = CardImplementationDto.CreatureState!.Atk;
-        _defPanel.Value = dto.CreatureState!.Def;
-
+        _atkPanel.SetValue(dto.CreatureState!.Atk, dto.CreatureOutline!.Atk);
+        _defPanel.SetValue(dto.CreatureState!.Def, dto.CreatureOutline!.Def);
         _textureRect.Texture = GD.Load<Texture2D>(CardImplementationDto.Outline.ImgPath);
 
         var shader = _textureRect.Material as ShaderMaterial;
@@ -105,10 +104,9 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
     public async Task UpdateAsync(CardImplementationDto dto)
     {
         CardImplementationDto = dto;
-        _atkPanel.Value = dto.CreatureState!.Atk;
+        _atkPanel.SetValue(dto.CreatureState!.Atk, dto.CreatureOutline!.Atk);
         var diff = dto.CreatureState!.Def - _defPanel.Value;
-        _defPanel.Value = dto.CreatureState!.Def;
-
+        _defPanel.SetValue(dto.CreatureState!.Def, dto.CreatureOutline!.Def);
 
         var shader = _textureRect.Material as ShaderMaterial;
         shader?.SetShaderParameter("doMix", !dto.CreatureState!.IsExposed);

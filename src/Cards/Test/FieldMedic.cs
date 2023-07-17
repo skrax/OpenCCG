@@ -8,7 +8,10 @@ namespace OpenCCG.Cards.Test;
 
 public class FieldMedic : CreatureImplementation
 {
-    public FieldMedic(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new CreatureAbilities(), playerGameState)
+    public FieldMedic(CreatureOutline outline, PlayerGameState playerGameState) : base(outline, new CreatureAbilities()
+    {
+        Arcane = true
+    }, playerGameState)
     {
     }
 

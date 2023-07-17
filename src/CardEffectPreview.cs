@@ -45,7 +45,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
         Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
         _descriptionPanel.Value = dto.Outline.Description;
         _namePanel.Value = dto.Outline.Name;
-        _costPanel.Value = dto.State.Cost;
+        _costPanel.SetValue(dto.State.Cost, dto.Outline.Cost);
     }
 
     private void Reset()
