@@ -7,6 +7,7 @@ using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Rpc;
 using FileAccess = Godot.FileAccess;
 
@@ -60,7 +61,7 @@ public partial class Main : Node, IMessageReceiver<MessageType>
         if (file == null) throw new FileLoadException();
         var deck = JsonSerializer.Deserialize<SavedDeck>(file.GetAsText())!;
 
-        var dto = new QueuePlayerDto(deck, password);
+        var dto = new MatchmakingRequest(deck, password);
 
         IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.Queue, dto);
     }

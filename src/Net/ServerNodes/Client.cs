@@ -11,7 +11,7 @@ public partial class Client : Node
         var peer = new ENetMultiplayerPeer();
         var result = peer.CreateClient("127.0.0.1", 8080);
 
-        if (result is Error.Ok)
+        if (result is Godot.Error.Ok)
         {
             var mp = GetTree().GetMultiplayer();
             mp.MultiplayerPeer = peer;
@@ -22,11 +22,11 @@ public partial class Client : Node
             Multiplayer.PeerConnected += OnPeerConnected;
             Multiplayer.PeerDisconnected += OnPeerDisconnected;
         }
-        else if (result is Error.AlreadyInUse)
+        else if (result is Godot.Error.AlreadyInUse)
         {
             peer.Close();
         }
-        else if (result is Error.CantCreate)
+        else if (result is Godot.Error.CantCreate)
         {
             throw new ApplicationException("Failed to connect to server");
         }

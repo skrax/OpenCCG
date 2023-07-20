@@ -535,8 +535,8 @@ text = "Total:"
 label_settings = SubResource("LabelSettings_q1lue")
 
 [node name="FileDialog" type="FileDialog" parent="."]
-initial_position = 1
 title = "Open a File"
+initial_position = 1
 size = Vector2i(500, 500)
 ok_button_text = "Open"
 dialog_hide_on_ok = true

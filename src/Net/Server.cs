@@ -6,17 +6,13 @@ using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
 using OpenCCG.Core;
-using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 using Serilog;
 
 namespace OpenCCG.Net;
-
-public record QueuePlayerDto(SavedDeck Deck, string? Password);
-
-public record QueuedPlayer(long peerId, List<ICardOutline> deckList);
 
 public partial class Server : Node, IMessageReceiver<MessageType>
 {
@@ -41,7 +37,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
                 Executor.ResponseMode.NoResponse),
             MessageType.CombatPlayer => Executor.Make<Guid>(CombatPlayer, Executor.ResponseMode.NoResponse),
             MessageType.EndTurn => Executor.Make(EndTurn, Executor.ResponseMode.NoResponse),
-            MessageType.Queue => Executor.Make<QueuePlayerDto>(QueuePlayer, Executor.ResponseMode.NoResponse),
+            MessageType.Queue => Executor.Make<MatchmakingRequest>(QueuePlayer, Executor.ResponseMode.NoResponse),
             _ => null
         };
     }
@@ -51,18 +47,18 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         var peer = new ENetMultiplayerPeer();
         var result = peer.CreateServer(57618, 16);
 
-        if (result is Error.Ok)
+        if (result is Godot.Error.Ok)
         {
             Log.Information("listening on port 57618");
             GetTree().GetMultiplayer().MultiplayerPeer = peer;
             Multiplayer.PeerConnected += OnPeerConnected;
             Multiplayer.PeerDisconnected += OnPeerDisconnected;
         }
-        else if (result is Error.AlreadyInUse)
+        else if (result is Godot.Error.AlreadyInUse)
         {
             peer.Close();
         }
-        else if (result is Error.CantCreate)
+        else if (result is Godot.Error.CantCreate)
         {
             throw new ApplicationException("Failed to create server");
         }
@@ -134,20 +130,20 @@ public partial class Server : Node, IMessageReceiver<MessageType>
         await _gameState.PlayerGameStateCommandQueues[senderPeerId].EnqueueAsync(x => x.EndTurnAsync);
     }
 
-    private async Task QueuePlayer(long senderPeerId, QueuePlayerDto queuePlayerDto)
+    private async Task QueuePlayer(long senderPeerId, MatchmakingRequest matchmakingRequest)
     {
         var deckList = new List<ICardOutline>(30);
-        foreach (var card in queuePlayerDto.Deck.list)
+        foreach (var card in matchmakingRequest.Deck.list)
         {
             var cardRecord = TestSetOutlines.Cards[card.Id];
             for (var i = 0; i < card.Count; ++i) deckList.Add(cardRecord);
         }
 
-        var key = queuePlayerDto.Password ?? string.Empty;
+        var key = matchmakingRequest.Password ?? string.Empty;
 
         if (_queuesByPassword.TryGetValue(key, out var other))
         {
-            if (!Multiplayer.GetPeers().Contains((int)other.peerId))
+            if (!Multiplayer.GetPeers().Contains((int)other.PeerId))
             {
                 _queuesByPassword[key] = new QueuedPlayer(senderPeerId, deckList);
                 return;
@@ -157,7 +153,7 @@ public partial class Server : Node, IMessageReceiver<MessageType>
 
             var p1 = new PlayerGameState
             {
-                PeerId = other.peerId,
+                PeerId = other.PeerId,
                 EnemyPeerId = senderPeerId,
                 PlayerName = "player-1",
                 Nodes = _rpcNodes
@@ -165,12 +161,12 @@ public partial class Server : Node, IMessageReceiver<MessageType>
             var p2 = new PlayerGameState
             {
                 PeerId = senderPeerId,
-                EnemyPeerId = other.peerId,
+                EnemyPeerId = other.PeerId,
                 PlayerName = "player-2",
                 Nodes = _rpcNodes
             };
 
-            p1.Init(other.deckList);
+            p1.Init(other.DeckList);
             p2.Init(deckList);
 
             p1.Enemy = p2;

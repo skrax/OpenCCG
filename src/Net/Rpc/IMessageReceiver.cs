@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
 using Serilog;
 

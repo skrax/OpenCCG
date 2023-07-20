@@ -6,5 +6,5 @@ public interface IGodotRpcNode
 {
     MultiplayerApi Multiplayer { get; }
 
-    Error RpcId(long peerId, StringName method, params Variant[] args);
+    Godot.Error RpcId(long peerId, StringName method, params Variant[] args);
 }

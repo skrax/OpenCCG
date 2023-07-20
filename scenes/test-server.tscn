@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3j661fd6ik3i"]
+
+[ext_resource type="Script" path="res://src/Net/TestServer.cs" id="1_ylqk4"]
+
+[node name="test-server" type="Node"]
+script = ExtResource("1_ylqk4")
