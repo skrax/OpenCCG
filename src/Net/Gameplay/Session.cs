@@ -3,32 +3,25 @@ using System.Collections.Generic;
 using Godot;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Messaging;
-using Error = OpenCCG.Net.Messaging.Error;
 
 namespace OpenCCG.Net.Gameplay;
-
-public interface IPlayerState
-{
-    public void PlayCard();
-
-    public void CombatPlayer();
-
-    public void CombatPlayerCard();
-
-    public void EndTurn();
-}
-
-public delegate void SessionCommand();
 
 public partial class Session : Node, IMessageController
 {
     public Guid Id { get; } = Guid.NewGuid();
+    
+    public IPlayerState Player1 { get; }
+    public IPlayerState Player2 { get; }
 
     private readonly Queue<SessionCommand> _commandQueue = new();
     private readonly Dictionary<long, IPlayerState> _playerByPeerId = new();
 
     public Session(QueuedPlayer player1, QueuedPlayer player2)
     {
+        // TODO
+        _playerByPeerId.Add(player1.PeerId, null!);
+        _playerByPeerId.Add(player2.PeerId, null!);
+        Name = $"[Session]{player1.PeerId}_{player2.PeerId}";
     }
 
     public void Configure(IMessageBroker broker)

@@ -1,4 +1,5 @@
 using Godot;
+using OpenCCG.Net.Gameplay;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Messaging;
 using Serilog;
@@ -10,6 +11,7 @@ public partial class TestServer : MessageBroker
     private ENetMultiplayerPeer? _peer;
 
     [Export] private MatchmakingService _matchmakingService = null!;
+    [Export] private SessionManager _sessionManager = null!;
 
     public override void _Ready()
     {
@@ -25,6 +27,7 @@ public partial class TestServer : MessageBroker
     protected override void OnPeerDisconnected(long id)
     {
         Log.Information("Peer {Id} disconnected", id);
+        _sessionManager.DissolveSession(id);
     }
 
     protected override void OnConnectionFailed()
