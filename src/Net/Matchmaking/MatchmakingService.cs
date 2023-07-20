@@ -1,13 +1,16 @@
 using System.Collections.Generic;
+using Godot;
 using OpenCCG.Net.Messaging;
 using Serilog;
+using Error = OpenCCG.Net.Messaging.Error;
 using IMessageBroker = OpenCCG.Net.Messaging.IMessageBroker;
 using IMessageController = OpenCCG.Net.Messaging.IMessageController;
 using MessageContext = OpenCCG.Net.Messaging.MessageContext;
 
 namespace OpenCCG.Net.Matchmaking;
 
-public class MatchmakingService : IMessageController
+[GlobalClass]
+public partial class MatchmakingService : Node, IMessageController
 {
     private readonly MatchmakingQueue _defaultQueue = new();
     private readonly Dictionary<string, MatchmakingQueue> _passwordQueues = new();
@@ -15,6 +18,7 @@ public class MatchmakingService : IMessageController
     public void Configure(IMessageBroker broker)
     {
         broker.Map(Route.Enqueue, OnPlayerEnqueue);
+        Log.Information("{Service} is running", nameof(MatchmakingService));
     }
 
     private MessageControllerResult OnPlayerEnqueue(MessageContext messageContext)
@@ -65,5 +69,21 @@ public class MatchmakingService : IMessageController
 
         queue = newQueue;
         return true;
+    }
+
+    public override void _Process(double delta)
+    {
+        while (_defaultQueue.TryGetPair(out var player1, out var player2))
+        {
+            Log.Information("Session created {Player1}, {Player2}", player1.PeerId, player2.PeerId);
+        }
+
+        foreach (var passwordQueue in _passwordQueues.Values)
+        {
+            while (passwordQueue.TryGetPair(out var player1, out var player2))
+            {
+                Log.Information("Session created {Player1}, {Player2}", player1.PeerId, player2.PeerId);
+            }
+        }
     }
 }

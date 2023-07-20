@@ -1,23 +1,20 @@
-using System;
-using System.Collections.Generic;
 using Godot;
 using OpenCCG.Net.Matchmaking;
+using OpenCCG.Net.Messaging;
 using Serilog;
 
 namespace OpenCCG.Net;
 
-
-
-
-public partial class TestServer : Messaging.MessageBroker
+public partial class TestServer : MessageBroker
 {
     private ENetMultiplayerPeer? _peer;
+
+    [Export] private MatchmakingService _matchmakingService = null!;
 
     public override void _Ready()
     {
         _peer = CreateServer(57777, 32);
-        var matchmaking = new MatchmakingService();
-        matchmaking.Configure(this);
+        _matchmakingService.Configure(this);
     }
 
     protected override void OnPeerConnected(long id)

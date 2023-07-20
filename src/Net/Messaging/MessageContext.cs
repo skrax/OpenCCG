@@ -1,6 +1,3 @@
 namespace OpenCCG.Net.Messaging;
 
-public record MessageContext(long PeerId, Message Message)
-{
-
-}
+public record MessageContext(long PeerId, Message Message);

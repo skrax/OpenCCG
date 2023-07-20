@@ -1,22 +1,25 @@
-using System;
 using OpenCCG.Net.Messaging;
 using Serilog;
 
 namespace OpenCCG.Net.Matchmaking;
 
-public class MatchmakingClient : IMessageController
+public class MatchmakingClient : MessageClient
 {
-    public void Configure(IMessageBroker broker)
+    public MatchmakingClient(IMessageBroker broker) : base(broker)
     {
-        broker.MapResponseForTask(Route.EnqueueResponse);
     }
 
-    public async void EnqueuePlayer(IMessageBroker broker)
+    public override void Configure()
     {
-        var deck = new SavedDeck(string.Empty, Array.Empty<CardUIDeck.JsonRecord>());
-        var dto = new MatchmakingRequest(deck, "secret");
-        var response = await broker.EnqueueMessageAndGetResponseAsync(1,
-            Message.CreateWithResponse(Route.Enqueue, Route.EnqueueResponse, dto));
+        Broker.MapAwaitableResponse(Route.EnqueueResponse);
+    }
+
+    public async void EnqueuePlayer(SavedDeck deck, string? password = null)
+    {
+        var dto = new MatchmakingRequest(deck, password);
+        var message = Message.CreateWithResponse(Route.Enqueue, Route.EnqueueResponse, dto);
+        var response = await Broker.EnqueueMessageAndGetResponseAsync(1, message);
+
         if (response != null)
         {
             if (response.Message.HasError())

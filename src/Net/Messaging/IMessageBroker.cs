@@ -18,7 +18,7 @@ public interface IMessageBroker
 {
     public void Map(string route, MessageResolver resolver);
 
-    public void MapResponseForTask(string route);
+    public void MapAwaitableResponse(string route);
 
     public void MapResponse(string route, MessageResolver resolver);
 

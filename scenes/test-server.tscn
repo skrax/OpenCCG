@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://c3j661fd6ik3i"]
+[gd_scene load_steps=3 format=3 uid="uid://c3j661fd6ik3i"]
 
 [ext_resource type="Script" path="res://src/Net/TestServer.cs" id="1_ylqk4"]
+[ext_resource type="Script" path="res://src/Net/Matchmaking/MatchmakingService.cs" id="2_rr8iu"]
 
-[node name="test-server" type="Node"]
+[node name="test-server" type="Node" node_paths=PackedStringArray("_matchmakingService")]
 script = ExtResource("1_ylqk4")
+_matchmakingService = NodePath("MatchmakingService")
+
+[node name="MatchmakingService" type="Node" parent="."]
+script = ExtResource("2_rr8iu")

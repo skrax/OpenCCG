@@ -7,8 +7,6 @@ using Serilog;
 
 namespace OpenCCG.Net.Messaging;
 
-public delegate MessageControllerResult? MessageResolver(MessageContext context);
-
 public abstract partial class MessageBroker : Node, IMessageBroker
 {
     private readonly Dictionary<string, MessageResolver> _routes = new();
@@ -158,7 +156,7 @@ public abstract partial class MessageBroker : Node, IMessageBroker
         MapInternal(route, resolver);
     }
 
-    public void MapResponseForTask(string route)
+    public void MapAwaitableResponse(string route)
     {
         MapInternal(route, ctx =>
         {
