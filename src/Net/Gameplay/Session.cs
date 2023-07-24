@@ -1,31 +1,49 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using OpenCCG.Core;
+using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Messaging;
+using Serilog;
+using Error = OpenCCG.Net.Messaging.Error;
 
 namespace OpenCCG.Net.Gameplay;
 
 public partial class Session : Node, IMessageController
 {
-    public Guid Id { get; } = Guid.NewGuid();
-    
-    public IPlayerState Player1 { get; }
-    public IPlayerState Player2 { get; }
-
+    public readonly SessionContext Context;
+    private readonly ILogger _logger;
     private readonly Queue<SessionCommand> _commandQueue = new();
-    private readonly Dictionary<long, IPlayerState> _playerByPeerId = new();
+    private readonly Dictionary<long, PlayerState> _playerByPeerId = new();
 
-    public Session(QueuedPlayer player1, QueuedPlayer player2)
+    public Session(QueuedPlayer queuedPlayer1, QueuedPlayer queuedPlayer2)
     {
-        // TODO
-        _playerByPeerId.Add(player1.PeerId, null!);
-        _playerByPeerId.Add(player2.PeerId, null!);
-        Name = $"[Session]{player1.PeerId}_{player2.PeerId}";
+        Context = new SessionContext(Guid.NewGuid());
+        _logger = Log.ForContext(new SessionContextEnricher(Context));
+        
+        var player1 = new PlayerState(queuedPlayer1.PeerId, queuedPlayer2.PeerId, queuedPlayer1.DeckList);
+        var player2 = new PlayerState(queuedPlayer2.PeerId, queuedPlayer1.PeerId, queuedPlayer2.DeckList);
+        player1.Enemy = player2;
+        player2.Enemy = player1;
+        _playerByPeerId.Add(player1.PeerId, player1);
+        _playerByPeerId.Add(player2.PeerId, player2);
+        
+        Name = $"[Session]{queuedPlayer1.PeerId}_{queuedPlayer2.PeerId}";
     }
 
     public void Configure(IMessageBroker broker)
     {
+        broker.Map(Route.PlayCard, OnPlayCard);
+        broker.Map(Route.CombatPlayer, OnCombatPlayer);
+        broker.Map(Route.CombatPlayerCard, OnCombatPlayerCard);
+        broker.Map(Route.EndTurn, OnEndTurn);
+        _logger.Information("{SessionName} created", Name);
+
+        foreach (var peerIds in _playerByPeerId.Keys)
+        {
+            broker.EnqueueMessage(peerIds, Message.Create(Route.MatchFound, Context));
+        }
     }
 
     public override void _Process(double delta)
@@ -33,32 +51,55 @@ public partial class Session : Node, IMessageController
         while (_commandQueue.TryDequeue(out var command)) command.Invoke();
     }
 
-    public void OnPlayCard(MessageContext context)
+    private MessageControllerResult OnPlayCard(MessageContext context)
     {
-        
-    }
-
-    public void OnCombatPlayer(MessageContext context)
-    {
-    }
-
-    public void OnCombatPlayerCard(MessageContext context)
-    {
-    }
-
-    public void OnEndTurn(MessageContext context)
-    {
-    }
-
-    private bool TryEnqueueCommand(long peerId, Func<IPlayerState, SessionCommand> selector)
-    {
-        if (!_playerByPeerId.TryGetValue(peerId, out var state))
+        if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
         {
-            return false;
+            _logger.Error("Player with {PeerId} not found", context.PeerId);
+            return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
         }
 
-        _commandQueue.Enqueue(selector(state));
+        _commandQueue.Enqueue(player.PlayCard);
 
-        return true;
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnCombatPlayer(MessageContext context)
+    {
+        if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
+        {
+            _logger.Error("Player with {PeerId} not found", context.PeerId);
+            return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
+        }
+
+        _commandQueue.Enqueue(player.CombatPlayer);
+
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnCombatPlayerCard(MessageContext context)
+    {
+        if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
+        {
+            _logger.Error("Player with {PeerId} not found", context.PeerId);
+            return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
+        }
+
+        _commandQueue.Enqueue(player.CombatPlayerCard);
+
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnEndTurn(MessageContext context)
+    {
+        if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
+        {
+            _logger.Error("Player with {PeerId} not found", context.PeerId);
+            return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
+        }
+
+        _commandQueue.Enqueue(player.EndTurn);
+
+        return MessageControllerResult.AsResult();
     }
 }

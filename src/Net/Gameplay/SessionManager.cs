@@ -22,7 +22,7 @@ public partial class SessionManager : Node
         
         session.AddToGroup($"Session-{player1.PeerId}");
         session.AddToGroup($"Session-{player2.PeerId}");
-        session.AddToGroup($"Session-{session.Id}");
+        session.AddToGroup($"Session-{session.Context.SessionId}");
     }
 
     public void DissolveSession(long peerId)

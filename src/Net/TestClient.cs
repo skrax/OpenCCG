@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using OpenCCG.Net.Gameplay;
 using OpenCCG.Net.Matchmaking;
 using Serilog;
 
@@ -9,16 +10,19 @@ public partial class TestClient : Messaging.MessageBroker
 {
     private ENetMultiplayerPeer? _peer;
     private readonly MatchmakingClient _matchmakingClient;
+    private readonly SessionClient _sessionClient;
 
     public TestClient()
     {
         _matchmakingClient = new(this);
+        _sessionClient = new(this);
     }
 
     public override void _Ready()
     {
         _peer = CreateClient("localhost", 57777);
         _matchmakingClient.Configure();
+        _sessionClient.Configure();
     }
 
     protected override void OnPeerConnected(long id)
