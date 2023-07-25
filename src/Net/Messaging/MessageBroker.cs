@@ -96,21 +96,7 @@ public abstract partial class MessageBroker : Node, IMessageBroker
             var result = resolver.Invoke(new(peerId, message));
             if (result is not null)
             {
-                if (result.IsError())
-                {
-                    RespondError(peerId, message, result.Error!);
-                }
-                else if (result.IsSuccess())
-                {
-                    if (result.HasData())
-                    {
-                        Respond(peerId, message, result.Data, result.DataType);
-                    }
-                    else
-                    {
-                        Respond(peerId, message);
-                    }
-                }
+                SendResult(new(peerId, message), result);
             }
         }
         else
@@ -190,6 +176,25 @@ public abstract partial class MessageBroker : Node, IMessageBroker
 
             return resolver(ctx);
         });
+    }
+
+    public void SendResult(MessageContext messageContext, MessageControllerResult result)
+    {
+        if (result.IsError())
+        {
+            RespondError(messageContext.PeerId, messageContext.Message, result.Error!);
+        }
+        else if (result.IsSuccess())
+        {
+            if (result.HasData())
+            {
+                Respond(messageContext.PeerId, messageContext.Message, result.Data!, result.DataType!);
+            }
+            else
+            {
+                Respond(messageContext.PeerId, messageContext.Message);
+            }
+        }
     }
 
     public void EnqueueMessage(long peerId, Message message)

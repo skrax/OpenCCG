@@ -13,4 +13,9 @@ public static class Route
     public const string EndTurn = "END_TURN";
     public const string EndTurnResponse = "END_TURN_RESPONSE";
     public const string MatchFound = "MATCH_FOUND";
+    public const string EnableEndTurnButton = "ENABLE_END_TURN_BUTTON";
+    public const string AddCardToHand = "ADD_CARD_TO_HAND";
+    public const string AddCardToBoard = "ADD_CARD_TO_BOARD";
+    public const string RemoveCardFromHand = "REMOVE_CARD_FROM_HAND";
+    public const string RemoveCardFromBoard = "REMOVE_CARD_FROM_BOARD";
 }

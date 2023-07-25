@@ -17,15 +17,23 @@ public class SessionClient : MessageClient
         Broker.MapAwaitableResponse(Route.CombatPlayerCardResponse);
         Broker.MapAwaitableResponse(Route.EndTurnResponse);
         Broker.Map(Route.MatchFound, OnMatchFound);
+        Broker.Map(Route.EnableEndTurnButton, OnEnableEndTurnButton);
+    }
+
+    private MessageControllerResult OnEnableEndTurnButton(MessageContext context)
+    {
+        Log.Information("End turn button enabled");
+        
+        return MessageControllerResult.AsResult();
     }
 
     private MessageControllerResult OnMatchFound(MessageContext context)
     {
         if (context.Message.TryUnwrap(out SessionContext sessionContext))
         {
-           Log.Information("Match found: {SessionId}", sessionContext.SessionId); 
+            Log.Information("Match found: {SessionId}", sessionContext.SessionId);
         }
-        
+
         return MessageControllerResult.AsResult();
     }
 }

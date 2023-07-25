@@ -3,7 +3,7 @@ using OpenCCG.Cards;
 
 namespace OpenCCG.Net.Gameplay;
 
-public class Hand : LinkedList<CardImplementation>
+public class Hand : LinkedList<ICard>
 {
 
 }

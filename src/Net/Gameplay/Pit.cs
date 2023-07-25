@@ -3,7 +3,7 @@ using OpenCCG.Cards;
 
 namespace OpenCCG.Net.Gameplay;
 
-public class Pit : LinkedList<CardImplementation> 
+public class Pit : LinkedList<ICard> 
 {
 
 }

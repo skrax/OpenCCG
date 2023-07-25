@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using OpenCCG.Cards;
 
 namespace OpenCCG.Net.Gameplay;
 
-public class Deck : LinkedList<CardImplementation>
+public class Deck : LinkedList<ICard>
 {
-    public Deck(IEnumerable<CardImplementation> cards) : base(cards)
+    public Deck(IEnumerable<ICard> cards) : base(cards)
     {
     }
 }

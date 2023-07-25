@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
@@ -10,48 +11,63 @@ using Error = OpenCCG.Net.Messaging.Error;
 
 namespace OpenCCG.Net.Gameplay;
 
-public partial class Session : Node, IMessageController
+public partial class Session : Node
 {
     public readonly SessionContext Context;
     private readonly ILogger _logger;
-    private readonly Queue<SessionCommand> _commandQueue = new();
+    private readonly Queue<SessionCommandContext> _commandQueue = new();
     private readonly Dictionary<long, PlayerState> _playerByPeerId = new();
+    private readonly IMessageBroker _broker;
 
-    public Session(QueuedPlayer queuedPlayer1, QueuedPlayer queuedPlayer2)
+    public Session(QueuedPlayer queuedPlayer1, QueuedPlayer queuedPlayer2, IMessageBroker broker)
     {
+        _broker = broker;
         Context = new SessionContext(Guid.NewGuid());
         _logger = Log.ForContext(new SessionContextEnricher(Context));
-        
-        var player1 = new PlayerState(queuedPlayer1.PeerId, queuedPlayer2.PeerId, queuedPlayer1.DeckList);
-        var player2 = new PlayerState(queuedPlayer2.PeerId, queuedPlayer1.PeerId, queuedPlayer2.DeckList);
+        Name = $"[Session]{queuedPlayer1.PeerId}_{queuedPlayer2.PeerId}";
+
+        var player1 = new PlayerState(queuedPlayer1.PeerId, queuedPlayer2.PeerId, queuedPlayer1.DeckList, this, broker);
+        var player2 = new PlayerState(queuedPlayer2.PeerId, queuedPlayer1.PeerId, queuedPlayer2.DeckList, this, broker);
         player1.Enemy = player2;
         player2.Enemy = player1;
         _playerByPeerId.Add(player1.PeerId, player1);
         _playerByPeerId.Add(player2.PeerId, player2);
-        
-        Name = $"[Session]{queuedPlayer1.PeerId}_{queuedPlayer2.PeerId}";
     }
 
-    public void Configure(IMessageBroker broker)
+    public void Configure()
     {
-        broker.Map(Route.PlayCard, OnPlayCard);
-        broker.Map(Route.CombatPlayer, OnCombatPlayer);
-        broker.Map(Route.CombatPlayerCard, OnCombatPlayerCard);
-        broker.Map(Route.EndTurn, OnEndTurn);
+        _broker.Map(Route.PlayCard, OnPlayCard);
+        _broker.Map(Route.CombatPlayer, OnCombatPlayer);
+        _broker.Map(Route.CombatPlayerCard, OnCombatPlayerCard);
+        _broker.Map(Route.EndTurn, OnEndTurn);
         _logger.Information("{SessionName} created", Name);
+    }
 
+    public void Begin()
+    {
         foreach (var peerIds in _playerByPeerId.Keys)
         {
-            broker.EnqueueMessage(peerIds, Message.Create(Route.MatchFound, Context));
+            _broker.EnqueueMessage(peerIds, Message.Create(Route.MatchFound, Context));
         }
+
+        var playerStart = GD.RandRange(0, _playerByPeerId.Keys.Count - 1);
+
+        var peerId = _playerByPeerId.Keys.ElementAt(playerStart);
+        _playerByPeerId[peerId].StartTurn();
     }
 
     public override void _Process(double delta)
     {
-        while (_commandQueue.TryDequeue(out var command)) command.Invoke();
+        while (_commandQueue.TryDequeue(out var commandContext))
+        {
+            var result = commandContext.Command.Invoke();
+            _broker.SendResult(commandContext.MessageContext, result);
+
+            commandContext.PlayerState.Process();
+        }
     }
 
-    private MessageControllerResult OnPlayCard(MessageContext context)
+    private MessageControllerResult? OnPlayCard(MessageContext context)
     {
         if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
         {
@@ -59,12 +75,12 @@ public partial class Session : Node, IMessageController
             return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
         }
 
-        _commandQueue.Enqueue(player.PlayCard);
+        _commandQueue.Enqueue(new(context, player.PlayCard, player));
 
-        return MessageControllerResult.AsResult();
+        return MessageControllerResult.AsDeferred();
     }
 
-    private MessageControllerResult OnCombatPlayer(MessageContext context)
+    private MessageControllerResult? OnCombatPlayer(MessageContext context)
     {
         if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
         {
@@ -72,12 +88,12 @@ public partial class Session : Node, IMessageController
             return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
         }
 
-        _commandQueue.Enqueue(player.CombatPlayer);
+        _commandQueue.Enqueue(new(context, player.CombatPlayer, player));
 
-        return MessageControllerResult.AsResult();
+        return MessageControllerResult.AsDeferred();
     }
 
-    private MessageControllerResult OnCombatPlayerCard(MessageContext context)
+    private MessageControllerResult? OnCombatPlayerCard(MessageContext context)
     {
         if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
         {
@@ -85,12 +101,12 @@ public partial class Session : Node, IMessageController
             return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
         }
 
-        _commandQueue.Enqueue(player.CombatPlayerCard);
+        _commandQueue.Enqueue(new(context, player.CombatPlayerCard, player));
 
-        return MessageControllerResult.AsResult();
+        return MessageControllerResult.AsDeferred();
     }
 
-    private MessageControllerResult OnEndTurn(MessageContext context)
+    private MessageControllerResult? OnEndTurn(MessageContext context)
     {
         if (!_playerByPeerId.TryGetValue(context.PeerId, out var player))
         {
@@ -98,8 +114,8 @@ public partial class Session : Node, IMessageController
             return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
         }
 
-        _commandQueue.Enqueue(player.EndTurn);
+        _commandQueue.Enqueue(new(context, player.EndTurn, player));
 
-        return MessageControllerResult.AsResult();
+        return MessageControllerResult.AsDeferred();
     }
 }

@@ -1,3 +1,5 @@
+using OpenCCG.Net.Messaging;
+
 namespace OpenCCG.Net.Gameplay;
 
-public delegate void SessionCommand();
+public delegate MessageControllerResult SessionCommand();

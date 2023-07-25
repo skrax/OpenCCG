@@ -16,13 +16,14 @@ public partial class SessionManager : Node
 
     public void CreateSession(QueuedPlayer player1, QueuedPlayer player2)
     {
-        var session = new Session(player1, player2);
+        var session = new Session(player1, player2, _server);
         AddChild(session);
-        session.Configure(_server);
-        
+        session.Configure();
         session.AddToGroup($"Session-{player1.PeerId}");
         session.AddToGroup($"Session-{player2.PeerId}");
         session.AddToGroup($"Session-{session.Context.SessionId}");
+        
+        session.Begin();
     }
 
     public void DissolveSession(long peerId)
