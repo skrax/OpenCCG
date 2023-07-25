@@ -7,10 +7,13 @@ using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
 using OpenCCG.Core;
 using OpenCCG.Net.Dto;
+using OpenCCG.Net.Gameplay;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 using Serilog;
+using Board = OpenCCG.Net.ServerNodes.Board;
+using Hand = OpenCCG.Net.ServerNodes.Hand;
 
 namespace OpenCCG.Net;
 

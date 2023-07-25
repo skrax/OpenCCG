@@ -1,43 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Net;
-using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 using Serilog;
+using Board = OpenCCG.GameBoard.Board;
 
 namespace OpenCCG;
 
-public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageType>
+public partial class CardEffectPreview : TextureRect
 {
     [Export] private CardStatPanel _costPanel;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
     [Export] private Sprite2D _projectile;
-    [Export] private SkipSelectionField _skipSelectionField;
+    [Export] private GameBoard.SkipSelectionField _skipSelectionField;
 
     private TaskCompletionSource<RequireTargetOutputDto>? _tsc;
     public RequireTargetInputDto? CurrentInputDto;
-
-    public Dictionary<string, IObserver>? Observers => null;
-
-    [Rpc]
-    public async void HandleMessageAsync(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
-    }
-
-    public Executor? GetExecutor(MessageType messageType)
-    {
-        return messageType switch
-        {
-            MessageType.RequireTarget => Executor.Make<RequireTargetInputDto, RequireTargetOutputDto>(RequireTarget),
-            MessageType.TmpShowCard => Executor.Make<CardImplementationDto>(TmpShowTarget,
-                Executor.ResponseMode.NoResponse),
-            _ => null
-        };
-    }
 
     private void Show(CardImplementationDto dto)
     {
@@ -161,7 +140,7 @@ public partial class CardEffectPreview : TextureRect, IMessageReceiver<MessageTy
 
         if (target is CardBoard cardBoard && CurrentInputDto!.Type != RequireTargetType.Avatar)
         {
-            var isEnemyBoard = cardBoard.GetParent<BoardArea>().IsEnemy;
+            var isEnemyBoard = cardBoard.GetParent<Board>().IsEnemy;
             if ((isEnemyBoard && CurrentInputDto.Side == RequireTargetSide.Friendly) ||
                 (!isEnemyBoard && CurrentInputDto.Side == RequireTargetSide.Enemy))
             {

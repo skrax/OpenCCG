@@ -24,7 +24,7 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
 
     public void Init(CardImplementationDto dto)
     {
-        IsEnemy = GetParent<BoardArea>().IsEnemy;
+        IsEnemy = GetParent<GameBoard.Board>().IsEnemy;
         CardImplementationDto = dto;
         _atkPanel.SetValue(dto.CreatureState!.Atk, dto.CreatureOutline!.Atk);
         _defPanel.SetValue(dto.CreatureState!.Def, dto.CreatureOutline!.Def);
@@ -77,7 +77,7 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
         if (!IsEnemy) return;
         if (!CardImplementationDto.CreatureState!.IsExposed) return;
         if (!CardImplementationDto.CreatureAbilities!.Defender &&
-            GetParent<BoardArea>().Cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
+            GetParent<GameBoard.Board>().Cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
 
         DrawOutline(true);
     }

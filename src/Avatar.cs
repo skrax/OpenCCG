@@ -42,7 +42,7 @@ public partial class Avatar : TextureRect
     private void OnDragForCombatStart(ulong instanceId)
     {
         if (!IsEnemy) return;
-        var board = GetNode<BoardArea>("/root/Main/EnemyBoard");
+        var board = GetNode<GameBoard.Board>("/root/Main/EnemyBoard");
         if (board.Cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
 
         DrawOutline(true);

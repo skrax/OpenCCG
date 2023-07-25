@@ -9,40 +9,18 @@ using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 using Serilog;
 
-namespace OpenCCG;
+namespace OpenCCG.GameBoard;
 
-public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
+public partial class Board : HBoxContainer
 {
-    private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
-
-    public readonly List<CardBoard> Cards = new();
+    [Export] private PackedScene _cardBoardScene = null!;
     [Export] public StatusPanel StatusPanel = null!, EnemyStatusPanel = null!;
-    [Export] public GameBoard.Board EnemyBoard = null!;
+    [Export] public Board EnemyBoard = null!;
     [Export] public bool IsEnemy;
 
-    public Dictionary<string, IObserver>? Observers => null;
+    public readonly List<CardBoard> Cards = new();
 
-    [Rpc]
-    public async void HandleMessageAsync(string messageJson)
-    {
-        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
-    }
-
-    public Executor? GetExecutor(MessageType messageType)
-    {
-        return messageType switch
-        {
-            MessageType.PlaceCard => Executor.Make<CardImplementationDto>(PlaceCard, Executor.ResponseMode.Respond),
-            MessageType.UpdateCard => Executor.Make<CardImplementationDto>(UpdateCardAsync,
-                Executor.ResponseMode.Respond),
-            MessageType.RemoveCard => Executor.Make<RemoveCardDto>(RemoveCard, Executor.ResponseMode.Respond),
-            MessageType.PlayCombatAnim => Executor.Make<PlayCombatDto>(PlayCombatAnimAsync,
-                Executor.ResponseMode.Respond),
-            _ => null
-        };
-    }
-
-    private async Task PlayCombatAnimAsync(PlayCombatDto dto)
+    public async Task PlayCombatAnimAsync(PlayCombatDto dto)
     {
         var card = Cards.FirstOrDefault(x => x.CardImplementationDto.Id == dto.From);
 
@@ -69,15 +47,15 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
         }
     }
 
-    private void PlaceCard(CardImplementationDto dto)
+    public void PlaceCard(CardImplementationDto dto)
     {
-        var card = CardBoardScene.Make<CardBoard, CardImplementationDto>(dto, this);
+        var card = _cardBoardScene.Make<CardBoard, CardImplementationDto>(dto, this);
         Log.Information("IsEnemy: {IsEnemy} placed: {Id} {Name}", IsEnemy, dto.Id, dto.Outline.Name);
 
         Cards.Add(card);
     }
 
-    private async Task UpdateCardAsync(CardImplementationDto dto)
+    public async Task UpdateCardAsync(CardImplementationDto dto)
     {
         Log.Information("IsEnemy: {IsEnemy} update: {Id}", IsEnemy, dto.Id);
 
@@ -94,7 +72,7 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
         await card.UpdateAsync(dto);
     }
 
-    private void RemoveCard(RemoveCardDto removeCardDto)
+    public void RemoveCard(RemoveCardDto removeCardDto)
     {
         Log.Information("IsEnemy: {IsEnemy} remove: {Id}", IsEnemy, removeCardDto.Id);
         var card = Cards.FirstOrDefault(x => x.CardImplementationDto.Id == removeCardDto.Id);

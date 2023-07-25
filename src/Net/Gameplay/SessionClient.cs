@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Net.Gameplay.Dto;
@@ -10,10 +12,20 @@ namespace OpenCCG.Net.Gameplay;
 public partial class SessionClient : Node
 {
     [Export] private MessageBroker _broker = null!;
+    [Export] private GameBoard.MidPanel _midPanel = null!;
+    private readonly Queue<Action> _taskQueue = new();
 
     public override void _Ready()
     {
         Configure();
+    }
+
+    public override void _Process(double delta)
+    {
+        while (_taskQueue.TryDequeue(out var act))
+        {
+            act();
+        }
     }
 
     public void Configure()
@@ -94,6 +106,8 @@ public partial class SessionClient : Node
         {
             Log.Information("Match found: {SessionId} {PlayerId} {EnemyPlayerId}",
                 matchInfoDto.SessionId, matchInfoDto.PlayerId, matchInfoDto.EnemyPlayerId);
+
+            _taskQueue.Enqueue(() => { _midPanel?.SetStatusMessage("Match Found"); });
         }
 
         return MessageControllerResult.AsResult();

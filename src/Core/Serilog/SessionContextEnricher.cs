@@ -1,3 +1,4 @@
+using OpenCCG.Net.Gameplay;
 using Serilog.Core;
 using Serilog.Events;
 

@@ -2,7 +2,7 @@ using System;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace OpenCCG.Core;
+namespace OpenCCG.Net.Gameplay;
 
 public record SessionContext(Guid SessionId)
 {

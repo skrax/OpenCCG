@@ -12,10 +12,12 @@ public partial class TestServer : MessageBroker
 
     [Export] private MatchmakingService _matchmakingService = null!;
     [Export] private SessionManager _sessionManager = null!;
+    [Export] private int _serverPort = 57777;
+    [Export] private int _maxClients = 32;
 
     public override void _Ready()
     {
-        _peer = CreateServer(57777, 32);
+        _peer = CreateServer(_serverPort, _maxClients);
     }
 
     protected override void OnPeerConnected(long id)

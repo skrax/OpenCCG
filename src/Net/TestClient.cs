@@ -1,19 +1,21 @@
 using System;
 using Godot;
-using OpenCCG.Net.Gameplay;
 using OpenCCG.Net.Matchmaking;
+using OpenCCG.Net.Messaging;
 using Serilog;
 
 namespace OpenCCG.Net;
 
-public partial class TestClient : Messaging.MessageBroker
+public partial class TestClient : MessageBroker
 {
     private ENetMultiplayerPeer? _peer;
-    [Export ]private MatchmakingClient _matchmakingClient = null!;
+    [Export] private MatchmakingClient _matchmakingClient = null!;
+    [Export] private string _serverAddress = "localhost";
+    [Export] private int _serverPort = 57777;
 
     public override void _Ready()
     {
-        _peer = CreateClient("localhost", 57777);
+        _peer = CreateClient(_serverAddress, _serverPort);
     }
 
     protected override void OnPeerConnected(long id)

@@ -9,6 +9,7 @@ namespace OpenCCG.Net.Matchmaking;
 public partial class MatchmakingClient : Node
 {
     [Export] private MessageBroker _broker = null!;
+    [Export] private GameBoard.MidPanel _midPanel = null!;
 
     public override void _Ready()
     {
@@ -30,13 +31,20 @@ public partial class MatchmakingClient : Node
         if (response != null)
         {
             if (response.Message.HasError())
+            {
                 Log.Error("Failed to enqueue");
+                _midPanel.SetStatusMessage("Connection Failed");
+            }
             else
+            {
                 Log.Information("Enqueued");
+                _midPanel.SetStatusMessage("Looking for Opponent ..");
+            }
         }
         else
         {
             Log.Error("Failed to enqueue");
+            _midPanel.SetStatusMessage("Connection Failed");
         }
     }
 }
