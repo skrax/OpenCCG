@@ -1,4 +1,5 @@
 using Godot;
+using OpenCCG.Core;
 using OpenCCG.Net.Matchmaking;
 using Serilog;
 
@@ -11,7 +12,7 @@ public partial class SessionManager : Node
 
     public override void _Ready()
     {
-        Log.Information("{Service} is running", nameof(SessionManager));
+        Log.Information(Logging.Templates.ServiceIsRunning, nameof(SessionManager));
     }
 
     public void CreateSession(QueuedPlayer player1, QueuedPlayer player2)

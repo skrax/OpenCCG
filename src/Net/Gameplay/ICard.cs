@@ -27,5 +27,5 @@ public interface ICard
 
     public void OnEndTurn();
 
-    public void AsDto();
+    public CardImplementationDto AsDto();
 }

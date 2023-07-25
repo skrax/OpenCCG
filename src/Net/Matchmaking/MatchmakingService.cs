@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using OpenCCG.Core;
 using OpenCCG.Net.Gameplay;
 using OpenCCG.Net.Messaging;
 using Serilog;
@@ -8,18 +9,22 @@ using Error = OpenCCG.Net.Messaging.Error;
 namespace OpenCCG.Net.Matchmaking;
 
 [GlobalClass]
-public partial class MatchmakingService : Node, IMessageController
+public partial class MatchmakingService : Node
 {
     private readonly MatchmakingQueue _defaultQueue = new();
     private readonly Dictionary<string, MatchmakingQueue> _passwordQueues = new();
-    private IMessageBroker _broker = null!;
+    [Export] private MessageBroker _broker = null!;
     [Export] private SessionManager _sessionManager = null!;
 
-    public void Configure(IMessageBroker broker)
+    public override void _Ready()
     {
-        _broker = broker;
-        broker.Map(Route.Enqueue, OnPlayerEnqueue);
-        Log.Information("{Service} is running", nameof(MatchmakingService));
+        Configure();
+    }
+
+    public void Configure()
+    {
+        _broker.Map(Route.Enqueue, OnPlayerEnqueue);
+        Log.Information(Logging.Templates.ServiceIsRunning, nameof(MatchmakingService));
     }
 
     private MessageControllerResult OnPlayerEnqueue(MessageContext messageContext)

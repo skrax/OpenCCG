@@ -16,7 +16,6 @@ public partial class TestServer : MessageBroker
     public override void _Ready()
     {
         _peer = CreateServer(57777, 32);
-        _matchmakingService.Configure(this);
     }
 
     protected override void OnPeerConnected(long id)

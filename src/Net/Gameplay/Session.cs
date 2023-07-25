@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
+using OpenCCG.Net.Gameplay.Dto;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Messaging;
 using Serilog;
@@ -45,9 +46,15 @@ public partial class Session : Node
 
     public void Begin()
     {
-        foreach (var peerIds in _playerByPeerId.Keys)
+        foreach (var playerState in _playerByPeerId.Values)
         {
-            _broker.EnqueueMessage(peerIds, Message.Create(Route.MatchFound, Context));
+            var matchInfo = new MatchInfoDto(Context.SessionId, playerState.Id, playerState.Enemy.Id);
+            _broker.EnqueueMessage(playerState.PeerId, Message.Create(Route.MatchFound, matchInfo));
+        }
+
+        foreach (var playerState in _playerByPeerId.Values)
+        {
+            playerState.SetupMatch();
         }
 
         var playerStart = GD.RandRange(0, _playerByPeerId.Keys.Count - 1);

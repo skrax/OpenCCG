@@ -7,7 +7,7 @@ public class Creature : ICard
 {
     public Guid Id { get; } = Guid.NewGuid();
 
-    public readonly ICreatureOutline CreatureOutline;
+    public readonly CreatureOutline CreatureOutline;
 
     public readonly CreatureState CreatureState;
 
@@ -17,7 +17,7 @@ public class Creature : ICard
 
     public ICardState State => CreatureState;
 
-    public Creature(ICreatureOutline outline, CreatureState state, CreatureAbilities abilities)
+    public Creature(CreatureOutline outline, CreatureState state, CreatureAbilities abilities)
     {
         CreatureOutline = outline;
         CreatureState = state;
@@ -60,7 +60,6 @@ public class Creature : ICard
 
     public virtual void OnEndTurn()
     {
-        
     }
 
     public void OnUpkeep()
@@ -81,7 +80,6 @@ public class Creature : ICard
         CreatureState.Def -= amount;
     }
 
-    public void AsDto()
-    {
-    }
+    public CardImplementationDto AsDto() =>
+        CardImplementationDto.AsCreature(Id, CreatureOutline, CreatureState, Abilities);
 }

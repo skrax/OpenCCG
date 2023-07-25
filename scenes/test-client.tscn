@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://talarwjfhgsw"]
+[gd_scene load_steps=4 format=3 uid="uid://talarwjfhgsw"]
 
 [ext_resource type="Script" path="res://src/Net/TestClient.cs" id="1_fw7mh"]
+[ext_resource type="Script" path="res://src/Net/Gameplay/SessionClient.cs" id="2_oqnj8"]
+[ext_resource type="Script" path="res://src/Net/Matchmaking/MatchmakingClient.cs" id="2_yqt0l"]
 
-[node name="test-client" type="Node"]
+[node name="test-client" type="Node" node_paths=PackedStringArray("_matchmakingClient")]
 script = ExtResource("1_fw7mh")
+_matchmakingClient = NodePath("MatchmakingClient")
+
+[node name="MatchmakingClient" type="Node" parent="." node_paths=PackedStringArray("_broker")]
+script = ExtResource("2_yqt0l")
+_broker = NodePath("..")
+
+[node name="SessionClient" type="Node" parent="." node_paths=PackedStringArray("_broker")]
+script = ExtResource("2_oqnj8")
+_broker = NodePath("..")

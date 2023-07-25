@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenCCG.Cards;
 using OpenCCG.Core.Serilog;
+using OpenCCG.Net.Gameplay.Dto;
 using OpenCCG.Net.Messaging;
 using Serilog;
 
@@ -9,11 +11,12 @@ namespace OpenCCG.Net.Gameplay;
 
 public class PlayerState
 {
-    private ILogger _logger;
+    private readonly ILogger _logger;
     private readonly Queue<Action> _commandQueue;
     private readonly Session _session;
     private readonly IMessageBroker _broker;
 
+    public Guid Id = Guid.NewGuid();
     public readonly long PeerId;
     public readonly long EnemyPeerId;
     public PlayerState Enemy = null!;
@@ -51,22 +54,13 @@ public class PlayerState
     public int Energy;
     public int MaxEnergy;
 
-    public PlayerState(long peerId, long enemyPeerId, List<ICardOutline> deckList, Session session, IMessageBroker broker)
+    public PlayerState(long peerId, long enemyPeerId, List<ICardOutline> deckList, Session session,
+        IMessageBroker broker)
     {
         PeerId = peerId;
         EnemyPeerId = enemyPeerId;
         DeckList = deckList;
-        // TODO
-        /**
-        var deck = deckList.Shuffle().Select(x =>
-        {
-            var card = TestSetImplementations.GetImplementation(x.Id, this);
-            card.MoveToZone(CardZone.Deck);
-            return card;
-        });
-        **/
-        Deck = new(ArraySegment<ICard>.Empty);
-
+        Deck = new();
         Hand = new();
         Board = new();
         Pit = new();
@@ -78,6 +72,63 @@ public class PlayerState
         _session = session;
         _broker = broker;
         _logger = Log.ForContext(new SessionContextEnricher(session.Context));
+    }
+
+    public void SetupMatch()
+    {
+        _logger.Information("Setting up match for peer {PeerId}", PeerId);
+        Deck.Clear();
+        Hand.Clear();
+        Board.Clear();
+        Pit.Clear();
+        IsTurn = false;
+        // TODO add cards to deck
+
+        _commandQueue.Clear();
+
+        SetMaxEnergy(Rules.InitialEnergy);
+        SetEnergy(Rules.InitialEnergy);
+        SetHealth(Rules.InitialHealth);
+        SyncCardCount();
+
+        Draw(Rules.InitialCardsDrawn);
+    }
+
+    public void SetHealth(int amount)
+    {
+        Health = amount;
+        EnqueueSyncMessage(Route.SetHealth, new SetPlayerMetricDto(Id, Health));
+    }
+
+    public void SetEnergy(int amount)
+    {
+        Energy = amount;
+        EnqueueSyncMessage(Route.SetEnergy, new SetPlayerMetricDto(Id, Energy));
+    }
+
+    public void SetMaxEnergy(int amount)
+    {
+        MaxEnergy = amount;
+        EnqueueSyncMessage(Route.SetMaxEnergy, new SetPlayerMetricDto(Id, MaxEnergy));
+    }
+
+    public void Draw(int count)
+    {
+        foreach (var card in Deck.Take(count).ToList())
+        {
+            Deck.Remove(card);
+            Hand.AddLast(card);
+
+            var dto = card.AsDto();
+            EnqueueSyncMessage(Route.AddCardToHand, new AddCardDto(Id, dto), new AddCardDto(Id, null));
+            SyncCardCount();
+        }
+    }
+
+    private void SyncCardCount()
+    {
+        EnqueueSyncMessage(Route.SetCardsInDeck, new SetPlayerMetricDto(Id, Deck.Count));
+        EnqueueSyncMessage(Route.SetCardsInHand, new SetPlayerMetricDto(Id, Hand.Count));
     }
 
     public MessageControllerResult PlayCard()
@@ -129,8 +180,12 @@ public class PlayerState
         _logger.Information("Starting turn for peer {PeerId}", PeerId);
 
         IsTurn = true;
-        if (MaxEnergy < Rules.MaxEnergy) MaxEnergy += Rules.EnergyGainedPerTurn;
-        Energy = MaxEnergy;
+        if (MaxEnergy < Rules.MaxEnergy)
+        {
+            SetMaxEnergy(MaxEnergy + Rules.EnergyGainedPerTurn);
+        }
+
+        SetEnergy(MaxEnergy);
 
         foreach (var creature in Board)
         {
@@ -141,12 +196,20 @@ public class PlayerState
         {
             card.OnStartTurn();
         }
-        
+
         _broker.EnqueueMessage(PeerId, Message.Create(Route.EnableEndTurnButton));
     }
 
     public void Process()
     {
         while (_commandQueue.TryDequeue(out var command)) command.Invoke();
+    }
+
+    private void EnqueueSyncMessage<T>(string route, T myself, T? other = default)
+    {
+        var message = Message.Create(route, myself);
+        var messageOther = Message.Create(route, other ?? myself);
+        _broker.EnqueueMessage(PeerId, message);
+        _broker.EnqueueMessage(EnemyPeerId, messageOther);
     }
 }

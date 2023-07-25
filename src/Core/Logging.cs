@@ -40,4 +40,10 @@ public partial class Logging : Node
     {
         Log.CloseAndFlush();
     }
+
+    public static class Templates
+    {
+        public const string ServiceIsRunning = "{Service} is running";
+
+    }
 }

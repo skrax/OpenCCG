@@ -1,24 +1,31 @@
+using Godot;
+using OpenCCG.Core;
 using OpenCCG.Net.Messaging;
 using Serilog;
 
 namespace OpenCCG.Net.Matchmaking;
 
-public class MatchmakingClient : MessageClient
+[GlobalClass]
+public partial class MatchmakingClient : Node
 {
-    public MatchmakingClient(IMessageBroker broker) : base(broker)
+    [Export] private MessageBroker _broker = null!;
+
+    public override void _Ready()
     {
+        Configure();
     }
 
-    public override void Configure()
+    public void Configure()
     {
-        Broker.MapAwaitableResponse(Route.EnqueueResponse);
+        _broker.MapAwaitableResponse(Route.EnqueueResponse);
+        Log.Information(Logging.Templates.ServiceIsRunning, nameof(MatchmakingClient));
     }
 
     public async void EnqueuePlayer(SavedDeck deck, string? password = null)
     {
         var dto = new MatchmakingRequest(deck, password);
         var message = Message.CreateWithResponse(Route.Enqueue, Route.EnqueueResponse, dto);
-        var response = await Broker.EnqueueMessageAndGetResponseAsync(1, message);
+        var response = await _broker.EnqueueMessageAndGetResponseAsync(1, message);
 
         if (response != null)
         {

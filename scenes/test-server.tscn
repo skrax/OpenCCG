@@ -9,8 +9,9 @@ script = ExtResource("1_ylqk4")
 _matchmakingService = NodePath("MatchmakingService")
 _sessionManager = NodePath("SessionManager")
 
-[node name="MatchmakingService" type="Node" parent="." node_paths=PackedStringArray("_sessionManager")]
+[node name="MatchmakingService" type="Node" parent="." node_paths=PackedStringArray("_broker", "_sessionManager")]
 script = ExtResource("2_rr8iu")
+_broker = NodePath("..")
 _sessionManager = NodePath("../SessionManager")
 
 [node name="SessionManager" type="Node" parent="." node_paths=PackedStringArray("_server")]
