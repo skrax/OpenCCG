@@ -66,7 +66,7 @@ public partial class SessionClient : Node
         _broker.Map(Route.SetHealth, OnSetHealth);
         _broker.Map(Route.SetCardsInHand, OnSetCardsInHand);
         _broker.Map(Route.SetCardsInDeck, OnSetCardsInDeck);
-        Log.Information(Logging.Templates.ServiceIsRunning, nameof(SessionClient));
+        _logger.Information(Logging.Templates.ServiceIsRunning, nameof(SessionClient));
     }
 
     private MessageControllerResult OnSetCardsInDeck(MessageContext context)
@@ -149,11 +149,11 @@ public partial class SessionClient : Node
     {
         if (context.Message.TryUnwrap(out AddCardDto addCardDto))
         {
-            Log.Information("Add card to hand: {PlayerId} {CardId}", addCardDto.PlayerId, addCardDto.Dto?.Id);
+            _logger.Information("Add card to hand: {PlayerId} {CardId}", addCardDto.PlayerId, addCardDto.Dto?.Id);
         }
         else
         {
-            Log.Error("Failed to unwrap message for {Route}", Route.AddCardToHand);
+            _logger.Error("Failed to unwrap message for {Route}", Route.AddCardToHand);
         }
 
         return MessageControllerResult.AsResult();
@@ -161,7 +161,7 @@ public partial class SessionClient : Node
 
     private MessageControllerResult OnEnableEndTurnButton(MessageContext context)
     {
-        Log.Information("End turn button enabled");
+        _logger.Information("End turn button enabled");
 
         _midPanel.EndTurnButtonSetActive(new(true, null));
 
