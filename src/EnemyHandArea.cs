@@ -47,11 +47,10 @@ public partial class EnemyHandArea : HBoxContainer, IMessageReceiver<MessageType
         cardEntity.QueueFree();
     }
 
-    private async Task DrawCard()
+    private void DrawCard()
     {
         var entity = CardHiddenScene.Make<CardHidden>(this);
         _cards.Add(entity);
-        await entity.PlayDrawAnimAsync();
     }
 
     private void PreCustomSort()

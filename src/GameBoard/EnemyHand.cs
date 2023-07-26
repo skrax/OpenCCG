@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
-using OpenCCG.Net;
-using OpenCCG.Net.Rpc;
 
 namespace OpenCCG.GameBoard;
 
@@ -13,11 +11,26 @@ public partial class EnemyHand : HBoxContainer
     [Export] private PackedScene _cardHiddenScene = null!;
     [Export] private Curve _heightCurve = null!, _rotationCurve = null!, _separationCurve = null!;
     private readonly List<CardHidden> _cards = new();
+    private readonly HashSet<CardHidden> _addedCards = new();
+
+    private readonly Queue<CardHidden> _animationQueue = new();
+    private Task _currentAnimation = Task.CompletedTask;
 
     public override void _Ready()
     {
         SortChildren += CustomSort;
         PreSortChildren += PreCustomSort;
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_currentAnimation.IsCompleted)
+        {
+            if (_animationQueue.TryDequeue(out var c))
+            {
+                _currentAnimation = c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition);
+            }
+        }
     }
 
     public void RemoveCard()
@@ -33,6 +46,7 @@ public partial class EnemyHand : HBoxContainer
     {
         var entity = _cardHiddenScene.Make<CardHidden>(this);
         _cards.Add(entity);
+        _addedCards.Add(entity);
     }
 
     private void PreCustomSort()
@@ -59,7 +73,10 @@ public partial class EnemyHand : HBoxContainer
                 c.RotationDegrees = _rotationCurve.Sample(sampleIndex) * -4f;
             }
 
-            c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition);
+            if (_addedCards.Remove(c))
+            {
+                _animationQueue.Enqueue(c);
+            }
 
             c.ZIndex = _cards.Count - index;
         }

@@ -6,22 +6,16 @@ namespace OpenCCG;
 
 public partial class CardHidden : TextureRect
 {
-    private bool _drawAnim;
-    private TaskCompletionSource? _drawAnimTsc;
     [Export] private Curve _drawCurve;
 
-    public async Task PlayDrawAnimAsync()
+    public override void _Ready()
     {
-        _drawAnimTsc = new TaskCompletionSource();
-        _drawAnim = true;
-        await _drawAnimTsc.Task;
-        _drawAnimTsc = null;
+        Modulate = Colors.Transparent;
     }
 
-    public async void PlayDrawAnimAsync(Vector2 start, Vector2 end)
+    public async Task PlayDrawAnimAsync(Vector2 start, Vector2 end)
     {
-        if (_drawAnim is false || _drawAnimTsc is null) return;
-        _drawAnim = false;
+        Modulate = Colors.White;
         var t = 0f;
         const float delta = 1000 / 60f;
         while (t < 1f)
@@ -39,7 +33,5 @@ public partial class CardHidden : TextureRect
             GlobalPosition = pos;
             await Task.Delay(TimeSpan.FromMilliseconds(delta));
         }
-
-        _drawAnimTsc.SetResult();
     }
 }

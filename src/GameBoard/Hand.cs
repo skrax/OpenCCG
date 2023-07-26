@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Core;
-using Serilog;
 
 namespace OpenCCG.GameBoard;
 
