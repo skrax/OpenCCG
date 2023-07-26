@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenCCG.Cards;
+using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Gameplay.Dto;
+using OpenCCG.Net.Gameplay.Test;
 using OpenCCG.Net.Messaging;
 using Serilog;
 
@@ -83,6 +85,11 @@ public class PlayerState
         Pit.Clear();
         IsTurn = false;
         // TODO add cards to deck
+
+        foreach (var card in DeckList.Select(x => TestSetImplementations.GetImplementation(x.Id)).Shuffle())
+        {
+            Deck.AddLast(card);
+        }
 
         _commandQueue.Clear();
 

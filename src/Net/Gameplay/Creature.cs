@@ -3,7 +3,7 @@ using OpenCCG.Cards;
 
 namespace OpenCCG.Net.Gameplay;
 
-public class Creature : ICard
+public abstract class Creature : ICard
 {
     public Guid Id { get; } = Guid.NewGuid();
 
@@ -17,10 +17,20 @@ public class Creature : ICard
 
     public ICardState State => CreatureState;
 
-    public Creature(CreatureOutline outline, CreatureState state, CreatureAbilities abilities)
+    public Creature(CreatureOutline outline, CreatureAbilities abilities)
     {
         CreatureOutline = outline;
-        CreatureState = state;
+        CreatureState = new CreatureState
+        {
+            Atk = outline.Atk,
+            Def = outline.Def,
+            Cost = outline.Cost,
+            AttacksAvailable = 0,
+            MaxAttacksPerTurn = 1,
+            Zone = CardZone.None,
+            IsExposed = abilities.Exposed
+        };
+
         Abilities = abilities;
     }
 

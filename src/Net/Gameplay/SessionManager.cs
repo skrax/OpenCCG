@@ -1,5 +1,6 @@
 using Godot;
 using OpenCCG.Core;
+using OpenCCG.Net.Gameplay.Test;
 using OpenCCG.Net.Matchmaking;
 using Serilog;
 
@@ -12,6 +13,7 @@ public partial class SessionManager : Node
 
     public override void _Ready()
     {
+        TestSetImplementations.Init();
         Log.Information(Logging.Templates.ServiceIsRunning, nameof(SessionManager));
     }
 

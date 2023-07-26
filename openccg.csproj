@@ -11,10 +11,4 @@
     <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.1.0" />
     <PackageReference Include="Stateless" Version="5.13.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="MultiplayerProtocolGenerator\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="MultiplayerProtocolGenerator\**" />
-  </ItemGroup>
 </Project>
