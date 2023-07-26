@@ -15,6 +15,8 @@ public partial class MatchmakingClient : Node
     [Export] private GameBoard.MidPanel _midPanel = null!;
     [Export] private GameBoard.StatusPanel _statusPanel = null!;
     [Export] private GameBoard.StatusPanel _enemyStatusPanel = null!;
+    [Export] private GameBoard.Hand _hand = null!;
+    [Export] private GameBoard.EnemyHand _enemyHand = null!;
 
     public override void _Ready()
     {
@@ -66,7 +68,9 @@ public partial class MatchmakingClient : Node
             matchInfoDto.SessionId, matchInfoDto.PlayerId, matchInfoDto.EnemyPlayerId);
 
         _midPanel.SetStatusMessage("Match Found");
-        var sessionClient = new SessionClient(_broker, matchInfoDto, _midPanel, _statusPanel, _enemyStatusPanel);
+        var sessionClient = new SessionClient(_broker, matchInfoDto,
+            _midPanel, _statusPanel, _enemyStatusPanel,
+            _hand, _enemyHand);
         AddChild(sessionClient);
 
         return MessageControllerResult.AsResult();

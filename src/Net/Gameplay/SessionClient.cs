@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
+using OpenCCG.GameBoard;
 using OpenCCG.Net.Gameplay.Dto;
 using OpenCCG.Net.Messaging;
 using Serilog;
@@ -15,6 +16,8 @@ public partial class SessionClient : Node
     private readonly GameBoard.MidPanel _midPanel;
     private readonly GameBoard.StatusPanel _statusPanel;
     private readonly GameBoard.StatusPanel _enemyStatusPanel;
+    private readonly GameBoard.Hand _hand;
+    private readonly GameBoard.EnemyHand _enemyHand;
     private readonly Queue<Action> _commandQueue = new();
     private readonly MatchInfoDto _matchInfoDto;
     private readonly ILogger _logger;
@@ -22,13 +25,19 @@ public partial class SessionClient : Node
     public SessionClient(MessageBroker broker,
         MatchInfoDto matchInfoDto,
         GameBoard.MidPanel midPanel,
-        GameBoard.StatusPanel statusPanel, GameBoard.StatusPanel enemyStatusPanel)
+        GameBoard.StatusPanel statusPanel,
+        GameBoard.StatusPanel enemyStatusPanel,
+        GameBoard.Hand hand,
+        EnemyHand enemyHand
+    )
     {
         _broker = broker;
         _midPanel = midPanel;
         _matchInfoDto = matchInfoDto;
         _statusPanel = statusPanel;
         _enemyStatusPanel = enemyStatusPanel;
+        _hand = hand;
+        _enemyHand = enemyHand;
         _logger = Log.ForContext(new SessionContextEnricher(new(matchInfoDto.SessionId)));
         Name = $"[{_matchInfoDto.SessionId}]{_matchInfoDto.PlayerId}_{_matchInfoDto.EnemyPlayerId}";
     }
@@ -150,6 +159,14 @@ public partial class SessionClient : Node
         if (context.Message.TryUnwrap(out AddCardDto addCardDto))
         {
             _logger.Information("Add card to hand: {PlayerId} {CardId}", addCardDto.PlayerId, addCardDto.Dto?.Id);
+            if (addCardDto.PlayerId == _matchInfoDto.PlayerId)
+            {
+                _hand.AddCard(addCardDto.Dto!);
+            }
+            else if (addCardDto.PlayerId == _matchInfoDto.EnemyPlayerId)
+            {
+                _enemyHand.AddCard();
+            }
         }
         else
         {

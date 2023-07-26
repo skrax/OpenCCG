@@ -55,12 +55,14 @@ bg_color = Color(0.70261, 0.0548099, 0.36398, 1)
 script = ExtResource("1_qux0l")
 _matchmakingClient = NodePath("MatchmakingClient")
 
-[node name="MatchmakingClient" type="Node" parent="test-client" node_paths=PackedStringArray("_broker", "_midPanel", "_statusPanel", "_enemyStatusPanel")]
+[node name="MatchmakingClient" type="Node" parent="test-client" node_paths=PackedStringArray("_broker", "_midPanel", "_statusPanel", "_enemyStatusPanel", "_hand", "_enemyHand")]
 script = ExtResource("2_bjgef")
 _broker = NodePath("..")
 _midPanel = NodePath("../../MidPanel")
 _statusPanel = NodePath("../../StatusPanel")
 _enemyStatusPanel = NodePath("../../EnemyStatusPanel")
+_hand = NodePath("../../Hand")
+_enemyHand = NodePath("../../EnemyHand")
 
 [node name="Background" type="TextureRect" parent="."]
 z_index = -1
