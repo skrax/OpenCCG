@@ -205,6 +205,7 @@ theme_override_colors/font_disabled_color = Color(1, 1, 0, 1)
 theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_8ghqf")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_1jar7")
+disabled = true
 text = "End Turn"
 
 [node name="ExitButton" type="Button" parent="MidPanel"]

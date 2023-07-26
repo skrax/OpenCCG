@@ -13,7 +13,7 @@ public partial class SessionClient : Node
 {
     [Export] private MessageBroker _broker = null!;
     [Export] private GameBoard.MidPanel _midPanel = null!;
-    private readonly Queue<Action> _taskQueue = new();
+    private readonly Queue<Action> _commandQueue = new();
 
     public override void _Ready()
     {
@@ -22,9 +22,9 @@ public partial class SessionClient : Node
 
     public override void _Process(double delta)
     {
-        while (_taskQueue.TryDequeue(out var act))
+        while (_commandQueue.TryDequeue(out var command))
         {
-            act();
+            command();
         }
     }
 
@@ -97,6 +97,8 @@ public partial class SessionClient : Node
     {
         Log.Information("End turn button enabled");
 
+        _midPanel.EndTurnButtonSetActive(new(true, null));
+
         return MessageControllerResult.AsResult();
     }
 
@@ -107,7 +109,7 @@ public partial class SessionClient : Node
             Log.Information("Match found: {SessionId} {PlayerId} {EnemyPlayerId}",
                 matchInfoDto.SessionId, matchInfoDto.PlayerId, matchInfoDto.EnemyPlayerId);
 
-            _taskQueue.Enqueue(() => { _midPanel?.SetStatusMessage("Match Found"); });
+            _commandQueue.Enqueue(() => { _midPanel.SetStatusMessage("Match Found"); });
         }
 
         return MessageControllerResult.AsResult();
