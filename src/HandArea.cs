@@ -53,7 +53,7 @@ public partial class HandArea : HBoxContainer, IMessageReceiver<MessageType>
     {
         var entity = CardScene.Make<Card, CardImplementationDto>(card, this);
         _cards.Add(entity);
-        await entity.PlayDrawAnimAsync();
+        //await entity.PlayDrawAnimAsync();
     }
 
     private void PreCustomSort()

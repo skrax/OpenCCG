@@ -12,11 +12,9 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
 
     private CardImplementationDto _cardGameState = null!;
     [Export] private PackedScene _cardPreviewScene = null!;
-    [Export] private CardStatPanel _costPanel = null!, _atkPanel = null!, _defPanel;
-    private bool _drawAnim;
-    private TaskCompletionSource? _drawAnimTsc;
-    [Export] private Curve _drawCurve;
-    [Export] private CardInfoPanel _infoPanel, _namePanel;
+    [Export] private CardStatPanel _costPanel = null!, _atkPanel = null!, _defPanel = null!;
+    [Export] private Curve _drawCurve = null!;
+    [Export] private CardInfoPanel _infoPanel = null!, _namePanel = null!;
     private CardPreview? _preview;
 
     public Guid Id { get; private set; }
@@ -44,20 +42,13 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
 
         MouseEntered += ShowPreview;
         MouseExited += DisablePreview;
+
+        Modulate = Colors.Transparent;
     }
 
-    public async Task PlayDrawAnimAsync()
+    public async Task PlayDrawAnimAsync(Vector2 start, Vector2 end)
     {
-        _drawAnimTsc = new TaskCompletionSource();
-        _drawAnim = true;
-        await _drawAnimTsc.Task;
-        _drawAnimTsc = null;
-    }
-
-    public async void PlayDrawAnimAsync(Vector2 start, Vector2 end)
-    {
-        if (!_drawAnim) return;
-        _drawAnim = false;
+        Modulate = Colors.White;
         var t = 0f;
         const float delta = 1000 / 60f;
         while (t < 1f)
@@ -75,8 +66,6 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
             GlobalPosition = pos;
             await Task.Delay(TimeSpan.FromMilliseconds(delta));
         }
-
-        _drawAnimTsc!.SetResult();
     }
 
     public override void _Process(double delta)
