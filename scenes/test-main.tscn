@@ -1,6 +1,7 @@
-[gd_scene load_steps=29 format=3 uid="uid://5d6l65ukuwjn"]
+[gd_scene load_steps=30 format=3 uid="uid://5d6l65ukuwjn"]
 
 [ext_resource type="Script" path="res://src/Net/TestClient.cs" id="1_qux0l"]
+[ext_resource type="Script" path="res://src/GameBoard/AnimationQueue.cs" id="1_ueljg"]
 [ext_resource type="Script" path="res://src/Net/Matchmaking/MatchmakingClient.cs" id="2_bjgef"]
 [ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="2_yjhuj"]
 [ext_resource type="Texture2D" uid="uid://cc6ljig5aldur" path="res://img/line_arrow.png" id="4_h5nmh"]
@@ -50,6 +51,9 @@ bg_color = Color(0.6, 0, 0.6, 1)
 bg_color = Color(0.70261, 0.0548099, 0.36398, 1)
 
 [node name="Main" type="Node2D"]
+
+[node name="AnimationQueue" type="Node" parent="."]
+script = ExtResource("1_ueljg")
 
 [node name="test-client" type="Node" parent="." node_paths=PackedStringArray("_matchmakingClient")]
 script = ExtResource("1_qux0l")
@@ -114,7 +118,7 @@ _arrow = NodePath("Arrow")
 position = Vector2(332, -44)
 texture = ExtResource("4_h5nmh")
 
-[node name="Hand" type="HBoxContainer" parent="."]
+[node name="Hand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue")]
 offset_top = 953.0
 offset_right = 1920.0
 offset_bottom = 1208.0
@@ -124,8 +128,9 @@ _cardScene = ExtResource("7_x23eh")
 _heightCurve = ExtResource("6_as6je")
 _rotationCurve = ExtResource("7_r7nua")
 _separationCurve = ExtResource("8_gukac")
+_animationQueue = NodePath("../AnimationQueue")
 
-[node name="EnemyHand" type="HBoxContainer" parent="."]
+[node name="EnemyHand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue")]
 offset_top = -127.0
 offset_right = 1920.0
 offset_bottom = 128.0
@@ -136,6 +141,7 @@ _cardHiddenScene = ExtResource("11_kebmu")
 _heightCurve = ExtResource("6_as6je")
 _rotationCurve = ExtResource("7_r7nua")
 _separationCurve = ExtResource("8_gukac")
+_animationQueue = NodePath("../AnimationQueue")
 
 [node name="Board" type="HBoxContainer" parent="." node_paths=PackedStringArray("StatusPanel", "EnemyStatusPanel", "EnemyBoard")]
 offset_top = 572.0

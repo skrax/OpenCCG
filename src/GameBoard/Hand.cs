@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Core;
@@ -13,27 +12,14 @@ public partial class Hand : HBoxContainer
 {
     [Export] private PackedScene _cardScene = null!;
     [Export] private Curve _heightCurve = null!, _rotationCurve = null!, _separationCurve = null!;
+    [Export] private AnimationQueue _animationQueue = null!;
     private readonly List<Card> _cards = new();
     private readonly HashSet<Guid> _addedCardIds = new();
-
-    private readonly Queue<Card> _animationQueue = new();
-    private Task _currentAnimation = Task.CompletedTask;
 
     public override void _Ready()
     {
         SortChildren += CustomSort;
         PreSortChildren += CustomPreSort;
-    }
-
-    public override void _Process(double delta)
-    {
-        if (_currentAnimation.IsCompleted)
-        {
-            if (_animationQueue.TryDequeue(out var c))
-            {
-                _currentAnimation = c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition);
-            }
-        }
     }
 
     public void RemoveCard(Guid cardId)
@@ -78,7 +64,8 @@ public partial class Hand : HBoxContainer
 
             if (_addedCardIds.Remove(c.Id))
             {
-                _animationQueue.Enqueue(c);
+                _animationQueue.Enqueue(async () =>
+                    await c.PlayDrawAnimAsync(new Vector2(1921, c.GlobalPosition.Y), c.GlobalPosition));
             }
 
             c.ZIndex = _cards.Count - index;

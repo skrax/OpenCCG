@@ -18,7 +18,6 @@ public partial class SessionClient : Node
     private readonly GameBoard.StatusPanel _enemyStatusPanel;
     private readonly GameBoard.Hand _hand;
     private readonly GameBoard.EnemyHand _enemyHand;
-    private readonly Queue<Action> _commandQueue = new();
     private readonly MatchInfoDto _matchInfoDto;
     private readonly ILogger _logger;
 
@@ -45,14 +44,6 @@ public partial class SessionClient : Node
     public override void _Ready()
     {
         Configure();
-    }
-
-    public override void _Process(double delta)
-    {
-        while (_commandQueue.TryDequeue(out var command))
-        {
-            command();
-        }
     }
 
     public override void _ExitTree()
