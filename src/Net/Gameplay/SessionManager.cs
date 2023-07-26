@@ -15,7 +15,7 @@ public partial class SessionManager : Node
         Log.Information(Logging.Templates.ServiceIsRunning, nameof(SessionManager));
     }
 
-    public void CreateSession(QueuedPlayer player1, QueuedPlayer player2)
+    public async void CreateSession(QueuedPlayer player1, QueuedPlayer player2)
     {
         var session = new Session(player1, player2, _server);
         AddChild(session);
@@ -23,12 +23,22 @@ public partial class SessionManager : Node
         session.AddToGroup($"Session-{player1.PeerId}");
         session.AddToGroup($"Session-{player2.PeerId}");
         session.AddToGroup($"Session-{session.Context.SessionId}");
-        
+
+        var canBegin = await session.TryPreparePlayers();
+        if (!canBegin)
+        {
+            if (!session.IsQueuedForDeletion()) session.QueueFree();
+            return;
+        }
+
         session.Begin();
     }
 
     public void DissolveSession(long peerId)
     {
-        GetTree().GetFirstNodeInGroup($"Session-{peerId}")?.QueueFree();
+        var session = GetTree().GetFirstNodeInGroup($"Session-{peerId}");
+        if (session is null || session.IsQueuedForDeletion()) return;
+
+        session.QueueFree();
     }
 }

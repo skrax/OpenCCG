@@ -2,8 +2,9 @@ using System;
 
 namespace OpenCCG.Net.Gameplay.Dto;
 
-public record SetPlayerMetricDto
+public record PlayerMetricDto
 (
     Guid PlayerId,
-    int Value 
+    int Value,
+    int? MaxValue = null
 );

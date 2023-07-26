@@ -97,19 +97,19 @@ public class PlayerState
     public void SetHealth(int amount)
     {
         Health = amount;
-        EnqueueSyncMessage(Route.SetHealth, new SetPlayerMetricDto(Id, Health));
+        EnqueueSyncMessage(Route.SetHealth, new PlayerMetricDto(Id, Health));
     }
 
     public void SetEnergy(int amount)
     {
         Energy = amount;
-        EnqueueSyncMessage(Route.SetEnergy, new SetPlayerMetricDto(Id, Energy));
+        EnqueueSyncMessage(Route.SetEnergy, new PlayerMetricDto(Id, Energy, MaxEnergy));
     }
 
     public void SetMaxEnergy(int amount)
     {
         MaxEnergy = amount;
-        EnqueueSyncMessage(Route.SetMaxEnergy, new SetPlayerMetricDto(Id, MaxEnergy));
+        EnqueueSyncMessage(Route.SetEnergy, new PlayerMetricDto(Id, Energy, MaxEnergy));
     }
 
     public void Draw(int count)
@@ -127,8 +127,8 @@ public class PlayerState
 
     private void SyncCardCount()
     {
-        EnqueueSyncMessage(Route.SetCardsInDeck, new SetPlayerMetricDto(Id, Deck.Count));
-        EnqueueSyncMessage(Route.SetCardsInHand, new SetPlayerMetricDto(Id, Hand.Count));
+        EnqueueSyncMessage(Route.SetCardsInDeck, new PlayerMetricDto(Id, Deck.Count));
+        EnqueueSyncMessage(Route.SetCardsInHand, new PlayerMetricDto(Id, Hand.Count));
     }
 
     public MessageControllerResult PlayCard()

@@ -1,9 +1,8 @@
-[gd_scene load_steps=30 format=3 uid="uid://5d6l65ukuwjn"]
+[gd_scene load_steps=29 format=3 uid="uid://5d6l65ukuwjn"]
 
 [ext_resource type="Script" path="res://src/Net/TestClient.cs" id="1_qux0l"]
 [ext_resource type="Script" path="res://src/Net/Matchmaking/MatchmakingClient.cs" id="2_bjgef"]
 [ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="2_yjhuj"]
-[ext_resource type="Script" path="res://src/Net/Gameplay/SessionClient.cs" id="3_mmio8"]
 [ext_resource type="Texture2D" uid="uid://cc6ljig5aldur" path="res://img/line_arrow.png" id="4_h5nmh"]
 [ext_resource type="Script" path="res://src/GameBoard/TargetLine.cs" id="4_qypxm"]
 [ext_resource type="Script" path="res://src/GameBoard/Hand.cs" id="6_aavwd"]
@@ -56,15 +55,12 @@ bg_color = Color(0.70261, 0.0548099, 0.36398, 1)
 script = ExtResource("1_qux0l")
 _matchmakingClient = NodePath("MatchmakingClient")
 
-[node name="MatchmakingClient" type="Node" parent="test-client" node_paths=PackedStringArray("_broker", "_midPanel")]
+[node name="MatchmakingClient" type="Node" parent="test-client" node_paths=PackedStringArray("_broker", "_midPanel", "_statusPanel", "_enemyStatusPanel")]
 script = ExtResource("2_bjgef")
 _broker = NodePath("..")
 _midPanel = NodePath("../../MidPanel")
-
-[node name="SessionClient" type="Node" parent="test-client" node_paths=PackedStringArray("_broker", "_midPanel")]
-script = ExtResource("3_mmio8")
-_broker = NodePath("..")
-_midPanel = NodePath("../../MidPanel")
+_statusPanel = NodePath("../../StatusPanel")
+_enemyStatusPanel = NodePath("../../EnemyStatusPanel")
 
 [node name="Background" type="TextureRect" parent="."]
 z_index = -1

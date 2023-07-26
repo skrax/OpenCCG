@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Godot;
 
 namespace OpenCCG.GameBoard;
@@ -18,21 +16,22 @@ public partial class StatusPanel : Node
         _avatar.IsEnemy = _isEnemy;
     }
 
-    private void SetEnergy(SetEnergyDto dto)
+    public void SetEnergy(int current, int max)
     {
-        _energyLabel.Text = $"{dto.Current} / {dto.Max}";
+        _energyLabel.Text = $"{current} / {max}";
     }
 
-    private void SetCardCount(int value)
+    public void SetCardCount(int value)
     {
         _cardCountLabel.Text = value.ToString();
     }
 
-    private async Task SetHealth(int value)
+    public void SetHealth(int value)
     {
         var diff = value - int.Parse(_healthLabel.Text);
         _healthLabel.Text = value.ToString();
-
+        // TODO
+#if false
         if (diff != 0)
         {
             _dmgPopup.Visible = true;
@@ -40,5 +39,6 @@ public partial class StatusPanel : Node
             await Task.Delay(TimeSpan.FromSeconds(2));
             _dmgPopup.Visible = false;
         }
+#endif
     }
 }

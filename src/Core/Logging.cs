@@ -2,6 +2,7 @@ using System.Linq;
 using Godot;
 using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Gameplay;
+using OpenCCG.Net.Gameplay.Dto;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Sinks.Grafana.Loki;
@@ -23,7 +24,10 @@ public partial class Logging : Node
                                                       }
                                                   },
                                                   propertiesAsLabels: SessionContext.LogPropertyNames()
-                                                      .Concat(new[] { "MessageId" }))
+                                                      .Concat(MatchInfoDto.LogPropertyNames())
+                                                      .Concat(new[] { "MessageId" })
+                                                      .Distinct()
+                                              )
                                               .CreateLogger();
 
         SelfLog.Enable(GD.Print);
@@ -45,6 +49,5 @@ public partial class Logging : Node
     public static class Templates
     {
         public const string ServiceIsRunning = "{Service} is running";
-
     }
 }

@@ -20,7 +20,7 @@ public static class Route
     public const string RemoveCardFromBoard = "REMOVE_CARD_FROM_BOARD";
     public const string SetHealth = "SET_HEALTH";
     public const string SetEnergy = "SET_ENERGY";
-    public const string SetMaxEnergy = "SET_MAX_ENERGY";
     public const string SetCardsInHand = "SET_CARDS_IN_HAND";
     public const string SetCardsInDeck = "SET_CARDS_IN_DECK";
+    public const string MatchFoundResponse = "MATCH_FOUND_RESPONSE";
 }

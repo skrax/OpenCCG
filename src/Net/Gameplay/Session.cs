@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Gameplay.Dto;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Messaging;
 using Serilog;
 using Error = OpenCCG.Net.Messaging.Error;
+using IMessageBroker = OpenCCG.Net.Messaging.IMessageBroker;
 
 namespace OpenCCG.Net.Gameplay;
 
@@ -37,6 +38,7 @@ public partial class Session : Node
 
     public void Configure()
     {
+        _broker.MapAwaitableResponse(Route.MatchFoundResponse);
         _broker.Map(Route.PlayCard, OnPlayCard);
         _broker.Map(Route.CombatPlayer, OnCombatPlayer);
         _broker.Map(Route.CombatPlayerCard, OnCombatPlayerCard);
@@ -44,14 +46,32 @@ public partial class Session : Node
         _logger.Information("{SessionName} created", Name);
     }
 
-    public void Begin()
+    public async Task<bool> TryPreparePlayers()
     {
         foreach (var playerState in _playerByPeerId.Values)
         {
             var matchInfo = new MatchInfoDto(Context.SessionId, playerState.Id, playerState.Enemy.Id);
-            _broker.EnqueueMessage(playerState.PeerId, Message.Create(Route.MatchFound, matchInfo));
+            var response = await _broker.EnqueueMessageAndGetResponseAsync(
+                playerState.PeerId,
+                Message.CreateWithResponse(Route.MatchFound, Route.MatchFoundResponse, matchInfo));
+
+            if (response is null)
+            {
+                return false;
+            }
+
+            if (response.Message.TryGetError(out var error))
+            {
+                _logger.Error("Error {Error} from {PeerId}", error, playerState.PeerId);
+                return false;
+            }
         }
 
+        return true;
+    }
+
+    public void Begin()
+    {
         foreach (var playerState in _playerByPeerId.Values)
         {
             playerState.SetupMatch();

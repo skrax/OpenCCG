@@ -2,18 +2,36 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using OpenCCG.Core;
+using OpenCCG.Core.Serilog;
 using OpenCCG.Net.Gameplay.Dto;
 using OpenCCG.Net.Messaging;
 using Serilog;
 
 namespace OpenCCG.Net.Gameplay;
 
-[GlobalClass]
 public partial class SessionClient : Node
 {
-    [Export] private MessageBroker _broker = null!;
-    [Export] private GameBoard.MidPanel _midPanel = null!;
+    private readonly MessageBroker _broker;
+    private readonly GameBoard.MidPanel _midPanel;
+    private readonly GameBoard.StatusPanel _statusPanel;
+    private readonly GameBoard.StatusPanel _enemyStatusPanel;
     private readonly Queue<Action> _commandQueue = new();
+    private readonly MatchInfoDto _matchInfoDto;
+    private readonly ILogger _logger;
+
+    public SessionClient(MessageBroker broker,
+        MatchInfoDto matchInfoDto,
+        GameBoard.MidPanel midPanel,
+        GameBoard.StatusPanel statusPanel, GameBoard.StatusPanel enemyStatusPanel)
+    {
+        _broker = broker;
+        _midPanel = midPanel;
+        _matchInfoDto = matchInfoDto;
+        _statusPanel = statusPanel;
+        _enemyStatusPanel = enemyStatusPanel;
+        _logger = Log.ForContext(new SessionContextEnricher(new(matchInfoDto.SessionId)));
+        Name = $"[{_matchInfoDto.SessionId}]{_matchInfoDto.PlayerId}_{_matchInfoDto.EnemyPlayerId}";
+    }
 
     public override void _Ready()
     {
@@ -28,13 +46,17 @@ public partial class SessionClient : Node
         }
     }
 
+    public override void _ExitTree()
+    {
+        // TODO
+    }
+
     public void Configure()
     {
         _broker.MapAwaitableResponse(Route.PlayCardResponse);
         _broker.MapAwaitableResponse(Route.CombatPlayerResponse);
         _broker.MapAwaitableResponse(Route.CombatPlayerCardResponse);
         _broker.MapAwaitableResponse(Route.EndTurnResponse);
-        _broker.Map(Route.MatchFound, OnMatchFound);
         _broker.Map(Route.EnableEndTurnButton, OnEnableEndTurnButton);
         _broker.Map(Route.AddCardToHand, OnAddCardToHand);
         _broker.Map(Route.AddCardToBoard, OnAddCardToBoard);
@@ -42,54 +64,98 @@ public partial class SessionClient : Node
         _broker.Map(Route.RemoveCardFromBoard, OnRemoveCardFromBoard);
         _broker.Map(Route.SetEnergy, OnSetEnergy);
         _broker.Map(Route.SetHealth, OnSetHealth);
-        _broker.Map(Route.SetMaxEnergy, OnSetMaxEnergy);
         _broker.Map(Route.SetCardsInHand, OnSetCardsInHand);
         _broker.Map(Route.SetCardsInDeck, OnSetCardsInDeck);
         Log.Information(Logging.Templates.ServiceIsRunning, nameof(SessionClient));
     }
 
-    private MessageControllerResult? OnSetCardsInDeck(MessageContext context)
+    private MessageControllerResult OnSetCardsInDeck(MessageContext context)
+    {
+        if (context.Message.TryUnwrap(out PlayerMetricDto metric))
+        {
+            // TODO
+        }
+
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnSetCardsInHand(MessageContext context)
+    {
+        if (context.Message.TryUnwrap(out PlayerMetricDto metric))
+        {
+            if (metric.PlayerId == _matchInfoDto.PlayerId)
+            {
+                _statusPanel.SetCardCount(metric.Value);
+            }
+            else if (metric.PlayerId == _matchInfoDto.EnemyPlayerId)
+            {
+                _enemyStatusPanel.SetCardCount(metric.Value);
+            }
+        }
+
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnSetHealth(MessageContext context)
+    {
+        if (context.Message.TryUnwrap(out PlayerMetricDto metric))
+        {
+            if (metric.PlayerId == _matchInfoDto.PlayerId)
+            {
+                _statusPanel.SetHealth(metric.Value);
+            }
+            else if (metric.PlayerId == _matchInfoDto.EnemyPlayerId)
+            {
+                _enemyStatusPanel.SetHealth(metric.Value);
+            }
+        }
+
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnSetEnergy(MessageContext context)
+    {
+        if (context.Message.TryUnwrap(out PlayerMetricDto metric))
+        {
+            if (metric.PlayerId == _matchInfoDto.PlayerId)
+            {
+                _statusPanel.SetEnergy(metric.Value, metric.MaxValue!.Value);
+            }
+            else if (metric.PlayerId == _matchInfoDto.EnemyPlayerId)
+            {
+                _enemyStatusPanel.SetEnergy(metric.Value, metric.MaxValue!.Value);
+            }
+        }
+
+        return MessageControllerResult.AsResult();
+    }
+
+    private MessageControllerResult OnRemoveCardFromBoard(MessageContext context)
     {
         return MessageControllerResult.AsResult();
     }
 
-    private MessageControllerResult? OnSetCardsInHand(MessageContext context)
+    private MessageControllerResult OnRemoveCardFromHand(MessageContext context)
     {
         return MessageControllerResult.AsResult();
     }
 
-    private MessageControllerResult? OnSetHealth(MessageContext context)
+    private MessageControllerResult OnAddCardToBoard(MessageContext context)
     {
         return MessageControllerResult.AsResult();
     }
 
-    private MessageControllerResult? OnSetMaxEnergy(MessageContext context)
+    private MessageControllerResult OnAddCardToHand(MessageContext context)
     {
-        return MessageControllerResult.AsResult();
-    }
+        if (context.Message.TryUnwrap(out AddCardDto addCardDto))
+        {
+            Log.Information("Add card to hand: {PlayerId} {CardId}", addCardDto.PlayerId, addCardDto.Dto?.Id);
+        }
+        else
+        {
+            Log.Error("Failed to unwrap message for {Route}", Route.AddCardToHand);
+        }
 
-    private MessageControllerResult? OnSetEnergy(MessageContext context)
-    {
-        return MessageControllerResult.AsResult();
-    }
-
-    private MessageControllerResult? OnRemoveCardFromBoard(MessageContext context)
-    {
-        return MessageControllerResult.AsResult();
-    }
-
-    private MessageControllerResult? OnRemoveCardFromHand(MessageContext context)
-    {
-        return MessageControllerResult.AsResult();
-    }
-
-    private MessageControllerResult? OnAddCardToBoard(MessageContext context)
-    {
-        return MessageControllerResult.AsResult();
-    }
-
-    private MessageControllerResult? OnAddCardToHand(MessageContext context)
-    {
         return MessageControllerResult.AsResult();
     }
 
@@ -98,19 +164,6 @@ public partial class SessionClient : Node
         Log.Information("End turn button enabled");
 
         _midPanel.EndTurnButtonSetActive(new(true, null));
-
-        return MessageControllerResult.AsResult();
-    }
-
-    private MessageControllerResult OnMatchFound(MessageContext context)
-    {
-        if (context.Message.TryUnwrap(out MatchInfoDto matchInfoDto))
-        {
-            Log.Information("Match found: {SessionId} {PlayerId} {EnemyPlayerId}",
-                matchInfoDto.SessionId, matchInfoDto.PlayerId, matchInfoDto.EnemyPlayerId);
-
-            _commandQueue.Enqueue(() => { _midPanel.SetStatusMessage("Match Found"); });
-        }
 
         return MessageControllerResult.AsResult();
     }
