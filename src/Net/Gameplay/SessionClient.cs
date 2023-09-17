@@ -137,6 +137,18 @@ public partial class SessionClient : Node
 
     private MessageControllerResult OnRemoveCardFromHand(MessageContext context)
     {
+        if (context.Message.TryUnwrap(out RemoveCardDto removeCardDto))
+        {
+            if (removeCardDto.PlayerId == _matchInfoDto.PlayerId)
+            {
+                _hand.RemoveCard(removeCardDto.CardId!.Value);
+            }
+            else if (removeCardDto.PlayerId == _matchInfoDto.EnemyPlayerId)
+            {
+                _enemyHand.RemoveCard();
+            }
+        }
+
         return MessageControllerResult.AsResult();
     }
 

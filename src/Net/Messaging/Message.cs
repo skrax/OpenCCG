@@ -28,14 +28,15 @@ public record Message(Guid Id, string Route, string? Data, Error? Error, string?
     public Message ToErrorResponse(Error error) => new(ResponseId!.Value, ResponseRoute!, null, error, null, null);
 
 
-    public TIn? Unwrap<TIn>() where TIn : class
+    public TIn? Unwrap<TIn>()
     {
+        if (typeof(TIn) == typeof(string)) throw new ArgumentException("Do not unwrap strings");
         return Data is null
-            ? null
+            ? default
             : JsonSerializer.Deserialize<TIn>(Data);
     }
 
-    public bool TryUnwrap<TIn>(out TIn result) where TIn : class
+    public bool TryUnwrap<TIn>(out TIn result)
     {
         var unwrapped = Unwrap<TIn>();
         if (unwrapped is not null)
@@ -44,7 +45,7 @@ public record Message(Guid Id, string Route, string? Data, Error? Error, string?
             return true;
         }
 
-        result = null!;
+        result = default!;
         return false;
     }
 

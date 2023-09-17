@@ -102,7 +102,12 @@ public partial class Session : Node
             return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
         }
 
-        _commandQueue.Enqueue(new(context, player.PlayCard, player));
+        if (!context.Message.TryUnwrap<Guid>(out var cardId))
+        {
+            return MessageControllerResult.AsError(Error.FromCode(ErrorCode.BadRequest));
+        }
+
+        _commandQueue.Enqueue(new(context, () => player.PlayCard(cardId), player));
 
         return MessageControllerResult.AsDeferred();
     }

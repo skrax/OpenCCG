@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Core;
 using OpenCCG.Core.Serilog;
@@ -8,6 +9,7 @@ using OpenCCG.Net.Gameplay.Dto;
 using OpenCCG.Net.Gameplay.Test;
 using OpenCCG.Net.Messaging;
 using Serilog;
+using Error = OpenCCG.Net.Messaging.Error;
 
 namespace OpenCCG.Net.Gameplay;
 
@@ -138,9 +140,26 @@ public class PlayerState
         EnqueueSyncMessage(Route.SetCardsInHand, new PlayerMetricDto(Id, Hand.Count));
     }
 
-    public MessageControllerResult PlayCard()
+    public MessageControllerResult PlayCard(Guid cardId)
     {
-        if (!IsTurn) return MessageControllerResult.AsError(Error.FromCode(ErrorCode.Conflict));
+        if (!IsTurn)
+        {
+            var error = new Error(ErrorCode.Conflict, "Cards can only played during a players turn.");
+            return MessageControllerResult.AsError(error);
+        }
+
+        if (Hand.SingleOrDefault(x => x.Id == cardId) is not Creature card)
+        {
+            var error = new Error(ErrorCode.BadRequest, "CardId not found");
+            return MessageControllerResult.AsError(error);
+        }
+
+        card.State.Zone = CardZone.Board;
+        Hand.Remove(card);
+        Board.AddLast(card);
+        var removeCardMessage = Message.Create(Route.RemoveCardFromHand, new RemoveCardDto(Id, card.Id));
+        _commandQueue.Enqueue(() => _broker.EnqueueMessage(PeerId, removeCardMessage));
+        //_commandQueue.Enqueue(() => _broker.EnqueueMessage(PeerId, Message.Create(Route.AddCardToBoard, card.AsDto())));
 
         return MessageControllerResult.AsResult();
     }

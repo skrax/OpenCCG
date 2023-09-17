@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Core;
+using OpenCCG.Net.Messaging;
 
 namespace OpenCCG.GameBoard;
 
@@ -13,6 +13,7 @@ public partial class Hand : HBoxContainer
     [Export] private PackedScene _cardScene = null!;
     [Export] private Curve _heightCurve = null!, _rotationCurve = null!, _separationCurve = null!;
     [Export] private AnimationQueue _animationQueue = null!;
+    [Export] private MessageBroker _broker = null!;
     private readonly List<Card> _cards = new();
     private readonly HashSet<Guid> _addedCardIds = new();
 
@@ -33,7 +34,9 @@ public partial class Hand : HBoxContainer
 
     public void AddCard(CardImplementationDto card)
     {
-        var entity = _cardScene.Make<Card, CardImplementationDto>(card, this);
+        var entity = _cardScene.Instantiate<Card>();
+        entity.Init(card, _broker);
+        AddChild(entity);
         _cards.Add(entity);
         _addedCardIds.Add(entity.Id);
     }

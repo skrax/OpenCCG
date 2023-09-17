@@ -3,38 +3,44 @@ using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Core;
+using OpenCCG.Net;
+using OpenCCG.Net.Messaging;
+using Serilog;
 
 namespace OpenCCG;
 
-public partial class Card : TextureRect, INodeInit<CardImplementationDto>
+public partial class Card : TextureRect
 {
     private static bool _canPreview = true;
 
-    private CardImplementationDto _cardGameState = null!;
     [Export] private PackedScene _cardPreviewScene = null!;
     [Export] private CardStatPanel _costPanel = null!, _atkPanel = null!, _defPanel = null!;
     [Export] private Curve _drawCurve = null!;
     [Export] private CardInfoPanel _infoPanel = null!, _namePanel = null!;
-    private CardPreview? _preview;
 
+    private MessageBroker _broker = null!;
+    private CardImplementationDto _cardGameState = null!;
+    private CardPreview? _preview;
     public Guid Id { get; private set; }
 
-    public void Init(CardImplementationDto dto)
+    public void Init(CardImplementationDto dto, MessageBroker broker)
     {
         SetProcess(false);
         _cardGameState = dto;
+        _broker = broker;
         Id = dto.Id;
-        _infoPanel.Value = dto.Outline.Description;
-        _namePanel.Value = dto.Outline.Name;
-        Texture = GD.Load<Texture2D>(dto.Outline.ImgPath);
-        _costPanel.SetValue(dto.State.Cost, dto.Outline.Cost);
 
-        if (dto.IsCreature)
+        _infoPanel.Value = _cardGameState.Outline.Description;
+        _namePanel.Value = _cardGameState.Outline.Name;
+        Texture = GD.Load<Texture2D>(_cardGameState.Outline.ImgPath);
+        _costPanel.SetValue(_cardGameState.State.Cost, _cardGameState.Outline.Cost);
+
+        if (_cardGameState.IsCreature)
         {
-            _atkPanel.SetValue(dto.CreatureState!.Atk, dto.CreatureOutline!.Atk);
-            _defPanel.SetValue(dto.CreatureState!.Def, dto.CreatureOutline!.Def);
+            _atkPanel.SetValue(_cardGameState.CreatureState!.Atk, _cardGameState.CreatureOutline!.Atk);
+            _defPanel.SetValue(_cardGameState.CreatureState!.Def, _cardGameState.CreatureOutline!.Def);
         }
-        else if (dto.IsSpell)
+        else if (_cardGameState.IsSpell)
         {
             _atkPanel.Visible = false;
             _defPanel.Visible = false;
@@ -123,11 +129,19 @@ public partial class Card : TextureRect, INodeInit<CardImplementationDto>
         _preview.Visible = false;
     }
 
-    public async Task PlayAsync()
+    public async void Play()
     {
-        Visible = false;
-        var success = await GetNode<Main>("/root/Main").TryPlayCardAsync(Id);
-        if (!success) Visible = true;
+        var response = await _broker.EnqueueMessageAndGetResponseAsync(1, Message.CreateWithResponse(
+            Route.PlayCard, Route.PlayCardResponse, Id));
+
+        if (response is null || response.Message.HasError())
+        {
+            Log.Error("failed to play card");
+        }
+        else
+        {
+            Log.Information("play card");
+        }
     }
 
     public void DrawOutline(bool enabled)
