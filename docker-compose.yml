@@ -1,0 +1,23 @@
+﻿services:
+  api:
+    image: openccg.data
+    build:
+      context: .
+      dockerfile: sources/OpenCCG.Data/Dockerfile
+    depends_on: 
+      db:
+        condition: service_healthy
+    ports:
+      - "7085:443"
+      - "5160:80"
+  
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: openccg
+      POSTGRES_USER: openccg
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5

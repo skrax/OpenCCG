@@ -34,7 +34,6 @@ public class BerenMorne : CreatureImplementation
         }
     }
 
-
     private void ResolveAvatarDamage(bool isEnemyAvatar)
     {
         PlayerGameState.Nodes.EnemyCardEffectPreview.TmpShowCard(PlayerGameState.EnemyPeerId, AsDto());

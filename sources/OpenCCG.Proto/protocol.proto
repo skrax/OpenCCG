@@ -1,0 +1,124 @@
+syntax = "proto3";
+package OpenCCG.Proto;
+
+option csharp_namespace = "OpenCCG.Proto";
+
+enum StatusCode {
+  Ok = 0;
+  Forbidden = 1;
+  BadRequest = 2;
+}
+
+enum CardType {
+  CreatureType = 0;
+  SpellType = 1;
+}
+
+message GenericResponse {
+  StatusCode StatusCode = 1;
+}
+
+message ById {
+  string Id = 1; 
+}
+
+message CombatPlayerCard{
+  string AttackerId = 1;
+  string TargetId = 2;
+}
+
+message CappedMetric {
+  uint32 Current = 1;
+  uint32 Max = 2;
+}
+
+message Metrics {
+  CappedMetric Health = 1;
+  CappedMetric Energy = 2;
+  int32 DeckCount = 3;
+  CappedMetric HandCount = 4;
+  CappedMetric BoardCount = 5;
+  int32 PitCount = 6;
+}
+
+enum CardZone {
+  None = 0;
+  Deck = 1;
+  Hand = 2;
+  Board = 3;
+  Pit = 4;
+}
+
+message CreatureOutline {
+  string Id = 1;
+  string Name = 2;
+  string Description = 3;
+  int32 Cost = 4;
+  int32 Atk = 5;
+  int32 Def = 6;
+  string ImgPath = 7;
+}
+
+message CreatureState {
+  int32 Atk = 1;
+  int32 Def = 2;
+  int32 Cost = 3;
+  int32 AttacksAvailable = 4;
+  int32 MaxAttacksPerTurn = 5;
+  bool IsExposed = 6;
+  CardZone Zone = 7;
+  string AddedText = 8;
+}
+
+message CreatureAbilities {
+  bool Exposed = 1;
+  bool Haste = 2;
+  bool Drain = 3;
+  bool Defender = 4;
+  bool Arcane = 5;
+}
+
+message Creature {
+  CreatureOutline Outline = 1;
+  CreatureState State = 2;
+  CreatureAbilities Abilities = 3;
+}
+
+message SpellOutline {
+  string Id = 1;
+  string Name = 2;
+  string Description = 3;
+  int32 Cost = 4;
+  string ImgPath = 5;
+}
+
+message SpellState {
+  int32 Cost = 1;
+  CardZone Zone = 2;
+  string AddedText = 3;
+}
+
+message Spell {
+  SpellOutline Outline = 1;
+  SpellState State = 2;
+}
+
+message Card {
+  string Id = 1;
+
+  oneof Implementation {
+    Creature Creature = 2;
+    Spell Spell = 3;
+  }
+}
+
+message DeckListEntry {
+  string Id = 1;
+  int32 Count = 2;
+  CardType CardType = 3;
+}
+
+message DeckList {
+  string Name = 1;
+  repeated DeckListEntry Entries = 2;
+}

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "lFPZqNy9W8LT84Vjmwwd/5Ai4fKiPebGnpb2vWLYyZYHESSzgBgdk1F0qLYJni6P4euYBs4kHUSc5+a5XySJCg==",
+  "success": true,
+  "projectFilePath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj",
+  "expectedPackageFiles": [
+    "/Users/fseidl/.nuget/packages/google.protobuf/3.24.3/google.protobuf.3.24.3.nupkg.sha512"
+  ],
+  "logs": []
+}

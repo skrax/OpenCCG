@@ -7,6 +7,7 @@ using Godot;
 using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
 using OpenCCG.Core;
+using OpenCCG.Net.Gameplay.Test;
 using Serilog;
 using FileAccess = Godot.FileAccess;
 

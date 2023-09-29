@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OpenCCG.Net;
+using OpenCCG.Net.Gameplay.Test;
 
 namespace OpenCCG.Cards.Test;
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using OpenCCG.Cards;
 using OpenCCG.Cards.Test;
+using OpenCCG.Net.Gameplay.Test;
 
 namespace OpenCCG.Net.Matchmaking;
 

@@ -6,9 +6,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Celnet.Infrastructure.Protobuf" Version="1.0.1" />
     <PackageReference Include="Serilog" Version="3.0.1" />
     <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
     <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.1.0" />
     <PackageReference Include="Stateless" Version="5.13.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="sources\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="sources\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="sources\OpenCCG.Proto\OpenCCG.Proto.csproj" />
   </ItemGroup>
 </Project>

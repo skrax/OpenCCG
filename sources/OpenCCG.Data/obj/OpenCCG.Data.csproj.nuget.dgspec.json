@@ -1,0 +1,265 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/fseidl/Projects/openccg/sources/OpenCCG.Data/OpenCCG.Data.csproj": {}
+  },
+  "projects": {
+    "/Users/fseidl/Projects/openccg/openccg.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/fseidl/Projects/openccg/openccg.csproj",
+        "projectName": "openccg",
+        "projectPath": "/Users/fseidl/Projects/openccg/openccg.csproj",
+        "packagesPath": "/Users/fseidl/.nuget/packages/",
+        "outputPath": "/Users/fseidl/Projects/openccg/.godot/mono/temp/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/Users/fseidl/Library/Application Support/Godot/mono/GodotNuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/fseidl/.nuget/NuGet/NuGet.Config",
+          "/Users/fseidl/.nuget/NuGet/config/Godot.Offline.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "/Users/fseidl/.nuget/local": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj": {
+                "projectPath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Celnet.Infrastructure.Protobuf": {
+              "target": "Package",
+              "version": "[1.0.1, )"
+            },
+            "Godot.SourceGenerators": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "GodotSharp": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "GodotSharpEditor": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[3.0.1, )"
+            },
+            "Serilog.Expressions": {
+              "target": "Package",
+              "version": "[3.4.1, )"
+            },
+            "Serilog.Sinks.Grafana.Loki": {
+              "target": "Package",
+              "version": "[8.1.0, )"
+            },
+            "Stateless": {
+              "target": "Package",
+              "version": "[5.13.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.306/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/fseidl/Projects/openccg/sources/OpenCCG.Data/OpenCCG.Data.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Data/OpenCCG.Data.csproj",
+        "projectName": "OpenCCG.Data",
+        "projectPath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Data/OpenCCG.Data.csproj",
+        "packagesPath": "/Users/fseidl/.nuget/packages/",
+        "outputPath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Data/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/Users/fseidl/Library/Application Support/Godot/mono/GodotNuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/fseidl/.nuget/NuGet/NuGet.Config",
+          "/Users/fseidl/.nuget/NuGet/config/Godot.Offline.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "/Users/fseidl/.nuget/local": {},
+          "/usr/local/share/dotnet/sdk/7.0.306/Sdks/Microsoft.NET.Sdk.Web/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/Users/fseidl/Projects/openccg/openccg.csproj": {
+                "projectPath": "/Users/fseidl/Projects/openccg/openccg.csproj"
+              },
+              "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj": {
+                "projectPath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[7.0.9, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[7.0.11, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[7.0.11, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[7.0.11, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL.Design": {
+              "target": "Package",
+              "version": "[1.1.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.5.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.306/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj",
+        "projectName": "OpenCCG.Proto",
+        "projectPath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/OpenCCG.Proto.csproj",
+        "packagesPath": "/Users/fseidl/.nuget/packages/",
+        "outputPath": "/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/Users/fseidl/Library/Application Support/Godot/mono/GodotNuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/fseidl/.nuget/NuGet/NuGet.Config",
+          "/Users/fseidl/.nuget/NuGet/config/Godot.Offline.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "/Users/fseidl/.nuget/local": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Google.Protobuf": {
+              "target": "Package",
+              "version": "[3.24.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.306/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

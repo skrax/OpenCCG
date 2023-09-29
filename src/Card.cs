@@ -1,10 +1,14 @@
 using System;
 using System.Threading.Tasks;
+using Celnet.Domain.Interfaces;
+using Celnet.Infrastructure.Protobuf;
 using Godot;
+using Google.Protobuf;
 using OpenCCG.Cards;
 using OpenCCG.Core;
 using OpenCCG.Net;
 using OpenCCG.Net.Messaging;
+using OpenCCG.Proto;
 using Serilog;
 
 namespace OpenCCG;
@@ -18,16 +22,16 @@ public partial class Card : TextureRect
     [Export] private Curve _drawCurve = null!;
     [Export] private CardInfoPanel _infoPanel = null!, _namePanel = null!;
 
-    private MessageBroker _broker = null!;
+    private ProtobufPeerTransport _transport = null!;
     private CardImplementationDto _cardGameState = null!;
     private CardPreview? _preview;
     public Guid Id { get; private set; }
 
-    public void Init(CardImplementationDto dto, MessageBroker broker)
+    public void Init(CardImplementationDto dto, ProtobufPeerTransport transport)
     {
         SetProcess(false);
         _cardGameState = dto;
-        _broker = broker;
+        _transport = transport;
         Id = dto.Id;
 
         _infoPanel.Value = _cardGameState.Outline.Description;
@@ -131,17 +135,31 @@ public partial class Card : TextureRect
 
     public async void Play()
     {
-        var response = await _broker.EnqueueMessageAndGetResponseAsync(1, Message.CreateWithResponse(
-            Route.PlayCard, Route.PlayCardResponse, Id));
-
-        if (response is null || response.Message.HasError())
+        var response = await _transport.PutAsync("cards/playById", new ById
         {
-            Log.Error("failed to play card");
+            Id = Id.ToString()
+        });
+
+        if (response is not GenericResponse genericResponse)
+        {
+            Log.Error("Cannot handle response from server");
         }
         else
         {
-            Log.Information("play card");
+            switch (genericResponse.StatusCode)
+            {
+                case StatusCode.Ok:
+                    Log.Information("Played card");
+                    break;
+                case StatusCode.Forbidden:
+                case StatusCode.BadRequest:
+                    Log.Error("Failed to play card {StatusCode}",genericResponse.StatusCode.ToString());
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
+        
     }
 
     public void DrawOutline(bool enabled)

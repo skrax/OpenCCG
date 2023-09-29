@@ -1,0 +1,12 @@
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/bin/Debug/net6.0/OpenCCG.Proto.deps.json
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/bin/Debug/net6.0/OpenCCG.Proto.dll
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/bin/Debug/net6.0/OpenCCG.Proto.pdb
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.csproj.AssemblyReference.cache
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.GeneratedMSBuildEditorConfig.editorconfig
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.AssemblyInfoInputs.cache
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.AssemblyInfo.cs
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.csproj.CoreCompileInputs.cache
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.dll
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/refint/OpenCCG.Proto.dll
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/OpenCCG.Proto.pdb
+/Users/fseidl/Projects/openccg/sources/OpenCCG.Proto/obj/Debug/net6.0/ref/OpenCCG.Proto.dll

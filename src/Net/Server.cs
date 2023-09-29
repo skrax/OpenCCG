@@ -4,16 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Cards.Test;
 using OpenCCG.Core;
 using OpenCCG.Net.Dto;
 using OpenCCG.Net.Gameplay;
+using OpenCCG.Net.Gameplay.Test;
 using OpenCCG.Net.Matchmaking;
 using OpenCCG.Net.Rpc;
 using OpenCCG.Net.ServerNodes;
 using Serilog;
 using Board = OpenCCG.Net.ServerNodes.Board;
 using Hand = OpenCCG.Net.ServerNodes.Hand;
+using TestSetImplementations = OpenCCG.Cards.Test.TestSetImplementations;
 
 namespace OpenCCG.Net;
 
