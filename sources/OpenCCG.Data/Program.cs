@@ -11,6 +11,7 @@ var connectionString = connectionStrings.GetValue<string>("Database");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseNpgsql(connectionString));
 
 var app = builder.Build();
@@ -23,6 +24,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.MapHealthChecks("/health");
 
 app.MapControllers();
 

@@ -2,6 +2,8 @@
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
+RUN apt-get update
+RUN apt-get -y install curl
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src

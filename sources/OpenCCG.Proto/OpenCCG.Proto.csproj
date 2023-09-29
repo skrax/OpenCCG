@@ -9,9 +9,5 @@
     <ItemGroup>
       <PackageReference Include="Google.Protobuf" Version="3.24.3" />
     </ItemGroup>
-    
-    <Target Name="Protoc" BeforeTargets="Build">
-        <Exec Command="protoc --csharp_out=. protocol.proto"/>
-    </Target>
 
 </Project>

@@ -15,4 +15,5 @@ RUN dotnet publish "OpenCCG.Gameserver.csproj" -c Release -o /app/publish /p:Use
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "OpenCCG.Gameserver.dll"]
+ENTRYPOINT /bin/bash
+#ENTRYPOINT ["dotnet", "OpenCCG.Gameserver.dll"]

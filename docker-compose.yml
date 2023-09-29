@@ -1,4 +1,13 @@
 ﻿services:
+  #gameserver:
+  #  image: openccg.gameserver
+  #  build:
+  #    context: .
+  #    dockerfile: sources/OpenCCG.Gameserver/Dockerfile
+  #  depends_on: 
+  #    api:
+  #      condition: service_healthy
+  
   api:
     image: openccg.data
     build:
@@ -10,6 +19,11 @@
     ports:
       - "7085:443"
       - "5160:80"
+    healthcheck:
+      test: curl --fail http://localhost/health || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
   
   db:
     image: postgres
