@@ -5,22 +5,18 @@ using System.Linq;
 using System.Text.Json;
 using Godot;
 using OpenCCG.Cards;
-using OpenCCG.Cards.Test;
 using OpenCCG.Core;
 using OpenCCG.Net.Gameplay.Test;
-using Serilog;
 using FileAccess = Godot.FileAccess;
 
 namespace OpenCCG;
 
 public partial class CardBrowser : Control
 {
-    private static readonly PackedScene CardUIScene = GD.Load<PackedScene>("res://scenes/card-ui.tscn");
     private static readonly PackedScene CardUIDeckScene = GD.Load<PackedScene>("res://scenes/card-ui-deck.tscn");
     private static readonly PackedScene MenuScene = GD.Load<PackedScene>("res://scenes/menu.tscn");
 
     private readonly Dictionary<string, CardUIDeck> _deck = new();
-    [Export] private HBoxContainer _bottomPanelContainer;
 
     [Export] private DeckCountProgressBar
         _cardCountBar0,
@@ -33,16 +29,13 @@ public partial class CardBrowser : Control
         _cardCountBar7,
         _cardCountBar8;
 
-    [Export] private FlowContainer _cardViewFlowContainer;
-
-    [Export] private ScrollContainer _cardViewScrollContainer, _deckScrollContainer;
-    [Export] private Button _clearTextButton;
+    [Export] private ScrollContainer  _deckScrollContainer;
 
     [Export] private CounterLabel _creatureCountLabel, _spellCountLabel, _totalCountLabel;
     [Export] private VBoxContainer _deckContainer;
     [Export] private FileDialog _fileDialog;
     [Export] private Button _menuButton, _createDeckButton, _saveDeckButton, _loadDeckButton;
-    [Export] private TextEdit _searchEdit, _deckNameEdit;
+    [Export] private TextEdit _deckNameEdit;
 
     public override void _Ready()
     {
@@ -54,31 +47,6 @@ public partial class CardBrowser : Control
         _createDeckButton.Pressed += ClearDeck;
 
         _saveDeckButton.Pressed += SaveDeck;
-
-        _clearTextButton.Pressed += () =>
-        {
-            Log.Information("text cleared");
-            _searchEdit.Text = "";
-
-            foreach (var child in _cardViewFlowContainer.GetChildren())
-                if (!child.IsQueuedForDeletion())
-                    child.QueueFree();
-
-            foreach (var outline in TestSetOutlines.All) AddCardToView(outline);
-        };
-
-        _searchEdit.TextChanged += () =>
-        {
-            var text = _searchEdit.Text;
-            foreach (var child in _cardViewFlowContainer.GetChildren())
-                if (!child.IsQueuedForDeletion())
-                    child.QueueFree();
-
-            foreach (var outline in TestSetOutlines.All.Where(x => x.Description.Contains(text)))
-                AddCardToView(outline);
-        };
-
-        foreach (var outline in TestSetOutlines.All.OrderBy(x => x.Cost)) AddCardToView(outline);
 
         ResetCounters();
     }
@@ -107,28 +75,6 @@ public partial class CardBrowser : Control
         _cardCountBar6.Count = 0;
         _cardCountBar7.Count = 0;
         _cardCountBar8.Count = 0;
-    }
-
-
-    private void AddCardToView(ICardOutline outline)
-    {
-        var card = CardUIScene.Make<CardUI, ICardOutline>(outline, _cardViewFlowContainer);
-        card.GuiInput += x =>
-        {
-            if (!x.IsActionPressed(InputActions.SpriteClick)) return;
-
-            if (_deck.TryGetValue(outline.Id, out var cardDeck))
-            {
-                cardDeck.SetCount(cardDeck.Count + 1);
-                IncreaseCounters(cardDeck.Outline);
-            }
-            else
-            {
-                AddCardToDeck(card.Outline);
-
-                IncreaseCounters(outline);
-            }
-        };
     }
 
     private CardUIDeck AddCardToDeck(ICardOutline outline)

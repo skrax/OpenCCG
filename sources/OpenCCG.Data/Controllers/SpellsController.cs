@@ -6,6 +6,12 @@ using OpenCCG.Proto;
 
 namespace OpenCCG.Data.Controllers;
 
+public enum SpellsOrderBy
+{
+    Cost,
+    Name
+}
+
 [ApiController]
 [Route("[controller]")]
 public class SpellsController : ControllerBase
@@ -26,20 +32,36 @@ public class SpellsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<SpellOutline>), 200)]
     public async Task<ActionResult> GetAsync(
         [FromQuery] string[] ids,
+        [FromQuery] SpellsOrderBy? orderBy,
         [FromQuery] [Range(0, int.MaxValue)] int pageNumber = 0,
         [FromQuery] [Range(1, 50)] int pageSize = 50
     )
     {
         var keys = ids.ToImmutableHashSet();
 
-        var spells = keys.Any()
-            ? await _applicationDbContext.Spells
-                                         .Where(x => keys.Contains(x.Id))
-                                         .ToArrayAsync()
-            : await _applicationDbContext.Spells
-                                         .Skip(pageNumber * pageSize)
-                                         .Take(pageSize)
-                                         .ToArrayAsync();
+        var query = keys.Any()
+            ? _applicationDbContext.Spells
+                                   .Where(x => keys.Contains(x.Id))
+            : _applicationDbContext.Spells
+                                   .Skip(pageNumber * pageSize)
+                                   .Take(pageSize);
+
+        if (orderBy.HasValue)
+        {
+            switch (orderBy.Value)
+            {
+                case SpellsOrderBy.Cost:
+                    query = query.OrderBy(x => x.Cost);
+                    break;
+                case SpellsOrderBy.Name:
+                    query = query.OrderBy(x => x.Name);
+                    break;
+                default:
+                    return BadRequest();
+            }
+        }
+
+        var spells = await query.ToArrayAsync();
 
         return Ok(spells);
     }

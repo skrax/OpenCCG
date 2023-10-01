@@ -107,7 +107,7 @@ _arrow = NodePath("Arrow")
 position = Vector2(332, -44)
 texture = ExtResource("4_h5nmh")
 
-[node name="Hand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue", "_broker")]
+[node name="Hand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue")]
 offset_top = 953.0
 offset_right = 1920.0
 offset_bottom = 1208.0
@@ -118,7 +118,6 @@ _heightCurve = ExtResource("6_as6je")
 _rotationCurve = ExtResource("7_r7nua")
 _separationCurve = ExtResource("8_gukac")
 _animationQueue = NodePath("../AnimationQueue")
-_broker = NodePath("../CelnetClient")
 
 [node name="EnemyHand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue")]
 offset_top = -127.0

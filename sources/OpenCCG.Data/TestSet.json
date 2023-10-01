@@ -5,6 +5,8 @@
       "Name": "Tiny Dragon",
       "Description": "",
       "Cost": 1,
+      "Atk": 2,
+      "Def": 2,
       "ImgPath": "res://img/cards/dragon.png"
     },
     {
@@ -12,6 +14,8 @@
       "Name": "Small Dragon",
       "Description": "",
       "Cost": 2,
+      "Atk": 3,
+      "Def": 3,     
       "ImgPath": "res://img/cards/dragon2.png"
     },
     {
@@ -19,6 +23,8 @@
       "Name": "Regular Dragon",
       "Description": "",
       "Cost": 3,
+      "Atk": 5,
+      "Def": 4,
       "ImgPath": "res://img/cards/dragon3.png"
     },
     {
@@ -26,6 +32,8 @@
       "Name": "Big Dragon",
       "Description": "",
       "Cost": 4,
+      "Atk": 6,
+      "Def": 5,
       "ImgPath": "res://img/cards/dragon4.png"
     },
     {
@@ -33,6 +41,8 @@
       "Name": "Large Dragon",
       "Description": "",
       "Cost": 5,
+      "Atk": 7,
+      "Def": 6,
       "ImgPath": "res://img/cards/dragon5.png"
     },
     {
@@ -40,6 +50,8 @@
       "Name": "Orestes, Half-Blind",
       "Description": "\n\n[center][b]Exposed[/b][/center]",
       "Cost": 1,
+      "Atk": 3,
+      "Def": 2,
       "ImgPath": "res://img/cards/orestes_half_blind.png"
     },
     {
@@ -47,6 +59,8 @@
       "Name": "Ymir, Winter Soldier",
       "Description": "\n\n[center][b]Haste[/b][/center]",
       "Cost": 3,
+      "Atk": 3,
+      "Def": 3,
       "ImgPath": "res://img/cards/ymir_winter_soldier.png"
     },
     {
@@ -54,6 +68,8 @@
       "Name": "Mornehold Spectre",
       "Description": "\n[center][b]Arcane[/b]\n[b]Exit:[/b] Deal 3 damage to a random enemy creature[/center]",
       "Cost": 2,
+      "Atk": 2,
+      "Def": 1,
       "ImgPath": "res://img/cards/mornehold_spectre.png"
     },
     {
@@ -61,6 +77,8 @@
       "Name": "Black Leech",
       "Description": "\n\n[center][b]Drain[/b][/center]",
       "Cost": 1,
+      "Atk": 1,
+      "Def": 3,
       "ImgPath": "res://img/cards/black_leech.png"
     },
     {
@@ -68,6 +86,8 @@
       "Name": "Towering Giant",
       "Description": "\n\n[center][b]Defender[/b][/center]",
       "Cost": 6,
+      "Atk": 4,
+      "Def": 8,
       "ImgPath": "res://img/cards/towering_giant.png"
     },
     {
@@ -75,6 +95,8 @@
       "Name": "Mornehold Assassin",
       "Description": "\n\n[center][b]Play:[/b] Deal 2 damage[/center]",
       "Cost": 2,
+      "Atk": 2,
+      "Def": 2,
       "ImgPath": "res://img/cards/mornehold_assassin.png"
     },
     {
@@ -82,6 +104,8 @@
       "Name": "Beren Morne",
       "Description": "\n\n[center][b]End of Turn:[/b] Deal 5 damage[/center]",
       "Cost": 8,
+      "Atk": 5,
+      "Def": 5,
       "ImgPath": "res://img/cards/beren_morne.png"
     },
     {
@@ -89,6 +113,8 @@
       "Name": "Bounty Hunter",
       "Description": "\n[center][b]Arcane[/b]\n[b]Play:[/b] Expose a creature[/center]",
       "Cost": 3,
+      "Atk": 4,
+      "Def": 3,
       "ImgPath": "res://img/cards/bounty_hunter.png"
     },
     {
@@ -96,6 +122,8 @@
       "Name": "Equites",
       "Description": "\n[center][b]Haste[/b]\n[b]Start Combat:[/b] Gain \u002B1/\u002B0 for each friendly creature[/center]",
       "Cost": 3,
+      "Atk": 1,
+      "Def": 3,
       "ImgPath": "res://img/cards/equites.png"
     },
     {
@@ -103,6 +131,8 @@
       "Name": "Peltast",
       "Description": "\n[center][b]Start Combat:[/b] Deal 2\ndamage to the enemy\n avatar[/center]",
       "Cost": 1,
+      "Atk": 1,
+      "Def": 1,
       "ImgPath": "res://img/cards/peltast.png"
     },
     {
@@ -110,6 +140,8 @@
       "Name": "Defender of Nargaeya",
       "Description": "\n\n[center][b]Defender[/b][/center]",
       "Cost": 2,
+      "Atk": 2,
+      "Def": 4,
       "ImgPath": "res://img/cards/defender_of_nargaeya.png"
     },
     {
@@ -117,6 +149,8 @@
       "Name": "Field Medic",
       "Description": "\n[center][b]Arcane[/b]\n[b]Enter:[/b] Give a creature\n\u002B0/\u002B2[/center]",
       "Cost": 1,
+      "Atk": 1,
+      "Def": 1,
       "ImgPath": "res://img/cards/field_medic.png"
     },
     {
@@ -124,6 +158,8 @@
       "Name": "Champion of Nargaeya",
       "Description": "\n\n[center][b]End Combat:[/b] Gain \u002B1/\u002B1[/center]",
       "Cost": 2,
+      "Atk": 3,
+      "Def": 3,
       "ImgPath": "res://img/cards/champion_of_nargaeya.png"
     },
     {
@@ -131,6 +167,8 @@
       "Name": "Hastatus",
       "Description": "\n\n[center][b]Play:[/b] Summon a copy of this creature.[/center]",
       "Cost": 1,
+      "Atk": 1,
+      "Def": 1,
       "ImgPath": "res://img/cards/hastatus.png"
     }
   ],

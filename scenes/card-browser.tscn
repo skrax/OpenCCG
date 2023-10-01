@@ -1,8 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://datdpp7ssksne"]
+[gd_scene load_steps=11 format=3 uid="uid://datdpp7ssksne"]
 
 [ext_resource type="Script" path="res://src/CardBrowser.cs" id="1_7casj"]
+[ext_resource type="Script" path="res://src/Browser/CreatureBrowser.cs" id="2_6jrhr"]
 [ext_resource type="Script" path="res://src/DeckCountProgressBar.cs" id="2_rge2r"]
+[ext_resource type="PackedScene" uid="uid://80hml386v23m" path="res://scenes/card-ui.tscn" id="3_5mrml"]
 [ext_resource type="Script" path="res://src/CounterLabel.cs" id="3_hch07"]
+[ext_resource type="Script" path="res://src/Browser/SpellBrowser.cs" id="4_sltj0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mulv"]
 bg_color = Color(0.705882, 0.584314, 0.262745, 1)
@@ -20,7 +23,7 @@ font_size = 15
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_7casj")
-_bottomPanelContainer = NodePath("FilterBar")
+_bottomPanelContainer = NodePath("")
 _cardCountBar0 = NodePath("DeckDetails/ProgressBar")
 _cardCountBar1 = NodePath("DeckDetails/ProgressBar2")
 _cardCountBar2 = NodePath("DeckDetails/ProgressBar3")
@@ -30,10 +33,10 @@ _cardCountBar5 = NodePath("DeckDetails/ProgressBar6")
 _cardCountBar6 = NodePath("DeckDetails/ProgressBar7")
 _cardCountBar7 = NodePath("DeckDetails/ProgressBar8")
 _cardCountBar8 = NodePath("DeckDetails/ProgressBar9")
-_cardViewFlowContainer = NodePath("CardBrowser/VFlowContainer")
-_cardViewScrollContainer = NodePath("CardBrowser")
+_cardViewFlowContainer = NodePath("CardBrowser/Creatures/VFlowContainer")
+_cardViewScrollContainer = NodePath("CardBrowser/Creatures")
 _deckScrollContainer = NodePath("DeckBrowser")
-_clearTextButton = NodePath("FilterBar/Button")
+_clearTextButton = NodePath("")
 _creatureCountLabel = NodePath("DeckDetails/CreatureCount/Count")
 _spellCountLabel = NodePath("DeckDetails/SpellCount/Count")
 _totalCountLabel = NodePath("DeckDetails/TotalCount/Count")
@@ -43,19 +46,26 @@ _menuButton = NodePath("MenuButton")
 _createDeckButton = NodePath("CreateDeckButton")
 _saveDeckButton = NodePath("SaveDeckButton")
 _loadDeckButton = NodePath("LoadDeckButton")
-_searchEdit = NodePath("FilterBar/TextEdit")
+_searchEdit = NodePath("")
 _deckNameEdit = NodePath("DeckName")
 
-[node name="CardBrowser" type="ScrollContainer" parent="."]
-layout_mode = 0
+[node name="CardBrowser" type="TabContainer" parent="."]
+layout_mode = 2
 offset_left = 25.0
 offset_top = 100.0
 offset_right = 1520.0
-offset_bottom = 980.0
+offset_bottom = 1068.0
+theme_override_constants/side_margin = 0
+
+[node name="Creatures" type="ScrollContainer" parent="CardBrowser" node_paths=PackedStringArray("_flowContainer")]
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_5mulv")
 horizontal_scroll_mode = 0
+script = ExtResource("2_6jrhr")
+_flowContainer = NodePath("VFlowContainer")
+_cardUIScene = ExtResource("3_5mrml")
 
-[node name="VFlowContainer" type="FlowContainer" parent="CardBrowser"]
+[node name="VFlowContainer" type="FlowContainer" parent="CardBrowser/Creatures"]
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -64,22 +74,23 @@ theme_override_constants/h_separation = 40
 theme_override_constants/v_separation = 40
 alignment = 1
 
-[node name="FilterBar" type="HBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 25.0
-offset_top = 988.0
-offset_right = 1520.0
-offset_bottom = 1068.0
-
-[node name="Button" type="Button" parent="FilterBar"]
-custom_minimum_size = Vector2(80, 2.08165e-12)
+[node name="Spells" type="ScrollContainer" parent="CardBrowser" node_paths=PackedStringArray("_flowContainer")]
+visible = false
 layout_mode = 2
-text = "Clear"
+theme_override_styles/panel = SubResource("StyleBoxFlat_5mulv")
+horizontal_scroll_mode = 0
+script = ExtResource("4_sltj0")
+_flowContainer = NodePath("VFlowContainer")
+_cardUIScene = ExtResource("3_5mrml")
 
-[node name="TextEdit" type="TextEdit" parent="FilterBar"]
+[node name="VFlowContainer" type="FlowContainer" parent="CardBrowser/Spells"]
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "Search description .."
+size_flags_vertical = 3
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 40
+alignment = 1
 
 [node name="MenuButton" type="Button" parent="."]
 layout_mode = 0
