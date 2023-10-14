@@ -8,7 +8,7 @@ using OpenCCG.Proto;
 using Serilog;
 using HttpClient = System.Net.Http.HttpClient;
 
-namespace OpenCCG.Browser;
+namespace OpenCCG.CardBrowser;
 
 [GlobalClass]
 public partial class CardStorage : Node

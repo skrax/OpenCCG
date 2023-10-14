@@ -1,10 +1,10 @@
 using Godot;
 
-namespace OpenCCG;
+namespace OpenCCG.CardBrowser;
 
 public partial class DeckCountProgressBar : ProgressBar
 {
-    [Export] private Label _countLabel;
+    [Export] private Label _countLabel = null!;
 
     public int Count
     {

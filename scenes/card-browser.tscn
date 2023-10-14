@@ -1,13 +1,14 @@
-[gd_scene load_steps=13 format=3 uid="uid://datdpp7ssksne"]
+[gd_scene load_steps=14 format=3 uid="uid://datdpp7ssksne"]
 
-[ext_resource type="Script" path="res://src/CardBrowser.cs" id="1_7casj"]
-[ext_resource type="Script" path="res://src/Browser/CreatureBrowser.cs" id="2_6jrhr"]
-[ext_resource type="Script" path="res://src/Browser/CardStorage.cs" id="2_e0g5l"]
-[ext_resource type="Script" path="res://src/DeckCountProgressBar.cs" id="2_rge2r"]
+[ext_resource type="Script" path="res://src/CardBrowser/CardStorage.cs" id="1_jl83r"]
+[ext_resource type="Script" path="res://src/CardBrowser/CreatureBrowser.cs" id="2_20lk0"]
 [ext_resource type="PackedScene" uid="uid://80hml386v23m" path="res://scenes/card-ui.tscn" id="3_5mrml"]
+[ext_resource type="Script" path="res://src/CardBrowser/SpellBrowser.cs" id="3_crr27"]
 [ext_resource type="Script" path="res://src/CounterLabel.cs" id="3_hch07"]
-[ext_resource type="Script" path="res://src/Browser/SpellBrowser.cs" id="4_sltj0"]
-[ext_resource type="Script" path="res://src/Browser/DeckBrowser.cs" id="6_eny82"]
+[ext_resource type="Script" path="res://src/CardBrowser/MenuButton.cs" id="5_qxjq2"]
+[ext_resource type="Script" path="res://src/CardBrowser/DeckBrowser.cs" id="6_im3xk"]
+[ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="6_jsm1f"]
+[ext_resource type="Script" path="res://src/CardBrowser/DeckCountProgressBar.cs" id="8_qvkjk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mulv"]
 bg_color = Color(0.705882, 0.584314, 0.262745, 1)
@@ -21,19 +22,12 @@ bg_color = Color(0, 0, 0, 0.262745)
 [sub_resource type="LabelSettings" id="LabelSettings_q1lue"]
 font_size = 15
 
-[node name="card-browser" type="Control" node_paths=PackedStringArray("_deckScrollContainer", "_fileDialog", "_menuButton", "_createDeckButton", "_saveDeckButton", "_loadDeckButton")]
+[node name="card-browser" type="Control"]
 layout_mode = 3
 anchors_preset = 0
-script = ExtResource("1_7casj")
-_deckScrollContainer = NodePath("DeckBrowser")
-_fileDialog = NodePath("FileDialog")
-_menuButton = NodePath("MenuButton")
-_createDeckButton = NodePath("CreateDeckButton")
-_saveDeckButton = NodePath("SaveDeckButton")
-_loadDeckButton = NodePath("LoadDeckButton")
 
 [node name="CardStorage" type="Node" parent="."]
-script = ExtResource("2_e0g5l")
+script = ExtResource("1_jl83r")
 
 [node name="CardBrowser" type="TabContainer" parent="."]
 layout_mode = 2
@@ -47,7 +41,7 @@ theme_override_constants/side_margin = 0
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_5mulv")
 horizontal_scroll_mode = 0
-script = ExtResource("2_6jrhr")
+script = ExtResource("2_20lk0")
 _cardStorage = NodePath("../../CardStorage")
 FlowContainer = NodePath("VFlowContainer")
 CardUiScene = ExtResource("3_5mrml")
@@ -67,7 +61,7 @@ visible = false
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_5mulv")
 horizontal_scroll_mode = 0
-script = ExtResource("4_sltj0")
+script = ExtResource("3_crr27")
 _cardStorage = NodePath("../../CardStorage")
 FlowContainer = NodePath("VFlowContainer")
 CardUiScene = ExtResource("3_5mrml")
@@ -90,6 +84,8 @@ offset_right = 325.0
 offset_bottom = 78.0
 theme_override_font_sizes/font_size = 32
 text = "BACK TO MENU"
+script = ExtResource("5_qxjq2")
+_menuScene = ExtResource("6_jsm1f")
 
 [node name="CreateDeckButton" type="Button" parent="."]
 layout_mode = 0
@@ -133,7 +129,7 @@ offset_top = 100.0
 offset_right = 1900.0
 offset_bottom = 867.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_fchwj")
-script = ExtResource("6_eny82")
+script = ExtResource("6_im3xk")
 _container = NodePath("VBoxContainer")
 _deckNameEdit = NodePath("../DeckName")
 _creatureCountLabel = NodePath("../DeckDetails/CreatureCount/Count")
@@ -177,7 +173,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar"]
@@ -212,7 +208,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar2"]
@@ -247,7 +243,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar3"]
@@ -282,7 +278,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar4"]
@@ -317,7 +313,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar5"]
@@ -352,7 +348,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar6"]
@@ -387,7 +383,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar7"]
@@ -422,7 +418,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar8"]
@@ -457,7 +453,7 @@ step = 1.0
 value = 1.0
 fill_mode = 3
 show_percentage = false
-script = ExtResource("2_rge2r")
+script = ExtResource("8_qvkjk")
 _countLabel = NodePath("Count")
 
 [node name="Label" type="Label" parent="DeckDetails/ProgressBar9"]

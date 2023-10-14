@@ -3,7 +3,7 @@ using Godot;
 using OpenCCG.Core;
 using OpenCCG.Proto;
 
-namespace OpenCCG.Browser;
+namespace OpenCCG.CardBrowser;
 
 public partial class SpellBrowser : AbstractCardBrowser<SpellOutline>
 {

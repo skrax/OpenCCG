@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Proto;
 
-namespace OpenCCG.Browser;
+namespace OpenCCG.CardBrowser;
 
 public abstract partial class AbstractCardBrowser<TOutline> : ScrollContainer
 {

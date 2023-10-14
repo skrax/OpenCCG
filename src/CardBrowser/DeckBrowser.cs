@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using Godot;
 using Google.Protobuf;
-using Google.Protobuf.Collections;
 using OpenCCG.Core;
 using OpenCCG.Proto;
 using FileAccess = Godot.FileAccess;
 
-namespace OpenCCG.Browser;
+namespace OpenCCG.CardBrowser;
 
 public partial class DeckBrowser : ScrollContainer
 {
