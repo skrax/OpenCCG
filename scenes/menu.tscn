@@ -91,6 +91,7 @@ layout_mode = 0
 offset_top = 117.0
 offset_right = 156.0
 offset_bottom = 148.0
+disabled = true
 text = "Use Password"
 
 [node name="TextEdit" type="LineEdit" parent="Panel"]
@@ -102,12 +103,13 @@ offset_bottom = 146.0
 theme_override_font_sizes/font_size = 14
 placeholder_text = "Enter Password .."
 max_length = 12
+editable = false
 secret = true
 clear_button_enabled = true
 
 [node name="FileDialog" type="FileDialog" parent="."]
-initial_position = 1
 title = "Open a File"
+initial_position = 1
 size = Vector2i(500, 500)
 ok_button_text = "Open"
 dialog_hide_on_ok = true

@@ -4,7 +4,7 @@ using OpenCCG.Core;
 using OpenCCG.Proto;
 using Serilog;
 
-namespace OpenCCG.Net2.Controllers;
+namespace OpenCCG.Net.Controllers;
 
 public class MetricsController
 {

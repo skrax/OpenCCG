@@ -6,11 +6,11 @@ using Godot;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using OpenCCG.Core;
-using OpenCCG.Net2.Controllers;
+using OpenCCG.Net.Controllers;
 using OpenCCG.Proto;
 using Serilog;
 
-namespace OpenCCG.Net2;
+namespace OpenCCG.Net;
 
 public partial class CelnetClient : Node
 {

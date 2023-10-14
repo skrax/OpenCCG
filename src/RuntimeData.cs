@@ -4,7 +4,7 @@ namespace OpenCCG;
 
 public partial class RuntimeData : Node
 {
-    public string? _deckPath;
-    public string? _queuePassword;
-    public bool _useQueuePassword;
+    public string? DeckPath;
+    public string? QueuePassword;
+    public bool UseQueuePassword;
 }

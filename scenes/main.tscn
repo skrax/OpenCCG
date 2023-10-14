@@ -1,21 +1,20 @@
 [gd_scene load_steps=25 format=3 uid="uid://j4opc717kx3j"]
 
-[ext_resource type="Script" path="res://src/HandArea.cs" id="1_kp75l"]
-[ext_resource type="Script" path="res://src/Main.cs" id="1_pq47c"]
-[ext_resource type="Script" path="res://src/EnemyHandArea.cs" id="3_8aogm"]
+
 [ext_resource type="PackedScene" uid="uid://usm5ti5ecytg" path="res://scenes/status-panel.tscn" id="3_n6g3w"]
-[ext_resource type="PackedScene" uid="uid://c18dtn6mg45og" path="res://scenes/client.tscn" id="3_uxwq6"]
-[ext_resource type="Script" path="res://src/Dropzone.cs" id="3_x8tt0"]
-[ext_resource type="Script" path="res://src/BoardArea.cs" id="4_4t5gh"]
+[ext_resource type="Script" path="res://src/GameBoard/Dropzone.cs" id="3_x8tt0"]
+[ext_resource type="Script" path="res://src/GameBoard/Board.cs" id="4_4t5gh"]
+[ext_resource type="Script" path="res://src/GameBoard/Hand.cs" id="1_kp75l"]
+[ext_resource type="Script" path="res://src/GameBoard/EnemyHand.cs" id="3_8aogm"]
 [ext_resource type="Curve" uid="uid://dlhs5oxncag7t" path="res://CardHeightCurve.tres" id="6_8m5r4"]
 [ext_resource type="Curve" uid="uid://cv6pqdivmwc2p" path="res://CardRotationCurve.tres" id="7_pec5a"]
 [ext_resource type="Curve" uid="uid://dc1gwp2rhsq4i" path="res://CardSeparationCuve.tres" id="8_uv6j5"]
 [ext_resource type="Script" path="res://src/TargetLine.cs" id="9_cltvt"]
-[ext_resource type="Script" path="res://src/MidPanel.cs" id="9_d8cg4"]
+[ext_resource type="Script" path="res://src/GameBoard/MidPanel.cs" id="9_d8cg4"]
 [ext_resource type="Texture2D" uid="uid://khshipm06wi" path="res://img/line_segment.png" id="9_xpu3a"]
 [ext_resource type="Texture2D" uid="uid://cc6ljig5aldur" path="res://img/line_arrow.png" id="10_a36md"]
 [ext_resource type="PackedScene" uid="uid://bi081wvfogtvn" path="res://scenes/card-effect-preview.tscn" id="13_hy35u"]
-[ext_resource type="Script" path="res://src/SkipSelectionField.cs" id="13_pb0qo"]
+[ext_resource type="Script" path="res://src/GameBoard/SkipSelectionField.cs" id="13_pb0qo"]
 [ext_resource type="PackedScene" uid="uid://bquu3tmpxxm7j" path="res://scenes/menu.tscn" id="13_xdsvr"]
 
 [sub_resource type="Gradient" id="Gradient_aglup"]
@@ -46,7 +45,6 @@ bg_color = Color(0.6, 0, 0.6, 1)
 bg_color = Color(0.70261, 0.0548099, 0.36398, 1)
 
 [node name="Main" type="Node2D"]
-script = ExtResource("1_pq47c")
 
 [node name="Background" type="TextureRect" parent="."]
 z_index = -1
@@ -160,10 +158,6 @@ offset_right = 1920.0
 offset_bottom = 827.0
 mouse_filter = 2
 script = ExtResource("3_x8tt0")
-
-[node name="Client" parent="." node_paths=PackedStringArray("_main") instance=ExtResource("3_uxwq6")]
-_main = NodePath("..")
-_serverAddress = "localhost"
 
 [node name="MidPanel" type="Panel" parent="." node_paths=PackedStringArray("_endTurnButton", "_exitButton", "_statusLabel")]
 offset_top = 509.0

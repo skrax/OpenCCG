@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using OpenCCG.Net2;
+using OpenCCG.Net;
 
 namespace OpenCCG.GameBoard;
 
