@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Net;
-using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
 public record SetEnergyDto(int Current, int Max);
 
-public partial class StatusPanel : Node, IMessageReceiver<MessageType>
+public partial class StatusPanel : Node
 {
+    #if false
     [Export] public Avatar _avatar;
     [Export] private Label _cardCountLabel;
     [Export] private Panel _dmgPopup;
@@ -65,4 +63,5 @@ public partial class StatusPanel : Node, IMessageReceiver<MessageType>
             _dmgPopup.Visible = false;
         }
     }
+#endif
 }

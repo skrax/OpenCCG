@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://5d6l65ukuwjn"]
+[gd_scene load_steps=28 format=3 uid="uid://5d6l65ukuwjn"]
 
 [ext_resource type="Script" path="res://src/GameBoard/AnimationQueue.cs" id="1_ueljg"]
 [ext_resource type="Script" path="res://src/Net2/CelnetClient.cs" id="2_ngawk"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://src/GameBoard/Hand.cs" id="6_aavwd"]
 [ext_resource type="Curve" uid="uid://dlhs5oxncag7t" path="res://CardHeightCurve.tres" id="6_as6je"]
 [ext_resource type="Curve" uid="uid://cv6pqdivmwc2p" path="res://CardRotationCurve.tres" id="7_r7nua"]
-[ext_resource type="PackedScene" uid="uid://dn7ayibqvf3jk" path="res://scenes/card.tscn" id="7_x23eh"]
 [ext_resource type="Curve" uid="uid://dc1gwp2rhsq4i" path="res://CardSeparationCuve.tres" id="8_gukac"]
 [ext_resource type="Script" path="res://src/GameBoard/EnemyHand.cs" id="10_vriwn"]
 [ext_resource type="PackedScene" uid="uid://usm5ti5ecytg" path="res://scenes/status-panel.tscn" id="11_6id2f"]
@@ -107,17 +106,12 @@ _arrow = NodePath("Arrow")
 position = Vector2(332, -44)
 texture = ExtResource("4_h5nmh")
 
-[node name="Hand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue")]
+[node name="Hand" type="HBoxContainer" parent="."]
 offset_top = 953.0
 offset_right = 1920.0
 offset_bottom = 1208.0
 alignment = 1
 script = ExtResource("6_aavwd")
-_cardScene = ExtResource("7_x23eh")
-_heightCurve = ExtResource("6_as6je")
-_rotationCurve = ExtResource("7_r7nua")
-_separationCurve = ExtResource("8_gukac")
-_animationQueue = NodePath("../AnimationQueue")
 
 [node name="EnemyHand" type="HBoxContainer" parent="." node_paths=PackedStringArray("_animationQueue")]
 offset_top = -127.0
@@ -168,7 +162,6 @@ script = ExtResource("14_g6hfw")
 offset_top = 129.0
 offset_bottom = 253.0
 script = ExtResource("14_g6hfw")
-_isEnemy = true
 
 [node name="Dropzone" type="Control" parent="."]
 layout_mode = 3
@@ -245,14 +238,13 @@ theme_override_font_sizes/font_size = 35
 text = "Skip Selection"
 script = ExtResource("19_q08ff")
 
-[node name="CardEffectPreview" parent="." node_paths=PackedStringArray("_skipSelectionField") instance=ExtResource("17_e7760")]
+[node name="CardEffectPreview" parent="." instance=ExtResource("17_e7760")]
 visible = false
 offset_left = 681.0
 offset_top = 788.0
 offset_right = 834.6
 offset_bottom = 1018.4
 mouse_filter = 2
-_skipSelectionField = NodePath("../MidPanel/SkipTargetField")
 
 [node name="EnemyCardEffectPreview" parent="." instance=ExtResource("17_e7760")]
 visible = false

@@ -1,11 +1,10 @@
 using Godot;
-using OpenCCG.Cards;
-using OpenCCG.Core;
 
 namespace OpenCCG;
 
-public partial class CardPreview : TextureRect, INodeInit<CardImplementationDto>
+public partial class CardPreview : TextureRect
 {
+    #if false
     [Export] private CardStatPanel _costPanel, _atkPanel, _defPanel;
     [Export] private CardInfoPanel _infoPanel, _namePanel;
 
@@ -34,4 +33,5 @@ public partial class CardPreview : TextureRect, INodeInit<CardImplementationDto>
 
         shader?.SetShaderParameter("drawOutline", enabled);
     }
+#endif
 }

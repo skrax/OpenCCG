@@ -33,7 +33,7 @@ public class SpellsController : ControllerBase
     public async Task<ActionResult> GetAsync(
         [FromQuery] string[] ids,
         [FromQuery] SpellsOrderBy? orderBy,
-        [FromQuery] [Range(0, int.MaxValue)] int pageNumber = 0,
+        [FromQuery] [Range(0, int.MaxValue)] int pageNumber = 1,
         [FromQuery] [Range(1, 50)] int pageSize = 50
     )
     {
@@ -43,7 +43,7 @@ public class SpellsController : ControllerBase
             ? _applicationDbContext.Spells
                                    .Where(x => keys.Contains(x.Id))
             : _applicationDbContext.Spells
-                                   .Skip(pageNumber * pageSize)
+                                   .Skip((pageNumber - 1) * pageSize)
                                    .Take(pageSize);
 
         if (orderBy.HasValue)

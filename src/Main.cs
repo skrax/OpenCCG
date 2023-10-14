@@ -1,20 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Core;
-using OpenCCG.Net;
-using OpenCCG.Net.Dto;
-using OpenCCG.Net.Matchmaking;
-using OpenCCG.Net.Rpc;
-using FileAccess = Godot.FileAccess;
 
 namespace OpenCCG;
 
-public partial class Main : Node, IMessageReceiver<MessageType>
+public partial class Main : Node
 {
+    #if false
     public Dictionary<string, IObserver> Observers { get; } = new();
 
     [Rpc]
@@ -65,4 +55,5 @@ public partial class Main : Node, IMessageReceiver<MessageType>
 
         IMessageReceiver<MessageType>.FireAndForget(this, 1, MessageType.Queue, dto);
     }
+#endif
 }

@@ -1,13 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Cards;
-using OpenCCG.Core;
-using OpenCCG.Net;
-using OpenCCG.Net.Rpc;
-using OpenCCG.Net.ServerNodes;
-using Serilog;
 
 namespace OpenCCG.GameBoard;
 
@@ -19,6 +11,7 @@ public partial class Board : HBoxContainer
     [Export] public bool IsEnemy;
 
     public readonly List<CardBoard> Cards = new();
+    #if false
 
     public async Task PlayCombatAnimAsync(PlayCombatDto dto)
     {
@@ -86,4 +79,5 @@ public partial class Board : HBoxContainer
         Cards.Remove(card);
         card.Destroy(() => { });
     }
+#endif
 }

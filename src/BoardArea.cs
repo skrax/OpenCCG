@@ -2,30 +2,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Cards;
 using OpenCCG.Core;
-using OpenCCG.Net;
-using OpenCCG.Net.Rpc;
-using OpenCCG.Net.ServerNodes;
+using OpenCCG.GameBoard;
 using Serilog;
 
 namespace OpenCCG;
 
-public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
+public partial class BoardArea : HBoxContainer
 {
     private static readonly PackedScene CardBoardScene = GD.Load<PackedScene>("res://scenes/card-board.tscn");
 
     public readonly List<CardBoard> Cards = new();
     [Export] public StatusPanel StatusPanel = null!, EnemyStatusPanel = null!;
-    [Export] public GameBoard.Board EnemyBoard = null!;
+    [Export] public Board EnemyBoard = null!;
     [Export] public bool IsEnemy;
 
-    public Dictionary<string, IObserver>? Observers => null;
+    #if false
 
     [Rpc]
     public async void HandleMessageAsync(string messageJson)
     {
-        await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
+        //await IMessageReceiver<MessageType>.HandleMessageAsync(this, messageJson);
     }
 
     public Executor? GetExecutor(MessageType messageType)
@@ -108,4 +105,5 @@ public partial class BoardArea : HBoxContainer, IMessageReceiver<MessageType>
         Cards.Remove(card);
         card.Destroy(() => { });
     }
+#endif
 }

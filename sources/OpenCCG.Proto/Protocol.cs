@@ -57,13 +57,13 @@ namespace OpenCCG.Proto {
             "ZW5DQ0cuUHJvdG8uQ3JlYXR1cmVIABIlCgVTcGVsbBgDIAEoCzIULk9wZW5D",
             "Q0cuUHJvdG8uU3BlbGxIAEIQCg5JbXBsZW1lbnRhdGlvbiJVCg1EZWNrTGlz",
             "dEVudHJ5EgoKAklkGAEgASgJEg0KBUNvdW50GAIgASgFEikKCENhcmRUeXBl",
-            "GAMgASgOMhcuT3BlbkNDRy5Qcm90by5DYXJkVHlwZSJHCghEZWNrTGlzdBIM",
-            "CgROYW1lGAEgASgJEi0KB0VudHJpZXMYAiADKAsyHC5PcGVuQ0NHLlByb3Rv",
-            "LkRlY2tMaXN0RW50cnkqMwoKU3RhdHVzQ29kZRIGCgJPaxAAEg0KCUZvcmJp",
-            "ZGRlbhABEg4KCkJhZFJlcXVlc3QQAiorCghDYXJkVHlwZRIQCgxDcmVhdHVy",
-            "ZVR5cGUQABINCglTcGVsbFR5cGUQASo8CghDYXJkWm9uZRIICgROb25lEAAS",
-            "CAoERGVjaxABEggKBEhhbmQQAhIJCgVCb2FyZBADEgcKA1BpdBAEQhCqAg1P",
-            "cGVuQ0NHLlByb3RvYgZwcm90bzM="));
+            "GAMgASgOMhcuT3BlbkNDRy5Qcm90by5DYXJkVHlwZSJcCghEZWNrTGlzdBIT",
+            "CgtGaWxlVmVyc2lvbhgBIAEoCRIMCgROYW1lGAIgASgJEi0KB0VudHJpZXMY",
+            "AyADKAsyHC5PcGVuQ0NHLlByb3RvLkRlY2tMaXN0RW50cnkqMwoKU3RhdHVz",
+            "Q29kZRIGCgJPaxAAEg0KCUZvcmJpZGRlbhABEg4KCkJhZFJlcXVlc3QQAior",
+            "CghDYXJkVHlwZRIQCgxDcmVhdHVyZVR5cGUQABINCglTcGVsbFR5cGUQASo8",
+            "CghDYXJkWm9uZRIICgROb25lEAASCAoERGVjaxABEggKBEhhbmQQAhIJCgVC",
+            "b2FyZBADEgcKA1BpdBAEQhCqAg1PcGVuQ0NHLlByb3RvYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::OpenCCG.Proto.StatusCode), typeof(global::OpenCCG.Proto.CardType), typeof(global::OpenCCG.Proto.CardZone), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -81,7 +81,7 @@ namespace OpenCCG.Proto {
             new pbr::GeneratedClrTypeInfo(typeof(global::OpenCCG.Proto.Spell), global::OpenCCG.Proto.Spell.Parser, new[]{ "Outline", "State" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::OpenCCG.Proto.Card), global::OpenCCG.Proto.Card.Parser, new[]{ "Id", "Creature", "Spell" }, new[]{ "Implementation" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::OpenCCG.Proto.DeckListEntry), global::OpenCCG.Proto.DeckListEntry.Parser, new[]{ "Id", "Count", "CardType" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::OpenCCG.Proto.DeckList), global::OpenCCG.Proto.DeckList.Parser, new[]{ "Name", "Entries" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::OpenCCG.Proto.DeckList), global::OpenCCG.Proto.DeckList.Parser, new[]{ "FileVersion", "Name", "Entries" }, null, null, null, null)
           }));
     }
     #endregion
@@ -4299,6 +4299,7 @@ namespace OpenCCG.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public DeckList(DeckList other) : this() {
+      fileVersion_ = other.fileVersion_;
       name_ = other.name_;
       entries_ = other.entries_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -4310,8 +4311,20 @@ namespace OpenCCG.Proto {
       return new DeckList(this);
     }
 
+    /// <summary>Field number for the "FileVersion" field.</summary>
+    public const int FileVersionFieldNumber = 1;
+    private string fileVersion_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string FileVersion {
+      get { return fileVersion_; }
+      set {
+        fileVersion_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     /// <summary>Field number for the "Name" field.</summary>
-    public const int NameFieldNumber = 1;
+    public const int NameFieldNumber = 2;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -4323,9 +4336,9 @@ namespace OpenCCG.Proto {
     }
 
     /// <summary>Field number for the "Entries" field.</summary>
-    public const int EntriesFieldNumber = 2;
+    public const int EntriesFieldNumber = 3;
     private static readonly pb::FieldCodec<global::OpenCCG.Proto.DeckListEntry> _repeated_entries_codec
-        = pb::FieldCodec.ForMessage(18, global::OpenCCG.Proto.DeckListEntry.Parser);
+        = pb::FieldCodec.ForMessage(26, global::OpenCCG.Proto.DeckListEntry.Parser);
     private readonly pbc::RepeatedField<global::OpenCCG.Proto.DeckListEntry> entries_ = new pbc::RepeatedField<global::OpenCCG.Proto.DeckListEntry>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -4348,6 +4361,7 @@ namespace OpenCCG.Proto {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (FileVersion != other.FileVersion) return false;
       if (Name != other.Name) return false;
       if(!entries_.Equals(other.entries_)) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -4357,6 +4371,7 @@ namespace OpenCCG.Proto {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
+      if (FileVersion.Length != 0) hash ^= FileVersion.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       hash ^= entries_.GetHashCode();
       if (_unknownFields != null) {
@@ -4377,8 +4392,12 @@ namespace OpenCCG.Proto {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Name.Length != 0) {
+      if (FileVersion.Length != 0) {
         output.WriteRawTag(10);
+        output.WriteString(FileVersion);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
         output.WriteString(Name);
       }
       entries_.WriteTo(output, _repeated_entries_codec);
@@ -4392,8 +4411,12 @@ namespace OpenCCG.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
+      if (FileVersion.Length != 0) {
         output.WriteRawTag(10);
+        output.WriteString(FileVersion);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
         output.WriteString(Name);
       }
       entries_.WriteTo(ref output, _repeated_entries_codec);
@@ -4407,6 +4430,9 @@ namespace OpenCCG.Proto {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
+      if (FileVersion.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(FileVersion);
+      }
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
@@ -4422,6 +4448,9 @@ namespace OpenCCG.Proto {
     public void MergeFrom(DeckList other) {
       if (other == null) {
         return;
+      }
+      if (other.FileVersion.Length != 0) {
+        FileVersion = other.FileVersion;
       }
       if (other.Name.Length != 0) {
         Name = other.Name;
@@ -4443,10 +4472,14 @@ namespace OpenCCG.Proto {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            Name = input.ReadString();
+            FileVersion = input.ReadString();
             break;
           }
           case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 26: {
             entries_.AddEntriesFrom(input, _repeated_entries_codec);
             break;
           }
@@ -4466,10 +4499,14 @@ namespace OpenCCG.Proto {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            Name = input.ReadString();
+            FileVersion = input.ReadString();
             break;
           }
           case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 26: {
             entries_.AddEntriesFrom(ref input, _repeated_entries_codec);
             break;
           }

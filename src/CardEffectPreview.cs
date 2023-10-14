@@ -1,15 +1,10 @@
-using System;
-using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Cards;
-using OpenCCG.Net.ServerNodes;
-using Serilog;
-using Board = OpenCCG.GameBoard.Board;
 
 namespace OpenCCG;
 
 public partial class CardEffectPreview : TextureRect
 {
+    #if false
     [Export] private CardStatPanel _costPanel;
     [Export] private CardInfoPanel _descriptionPanel, _namePanel;
     [Export] private Sprite2D _projectile;
@@ -182,4 +177,5 @@ public partial class CardEffectPreview : TextureRect
 
         ForceDrag();
     }
+#endif
 }

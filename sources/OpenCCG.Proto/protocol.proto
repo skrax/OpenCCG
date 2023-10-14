@@ -119,6 +119,7 @@ message DeckListEntry {
 }
 
 message DeckList {
-  string Name = 1;
-  repeated DeckListEntry Entries = 2;
+  string FileVersion = 1;
+  string Name = 2;
+  repeated DeckListEntry Entries = 3;
 }

@@ -1,12 +1,13 @@
 using System.Linq;
 using Godot;
-using OpenCCG.Net.ServerNodes;
+using OpenCCG.GameBoard;
 using Serilog;
 
 namespace OpenCCG;
 
 public partial class Avatar : TextureRect
 {
+    #if false
     [Export] public bool IsEnemy;
 
     public override void _Ready()
@@ -25,11 +26,11 @@ public partial class Avatar : TextureRect
         EventSink.OnDragSelectTargetStop -= OnDragSelectTargetStop;
     }
 
-    private void OnDragSelectTargetStart(RequireTargetInputDto dto)
+    private void OnDragSelectTargetStart()
     {
-        if (dto.Type is RequireTargetType.Creature) return;
-        if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
-        if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
+        //if (dto.Type is RequireTargetType.Creature) return;
+        //if (IsEnemy && dto.Side == RequireTargetSide.Friendly) return;
+        //if (!IsEnemy && dto.Side == RequireTargetSide.Enemy) return;
 
         DrawOutline(true);
     }
@@ -42,7 +43,7 @@ public partial class Avatar : TextureRect
     private void OnDragForCombatStart(ulong instanceId)
     {
         if (!IsEnemy) return;
-        var board = GetNode<GameBoard.Board>("/root/Main/EnemyBoard");
+        var board = GetNode<Board>("/root/Main/EnemyBoard");
         if (board.Cards.Any(x => x.CardImplementationDto.CreatureAbilities!.Defender)) return;
 
         DrawOutline(true);
@@ -92,4 +93,5 @@ public partial class Avatar : TextureRect
         var shader = Material as ShaderMaterial;
         shader?.SetShaderParameter("drawOutline", enabled);
     }
+#endif
 }

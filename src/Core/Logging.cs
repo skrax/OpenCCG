@@ -1,8 +1,6 @@
 using System.Linq;
 using Godot;
 using OpenCCG.Core.Serilog;
-using OpenCCG.Net.Gameplay;
-using OpenCCG.Net.Gameplay.Dto;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Sinks.Grafana.Loki;
@@ -23,9 +21,7 @@ public partial class Logging : Node
                                                           Key = "Godot", Value = "Godot Messages"
                                                       }
                                                   },
-                                                  propertiesAsLabels: SessionContext.LogPropertyNames()
-                                                      .Concat(MatchInfoDto.LogPropertyNames())
-                                                      .Concat(new[] { "MessageId" })
+                                                  propertiesAsLabels: new[] { "MessageId" }
                                                       .Distinct()
                                               )
                                               .CreateLogger();

@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dgxc2wsremhm6"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m08km"]
+load_path = "res://.godot/imported/firebomb.png-e36cd74047fd2a941d4daffcee48b1b3.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_m08km")
+region = Rect2(0, 24, 512, 288)

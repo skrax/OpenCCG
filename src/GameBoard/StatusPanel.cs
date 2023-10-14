@@ -4,6 +4,7 @@ namespace OpenCCG.GameBoard;
 
 public partial class StatusPanel : Node
 {
+    #if false
     [Export] public Avatar _avatar;
     [Export] private Label _cardCountLabel;
     [Export] private Panel _dmgPopup;
@@ -31,7 +32,6 @@ public partial class StatusPanel : Node
         var diff = value - int.Parse(_healthLabel.Text);
         _healthLabel.Text = value.ToString();
         // TODO
-#if false
         if (diff != 0)
         {
             _dmgPopup.Visible = true;
@@ -39,6 +39,6 @@ public partial class StatusPanel : Node
             await Task.Delay(TimeSpan.FromSeconds(2));
             _dmgPopup.Visible = false;
         }
-#endif
     }
+#endif
 }

@@ -4,6 +4,7 @@ namespace OpenCCG;
 
 public partial class SkipSelectionField : Button
 {
+    #if false
     public override bool _CanDropData(Vector2 atPosition, Variant data)
     {
         return Visible &&
@@ -26,4 +27,5 @@ public partial class SkipSelectionField : Button
     {
         Visible = false;
     }
+#endif
 }

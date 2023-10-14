@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://bsrt24211oddp"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_swlda"]
+load_path = "res://.godot/imported/champion_of_nargaeya.png-9b3bb845d01c1b5e739c457044e85e0b.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_swlda")
+region = Rect2(0, 72, 512, 192)

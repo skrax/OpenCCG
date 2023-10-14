@@ -1,49 +1,25 @@
-using System;
-using System.Net.Http.Json;
+using System.Threading.Tasks;
 using Godot;
 using OpenCCG.Core;
 using OpenCCG.Proto;
-using HttpClient = System.Net.Http.HttpClient;
 
 namespace OpenCCG.Browser;
 
-public partial class CreatureBrowser : ScrollContainer
+public partial class CreatureBrowser : AbstractCardBrowser<CreatureOutline>
 {
-    private readonly HttpClient _httpClient = new();
-    [Export] private FlowContainer _flowContainer = null!;
-    [Export] private PackedScene _cardUIScene = null!;
+    [Export] private CardStorage _cardStorage = null!;
 
-    public override async void _Ready()
+    protected override CardType CardType => CardType.CreatureType;
+
+    protected override async Task<CreatureOutline[]> FetchAsync()
     {
-        _httpClient.BaseAddress = new Uri("https://localhost:7085");
-        var creatures = await _httpClient.GetFromJsonAsync<CreatureOutline[]>("Creatures/?orderBy=cost");
+        await _cardStorage.DataReady;
 
-        foreach (var cardOutline in creatures)
-        {
-            AddCardToView(cardOutline);
-        }
+        return _cardStorage.Creatures;
     }
 
-    private void AddCardToView(CreatureOutline outline)
+    protected override CardUI CreateCard(CreatureOutline outline)
     {
-        var card = _cardUIScene.Make<CardUI, CreatureOutline>(outline, _flowContainer);
-#if false
-            card.GuiInput += x =>
-            {
-                if (!x.IsActionPressed(InputActions.SpriteClick)) return;
-    
-                if (_deck.TryGetValue(outline.Id, out var cardDeck))
-                {
-                    cardDeck.SetCount(cardDeck.Count + 1);
-                    IncreaseCounters(cardDeck.Outline);
-                }
-                else
-                {
-                    AddCardToDeck(card.Outline);
-    
-                    IncreaseCounters(outline);
-                }
-            };
-#endif
+        return CardUiScene.Make<CardUI, CreatureOutline>(outline, FlowContainer);
     }
 }

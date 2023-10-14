@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dfrbfskwf8dqo"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_a66jn"]
+load_path = "res://.godot/imported/squish_the_wimpy.png-e91e014698ec1890c262129b4d24a110.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_a66jn")
+region = Rect2(0, 392, 512, 376)

@@ -1,16 +1,11 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Godot;
-using OpenCCG.Cards;
 using OpenCCG.Core;
-using OpenCCG.Net.ServerNodes;
-using Serilog;
 
 namespace OpenCCG;
 
-public partial class CardBoard : Control, INodeInit<CardImplementationDto>
+public partial class CardBoard : Control
 {
+    #if false
     [Export] private AnimationPlayer _anim;
     [Export] private CardStatPanel _atkPanel, _defPanel;
     [Export] private PackedScene _cardPreviewScene;
@@ -248,4 +243,5 @@ public partial class CardBoard : Control, INodeInit<CardImplementationDto>
         var shader = _textureRect.Material as ShaderMaterial;
         shader?.SetShaderParameter("drawOutline", enabled);
     }
+#endif
 }

@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://v1rp4vfxx2sy"]
+
+[ext_resource type="Texture2D" uid="uid://cr27rj5r6l3pp" path="res://img/cards/beren_morne.png" id="1_qpi5x"]
+
+[resource]
+atlas = ExtResource("1_qpi5x")
+region = Rect2(0, 56, 512, 168)

@@ -1,20 +1,10 @@
-using System;
-using System.Threading.Tasks;
-using Celnet.Domain.Interfaces;
-using Celnet.Infrastructure.Protobuf;
 using Godot;
-using Google.Protobuf;
-using OpenCCG.Cards;
-using OpenCCG.Core;
-using OpenCCG.Net;
-using OpenCCG.Net.Messaging;
-using OpenCCG.Proto;
-using Serilog;
 
 namespace OpenCCG;
 
 public partial class Card : TextureRect
 {
+    #if false
     private static bool _canPreview = true;
 
     [Export] private PackedScene _cardPreviewScene = null!;
@@ -169,4 +159,5 @@ public partial class Card : TextureRect
 
         _preview?.DrawOutline(enabled);
     }
+#endif
 }

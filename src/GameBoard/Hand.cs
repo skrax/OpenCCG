@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using OpenCCG.Cards;
-using OpenCCG.Net.Messaging;
 using OpenCCG.Net2;
 
 namespace OpenCCG.GameBoard;
@@ -11,6 +9,7 @@ namespace OpenCCG.GameBoard;
 [GlobalClass]
 public partial class Hand : HBoxContainer
 {
+    #if false
     [Export] private PackedScene _cardScene = null!;
     [Export] private Curve _heightCurve = null!, _rotationCurve = null!, _separationCurve = null!;
     [Export] private AnimationQueue _animationQueue = null!;
@@ -75,4 +74,5 @@ public partial class Hand : HBoxContainer
             c.ZIndex = _cards.Count - index;
         }
     }
+#endif
 }

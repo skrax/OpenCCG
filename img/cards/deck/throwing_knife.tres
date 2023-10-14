@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://kxagbrei78we"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qqawr"]
+load_path = "res://.godot/imported/throwing_knife.png-b895ab244ed7127de9d8eee7299a7f1b.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_qqawr")
+region = Rect2(0, 16, 512, 272)

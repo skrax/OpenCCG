@@ -8,6 +8,8 @@
 script = ExtResource("1_ylqk4")
 _matchmakingService = NodePath("MatchmakingService")
 _sessionManager = NodePath("SessionManager")
+_serverPort = null
+_maxClients = null
 
 [node name="MatchmakingService" type="Node" parent="." node_paths=PackedStringArray("_broker", "_sessionManager")]
 script = ExtResource("2_rr8iu")

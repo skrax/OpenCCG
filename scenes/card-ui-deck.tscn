@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bqafd0nm4ghag"]
 
-[ext_resource type="Texture2D" uid="uid://bkq77ywxx12wb" path="res://img/cards/dragon.png" id="1_h2bf5"]
 [ext_resource type="Script" path="res://src/CardUIDeck.cs" id="1_lujvm"]
+[ext_resource type="Texture2D" uid="uid://b6v2bqq2u2776" path="res://img/cards/deck/ymir_winter_soldier.tres" id="2_jbtna"]
 
 [node name="CardUIDeck" type="ColorRect" node_paths=PackedStringArray("_costLabel", "_countLabel", "_nameLabel", "_image")]
 custom_minimum_size = Vector2(2.08165e-12, 60)
@@ -42,7 +42,7 @@ clip_contents = true
 custom_minimum_size = Vector2(233, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
-texture = ExtResource("1_h2bf5")
+texture = ExtResource("2_jbtna")
 expand_mode = 1
 stretch_mode = 1
 

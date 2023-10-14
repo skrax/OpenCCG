@@ -1,25 +1,51 @@
+using System;
+using System.IO;
 using Godot;
-using OpenCCG.Cards;
 using OpenCCG.Core;
+using OpenCCG.Proto;
+using Serilog;
 
 namespace OpenCCG;
 
-public partial class CardUIDeck : ColorRect, INodeInit<ICardOutline>
+public partial class CardUIDeck : ColorRect, INodeInit<CreatureOutline>, INodeInit<SpellOutline>
 {
-    [Export] private Label _costLabel, _countLabel, _nameLabel;
-    [Export] private TextureRect _image;
+    [Export] private Label _costLabel = null!, _countLabel = null!, _nameLabel = null!;
+    [Export] private TextureRect _image = null!;
 
     public int Count { get; private set; }
-    public ICardOutline Outline { get; private set; }
+    public SpellOutline? SpellOutline { get; private set; }
+    public CreatureOutline? CreatureOutline { get; private set; }
+    public CardType CardType { get; private set; }
 
-    public void Init(ICardOutline dto)
+    public string Id => CardType switch
     {
-        _costLabel.Text = dto.Cost.ToString();
+        CardType.CreatureType => CreatureOutline!.Id,
+        CardType.SpellType => SpellOutline!.Id,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
+    public void Init(CreatureOutline creatureOutline)
+    {
+        _costLabel.Text = creatureOutline.Cost.ToString();
         _countLabel.Text = "1x";
         Count = 1;
-        _nameLabel.Text = dto.Name;
-        _image.Texture = GD.Load<Texture2D>(dto.ImgPath);
-        Outline = dto;
+        _nameLabel.Text = creatureOutline.Name;
+        var fileName = Path.GetFileNameWithoutExtension(creatureOutline.ImgPath);
+        _image.Texture = GD.Load<AtlasTexture>($"res://img/cards/deck/{fileName}.tres");
+        CreatureOutline = creatureOutline;
+        CardType = CardType.CreatureType;
+    }
+
+    public void Init(SpellOutline spellOutline)
+    {
+        _costLabel.Text = spellOutline.Cost.ToString();
+        _countLabel.Text = "1x";
+        Count = 1;
+        _nameLabel.Text = spellOutline.Name;
+        var bla = Path.GetFileNameWithoutExtension(spellOutline.ImgPath);
+        _image.Texture = GD.Load<AtlasTexture>($"res://img/cards/deck/{bla}.tres");
+        SpellOutline = spellOutline;
+        CardType = CardType.SpellType;
     }
 
     public void SetCount(int count)
@@ -27,11 +53,4 @@ public partial class CardUIDeck : ColorRect, INodeInit<ICardOutline>
         Count = count;
         _countLabel.Text = $"{count}x";
     }
-
-    public JsonRecord ToJsonRecord()
-    {
-        return new JsonRecord(Outline.Id, Count);
-    }
-
-    public record JsonRecord(string Id, int Count);
 }

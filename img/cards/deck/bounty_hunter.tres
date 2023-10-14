@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://bj5e856yc5hg0"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_k3cku"]
+load_path = "res://.godot/imported/bounty_hunter.png-75fc9ec58afa1b8267bcbbbb9a7d1807.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_k3cku")
+region = Rect2(0, 48, 512, 176)

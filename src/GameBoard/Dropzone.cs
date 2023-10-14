@@ -4,6 +4,7 @@ namespace OpenCCG.GameBoard;
 
 public partial class Dropzone : Control
 {
+    #if false
     public override void _Ready()
     {
         EventSink.OnDragCardStart += StopMouse;
@@ -37,4 +38,5 @@ public partial class Dropzone : Control
         var card = InstanceFromId(data.As<ulong>()) as Card;
         card!.Play();
     }
+#endif
 }

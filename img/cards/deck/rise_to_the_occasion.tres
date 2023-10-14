@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dfnhsqr2atv3q"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_kau6w"]
+load_path = "res://.godot/imported/rise_to_the_occasion.png-457e967b804df644318618b7b9da6b9d.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_kau6w")
+region = Rect2(0, 376, 512, 336)

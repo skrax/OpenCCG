@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://b5ai26dwlmj6b"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_2llnk"]
+load_path = "res://.godot/imported/orestes_half_blind.png-8005f17369823f90f52a01fb26432d41.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_2llnk")
+region = Rect2(0, 32, 512, 216)

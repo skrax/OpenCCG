@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://d37n5k70adxmb"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_e7p65"]
+load_path = "res://.godot/imported/towering_giant.png-2db46c585392e08852121e53e833c2bc.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_e7p65")
+region = Rect2(0, 64, 512, 264)

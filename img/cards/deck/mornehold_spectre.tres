@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://b1ohc8newrhnv"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_2dao6"]
+load_path = "res://.godot/imported/mornehold_spectre.png-82f163b93e53bebb118729123a88ce33.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_2dao6")
+region = Rect2(0, 152, 512, 168)

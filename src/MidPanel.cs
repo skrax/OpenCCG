@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using Godot;
-using OpenCCG.Net;
-using OpenCCG.Net.Rpc;
 
 namespace OpenCCG;
 
-public partial class MidPanel : Control, IMessageReceiver<MessageType>
+public partial class MidPanel : Control
 {
+    #if false
     [Export] private Button _endTurnButton, _exitButton;
     [Export] private PackedScene _menuScene;
     [Export] private Label _statusLabel;
@@ -54,4 +53,5 @@ public partial class MidPanel : Control, IMessageReceiver<MessageType>
         else
             _endTurnButton.Text = dto.isActive ? "End Turn" : "Enemy Turn";
     }
+#endif
 }

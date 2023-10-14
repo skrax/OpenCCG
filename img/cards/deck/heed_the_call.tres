@@ -1,0 +1,8 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://ceosi8b5wbj38"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pbe0s"]
+load_path = "res://.godot/imported/heed_the_call.png-dc07e89fdc70a48327ecfcfd85558e8f.ctex"
+
+[resource]
+atlas = SubResource("CompressedTexture2D_pbe0s")
+region = Rect2(0, 16, 512, 216)
